@@ -1,0 +1,1 @@
+command -nargs=0 readinglist :execute "!osascript -e 'tell application \"Safari\" to add reading list item \"" + content.location.href + "\"'"

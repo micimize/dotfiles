@@ -118,7 +118,8 @@ if [ $(id -u) -eq 0 ];
                 export PS1="[\[$txtred\]\u\[$txtylw\]@\[$txtrst\]\h] \[$txtgrn\]\W\[$txtrst\]# "
         else
 
-                export PS1="\[$txtcyn\]\D{%m-%d} \A \[$bldcyn\]$sp $ "
+                export PS1="\[$txtcyn\]\D{%m-%d} \A \[$bldcyn\]$sp $ \[$txtwht\]"
+                shopt -s extdebug; trap "tput sgr0" DEBUG
                 export SUDO_PS1="[\[$txtred\]\u\[$txtylw\]@\[$txtrst\]\h] \[$txtgrn\]\W\[$txtrst\]# "
         export LSCOLORS="fxgxcxdxbxegedabagacad"
 fi

@@ -51,7 +51,7 @@ set backspace=indent,eol,start
 set t_Co=256
 
 " color scheme 
-colorscheme elflord
+colorscheme solarized
 set background=dark
 
 hi IndentGuidesOdd  ctermbg=237

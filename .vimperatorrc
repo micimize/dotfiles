@@ -1,1 +1,72 @@
+set hintchars=1234567890
+set gui=nonavigation
 command -nargs=0 readinglist :execute "!osascript -e 'tell application \"Safari\" to add reading list item \"" + content.location.href + "\"'"
+
+" Bulgarian
+noremap я q
+noremap в w
+noremap е e
+noremap р r
+noremap т t
+noremap ъ y
+noremap у u
+noremap и i
+noremap о o
+noremap п p
+
+noremap а a
+noremap с s
+noremap д d
+noremap ф f
+noremap г g
+noremap х h
+noremap й j
+noremap к k
+noremap л l
+
+noremap з z
+noremap ь x
+noremap ц c
+noremap ж v
+noremap б b
+noremap н n
+noremap м m
+
+"noremap ч `
+"noremap ш [
+"noremap щ ]
+"noremap ю \
+
+noremap Я Q
+noremap В W
+noremap Е E
+noremap Р R
+noremap Т T
+noremap Ъ Y
+noremap У U
+noremap И I
+noremap О O
+noremap П P
+
+noremap А A
+noremap С S
+noremap Д D
+noremap Ф F
+noremap Г G
+noremap Х H
+noremap Й J
+noremap К K
+noremap Л L
+
+noremap З Z
+noremap Ь X
+noremap Ц C
+noremap Ж V
+noremap Б B
+noremap Н N
+noremap М M
+
+"noremap Ч ~
+"noremap Ш {
+"noremap Щ }
+"noremap Ю |

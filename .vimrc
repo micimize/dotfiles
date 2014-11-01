@@ -1,68 +1,74 @@
 set shell=/bin/bash
 set path=.,,**
 
-" Use Vim settings, rather then Vi settings (much better!).
-set nocompatible
-
-
 " ************************************************************************
 " P A C K A G E S
 "
-
 filetype off                   " required!
-
 set rtp+=~/.vim/bundle/vundle/
 call vundle#rc()
-
 " let Vundle manage Vundle
 " required! 
 Bundle 'gmarik/vundle'
-Bundle 'jamesinchina/eclim-vundle'
 Bundle 'L9'
 Bundle 'FuzzyFinder'
+Bundle 'scrooloose/nerdcommenter'
+Bundle 'scrooloose/nerdtree'
+Bundle 'jistr/vim-nerdtree-tabs'
+Bundle 'mbbill/undotree'
+Bundle 'jiangmiao/auto-pairs'
 Bundle 'git://github.com/nathanaelkane/vim-indent-guides.git'
 Bundle 'vim-scripts/VimClojure'
-Bundle 'davidhalter/jedi-vim'
+"Bundle 'davidhalter/jedi-vim'
 Bundle 'ervandew/supertab'
+Bundle 'othree/vim-autocomplpop'
+Bundle 'scrooloose/syntastic'
+
+Bundle 'othree/xml.vim'
+Bundle 'sukima/xmledit'
+
 Bundle 'Rip-Rip/clang_complete'
 Bundle 'eraserhd/vim-ios'
 Bundle 'msanders/cocoa.vim'
-Bundle 'othree/vim-autocomplpop'
-Bundle 'scrooloose/syntastic'
 Bundle 'vim-scripts/dbext.vim'
 Bundle 'vim-scripts/Vim-R-plugin'
 Bundle 'christoomey/vim-tmux-navigator'
 Bundle 'vimoutliner/vimoutliner'
 Bundle 'altercation/vim-colors-solarized'
 
+Bundle 'ivanov/vim-ipython'
+
+Bundle 'maksimr/vim-jsbeautify'
+Bundle "Glench/Vim-Jinja2-Syntax" 
+Bundle 'groenewege/vim-less'
+Bundle 'mattn/emmet-vim'
+Bundle "MarcWeber/vim-addon-mw-utils"
+Bundle "tomtom/tlib_vim"
+Bundle "garbas/vim-snipmate"
+Bundle "honza/vim-snippets"
+Bundle "tpope/vim-rails"
+"Bundle "Bogdanp/browser-connect.vim"
+
 filetype plugin indent on     " required!
-
 " ************************************************************************
-set nu
-
-" Turn on the verboseness to see everything vim is doing.
-"set verbose=9
-
 " allow backspacing over everything in insert mode
 set backspace=indent,eol,start
 
 " Indendation, colorscheme, etc
-
-set t_Co=256
-
-" color scheme 
-colorscheme solarized
-set background=dark
-
-hi IndentGuidesOdd  ctermbg=237
-hi IndentGuidesEven ctermbg=234
-
-" do not keep a backup files 
-" set nobackup
-" set nowritebackup
+    set t_Co=256
+    colorscheme solarized
+    set background=dark
+    hi IndentGuidesOdd  ctermbg=237
+    hi IndentGuidesEven ctermbg=234
+    "visible whitespace
+    set list
+    set listchars=tab:>.
+" Set status line
+set statusline=[%02n]\ %f\ %(\[%M%R%H]%)%=\ %4l,%02c%2V\ %P%*
 
 " use the mouse whenever, wherever
 set mouse=a
+setlocal foldmethod=indent
 
 if has('gui_running')
     " i like about 80 character width lines
@@ -79,33 +85,18 @@ if has('gui_running')
     let html_use_css=1
 endif
 
-" keep 100 lines of command line history, cause why not?
-set history=100  
-
-" show the cursor position all the time
+"numbered lines
+set nu
+"show cursor, partial commands, incremental search
 set ruler       
-
-" show (partial) commands
 set showcmd     
-
-" do incremental searches (annoying but handy);
 set incsearch 
-
-" Show  tab characters. Visual Whitespace.
-set list
-set listchars=tab:>.
-
-" Set ignorecase on
 set ignorecase
+set history=10000
 
 " smart search (override 'ic' when pattern has uppers)
 set scs
 
-" Set 'g' substitute flag on
-" set gdefault
-
-" Set status line
-set statusline=[%02n]\ %f\ %(\[%M%R%H]%)%=\ %4l,%02c%2V\ %P%*
 
 " Always display a status line at the bottom of the window
 set laststatus=2
@@ -206,26 +197,34 @@ endfunc
 nmap yp :call YankPage() <Enter>
 map <c-a> ggVG
 
-func! NoCodeMode()
-	setlocal noexpandtab
-	setlocal paste
-	setlocal noautoindent
-endfu
+"func! WordProcessorMode() 
+  "setlocal formatoptions=1 
+  "setlocal noexpandtab 
+  "map j gj 
+  "map k gk
+  "setlocal spell spelllang=en_us 
+  "set thesaurus+=/Users/mjr/.vim/thesaurus/mthesaur.txt
+  "set complete+=s
+  "set formatprg=par
+  "setlocal wrap 
+  "setlocal linebreak 
+"endfu 
+"com! WP call WordProcessorMode()
 
-func! WordProcessorMode() 
-  setlocal formatoptions=1 
-  setlocal noexpandtab 
-  map j gj 
-  map k gk
-  setlocal spell spelllang=en_us 
-  set thesaurus+=/Users/mjr/.vim/thesaurus/mthesaur.txt
-  set complete+=s
-  set formatprg=par
-  setlocal wrap 
-  setlocal linebreak 
-endfu 
-com! WP call WordProcessorMode()
+"func! NoCodeMode()
+	"setlocal noexpandtab
+	"setlocal paste
+	"setlocal noautoindent
+"endfu
+"com! NCM call NoCodeMode()
 
+setlocal tabstop=4
+setlocal shiftwidth=4
+setlocal softtabstop=4
+setlocal expandtab
+setlocal autoindent
+setlocal foldmethod=indent
+setlocal nopaste
 func! CodeMode()
 	setlocal tabstop=4
 	setlocal shiftwidth=4
@@ -235,7 +234,15 @@ func! CodeMode()
 	setlocal foldmethod=indent
 	setlocal nopaste
 endfu
+com! CM call CodeMode()
 call CodeMode()
+
+func! ReportFromTODO()
+	g/	\[_\].*/d
+	%s/^\[.\].*% //g
+	%s/\[X\]/*/g
+endfunc!
+
 
 " ************************************************************************
 " B E G I N  A U T O C O M M A N D S
@@ -270,6 +277,15 @@ if has("autocmd")
     " It uses the functions above to replace the time stamp and restores cursor 
     " position afterwards (this is from the FAQ) 
     autocmd BufWritePre,FileWritePre *   ks|call UpdateTimeStamp()|'s
+
+    autocmd FileType javascript noremap <buffer>  <c-f> :call JsBeautify()<cr>
+    autocmd FileType html noremap <buffer> <c-f> :call HtmlBeautify()<cr>
+    autocmd FileType css noremap <buffer> <c-f> :call CSSBeautify()<cr>
+    "autocmd FileType less noremap <buffer> <c-f> :call CSSBeautify()<cr>
+    autocmd FileType less nnoremap <Leader>m :w <BAR> !lessc % > /Users/mjr/Documents/code/datafly/iep/www/static/compiled/%:t:r.css<CR><space>
+
+    "autocmd FileType python source /Users/mjr/.vim/bundle/vim-ipython/ftplugin/python/ipy.vim
+    "autocmd FileType python IPython
 
 endif " has("autocmd")
 
@@ -357,10 +373,7 @@ endif
 
 " PostgreSQL
 let g:dbext_default_profile_pgsql_local = 'type=PGSQL:user=mjr:passwd=:dbname=analysis'
-let g:dbext_default_profile_pgsql_dwh = 'type=PGSQL:user=bbuser_dwh:passwd=bbuser_dwh:dbname=bbdwh:host=10.240.0.231:port=5434'
-let g:dbext_default_profile_pgsql_dwh_stg = 'type=PGSQL:user=bbuser_dwh:passwd=bbuser_dwh:dbname=bbdwh:host=10.240.0.230:port=5444'
-let g:dbext_default_profile_pgsql_bbcur = 'type=PGSQL:user=bbuser_cur:passwd=bbuser_cur:dbname=bbcur:host=10.240.0.230:port=5433'
-let g:dbext_default_profile_pgsql_bbmerchant = 'type=PGSQL:user=bbuser_merchant:passwd=bbuser_merchant:dbname=bbmerchant:host=10.240.0.230:port=5433'
+let g:dbext_default_profile_pgsql_sanfran = 'type=PGSQL:user=mjr:passwd=:dbname=sanfran'
 let g:dbext_default_buffer_lines = 20
 let g:dbext_default_use_sep_result_buffer = 1 
 
@@ -408,3 +421,71 @@ let maplocalleader = ";"
 " Press the space bar to send lines (in Normal mode) and selections to R:
 vmap <Space> <Plug>RDSendSelection
 nmap <Space> <Plug>RDSendLine
+
+"autocmd StdinReadPre * let s:std_in=1
+"autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | <Plug>NERDTreeTabsToggle | endif
+map <Leader>n <plug>NERDTreeTabsToggle<CR>
+com! UT call UndotreeToggle()
+
+" Bulgarian
+	noremap я q
+	noremap в w
+	noremap е e
+	noremap р r
+	noremap т t
+	noremap ъ y
+	noremap у u
+	noremap и i
+	noremap о o
+	noremap п p
+	noremap а a
+	noremap с s
+	noremap д d
+	noremap ф f
+	noremap г g
+	noremap х h
+	noremap й j
+	noremap к k
+	noremap л l
+	noremap з z
+	noremap ь x
+	noremap ц c
+	noremap ж v
+	noremap б b
+	noremap н n
+	noremap м m
+	noremap ч `
+	noremap ш [
+	noremap щ ]
+	noremap ю \
+	noremap Я Q
+	noremap В W
+	noremap Е E
+	noremap Р R
+	noremap Т T
+	noremap Ъ Y
+	noremap У U
+	noremap И I
+	noremap О O
+	noremap П P
+	noremap А A
+	noremap С S
+	noremap Д D
+	noremap Ф F
+	noremap Г G
+	noremap Х H
+	noremap Й J
+	noremap К K
+	noremap Л L
+	noremap З Z
+	noremap Ь X
+	noremap Ц C
+	noremap Ж V
+	noremap Б B
+	noremap Н N
+	noremap М M
+	"noremap Ч ~
+	"noremap Ш {
+	"noremap Щ }
+	"noremap Ю |
+"

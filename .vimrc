@@ -9,45 +9,54 @@ set rtp+=~/.vim/bundle/vundle/
 call vundle#rc()
 " let Vundle manage Vundle
 " required! 
+
+" queued for deletion: 11-15-2014
+    "Bundle 'MarcWeber/vim-addon-mw-utils'
+    "Bundle 'tomtom/tlib_vim'
+    "Bundle 'tpope/vim-rails'
+    "Bundle 'Bogdanp/browser-connect.vim'
+    "Bundle 'git://github.com/nathanaelkane/vim-indent-guides.git'
+    "Bundle 'davidhalter/jedi-vim'
+    "Bundle 'othree/vim-autocomplpop'
+    "Bundle 'FuzzyFinder'
+    "Bundle 'othree/xml.vim'
+    "Bundle 'sukima/xmledit'
+    "Bundle 'Rip-Rip/clang_complete'
+    "Bundle 'eraserhd/vim-ios'
+    "Bundle 'msanders/cocoa.vim'
+    "Bundle 'vim-scripts/Vim-R-plugin'
+    "Bundle 'christoomey/vim-tmux-navigator'
+    "Bundle 'jiangmiao/auto-pairs'
+
+" never used, but seem useful:
+    "Bundle 'mattn/emmet-vim'
+    "Bundle 'garbas/vim-snipmate'
+    "Bundle 'honza/vim-snippets'
+" useful in the past:
+    "Bundle 'ivanov/vim-ipython'
+    "Bundle 'vim-scripts/dbext.vim'
+    "Bundle 'vimoutliner/vimoutliner'
+
 Bundle 'gmarik/vundle'
 Bundle 'L9'
-Bundle 'FuzzyFinder'
-Bundle 'scrooloose/nerdcommenter'
+
 Bundle 'scrooloose/nerdtree'
 Bundle 'jistr/vim-nerdtree-tabs'
 Bundle 'mbbill/undotree'
-Bundle 'jiangmiao/auto-pairs'
-Bundle 'git://github.com/nathanaelkane/vim-indent-guides.git'
-Bundle 'vim-scripts/VimClojure'
-"Bundle 'davidhalter/jedi-vim'
+Bundle 'scrooloose/nerdcommenter'
+Bundle 'kien/ctrlp.vim' 
+
 Bundle 'ervandew/supertab'
-Bundle 'othree/vim-autocomplpop'
 Bundle 'scrooloose/syntastic'
 
-Bundle 'othree/xml.vim'
-Bundle 'sukima/xmledit'
-
-Bundle 'Rip-Rip/clang_complete'
-Bundle 'eraserhd/vim-ios'
-Bundle 'msanders/cocoa.vim'
-Bundle 'vim-scripts/dbext.vim'
-Bundle 'vim-scripts/Vim-R-plugin'
-Bundle 'christoomey/vim-tmux-navigator'
-Bundle 'vimoutliner/vimoutliner'
 Bundle 'altercation/vim-colors-solarized'
 
-Bundle 'ivanov/vim-ipython'
+
+Bundle "guns/vim-clojure-static"
 
 Bundle 'maksimr/vim-jsbeautify'
 Bundle "Glench/Vim-Jinja2-Syntax" 
 Bundle 'groenewege/vim-less'
-Bundle 'mattn/emmet-vim'
-Bundle "MarcWeber/vim-addon-mw-utils"
-Bundle "tomtom/tlib_vim"
-Bundle "garbas/vim-snipmate"
-Bundle "honza/vim-snippets"
-Bundle "tpope/vim-rails"
-"Bundle "Bogdanp/browser-connect.vim"
 
 filetype plugin indent on     " required!
 " ************************************************************************
@@ -66,56 +75,18 @@ set backspace=indent,eol,start
 " Set status line
 set statusline=[%02n]\ %f\ %(\[%M%R%H]%)%=\ %4l,%02c%2V\ %P%*
 
-" use the mouse whenever, wherever
-set mouse=a
-setlocal foldmethod=indent
+
+set mouse=a " use the mouse whenever, wherever
+set foldmethod=indent
 
 if has('gui_running')
-    " i like about 80 character width lines
-    set textwidth=78
-    " Set 52 lines for the display
+    set textwidth=78 "78 character width lines
     set lines=52
-    " 2 for the status line.
-    set cmdheight=2
-    " add columns for the Project plugin
-    set columns=110
-    " enable use of mouse
-    set mouse=a
-    " for the TOhtml command
-    let html_use_css=1
+    set cmdheight=2 " 2 for the status line.
+    set columns=110 " add columns for the Project plugin
+    set mouse=a " enable use of mouse
+    let html_use_css=1 " for the TOhtml command
 endif
-
-"numbered lines
-set nu
-"show cursor, partial commands, incremental search
-set ruler       
-set showcmd     
-set incsearch 
-set ignorecase
-set history=10000
-
-" smart search (override 'ic' when pattern has uppers)
-set scs
-
-
-" Always display a status line at the bottom of the window
-set laststatus=2
-
-" Set vim to use 'short messages'.
-" set shortmess=a
-
-" showmatch: Show the matching bracket for the last ')'?
-set showmatch
-
-" allow tilde (~) to act as an operator -- ~w, etc.
-set notildeop
-
-" Commands for :Explore
-let g:explVertical=1    " open vertical split winow
-let g:explSplitRight=1  " Put new window to the right of the explorer
-let g:explStartRight=0  " new windows go to right of explorer window
-
-
 if has("gui")
     " set the gui options to:
     "   g: grey inactive menu items
@@ -127,16 +98,28 @@ if has("gui")
     set go=gmr
     set guifont=Courier
 endif
+if &t_Co > 2 || has("gui_running")
+    syntax on     " Switch syntax highlighting on, when the terminal has colors
+    set hlsearch  " Also switch on highlighting the last used search pattern. 
+endi
+
 
 set scrolloff=5
+set nu               "numbered lines
+set ruler            "show cursor
+set showcmd          "partial commands
+set incsearch        "incremental search 
+set ignorecase
+set history=10000
+set scs              " smart search (override 'ic' when pattern has uppers)
+set laststatus=2     " Always display a status line at the bottom of the window
+set showmatch        " showmatch: Show the matching bracket for the last ')'
+set notildeop        " allow tilde (~) to act as an operator -- ~w, etc.
 
-" Switch syntax highlighting on, when the terminal has colors
-" Also switch on highlighting the last used search pattern.
-if &t_Co > 2 || has("gui_running")
-    syntax on
-    set hlsearch
-endif
-
+" Commands for :Explore
+let g:explVertical=1    " open vertical split winow
+let g:explSplitRight=1  " Put new window to the right of the explorer
+let g:explStartRight=0  " new windows go to right of explorer window
 
 
 " ************************************************************************
@@ -167,8 +150,6 @@ map <c-n> gt
 map <c-p> gT
 nmap <Enter> o<Esc>
 
-
-
 " pressing < or > will let you indent/unident selected lines
 vnoremap < <gv
 vnoremap > >gv
@@ -197,11 +178,11 @@ endfunc
 nmap yp :call YankPage() <Enter>
 map <c-a> ggVG
 
+map j gj 
+map k gk
 "func! WordProcessorMode() 
   "setlocal formatoptions=1 
   "setlocal noexpandtab 
-  "map j gj 
-  "map k gk
   "setlocal spell spelllang=en_us 
   "set thesaurus+=/Users/mjr/.vim/thesaurus/mthesaur.txt
   "set complete+=s
@@ -217,31 +198,23 @@ map <c-a> ggVG
 	"setlocal noautoindent
 "endfu
 "com! NCM call NoCodeMode()
+"func! ReportFromTODO()
+	"g/	\[_\].*/d
+	"%s/^\[.\].*% //g
+	"%s/\[X\]/*/g
+"endfunc!
 
-setlocal tabstop=4
-setlocal shiftwidth=4
-setlocal softtabstop=4
-setlocal expandtab
-setlocal autoindent
-setlocal foldmethod=indent
-setlocal nopaste
 func! CodeMode()
-	setlocal tabstop=4
-	setlocal shiftwidth=4
-	setlocal softtabstop=4
-	setlocal expandtab
-	setlocal autoindent
-	setlocal foldmethod=indent
-	setlocal nopaste
+	set tabstop=4
+	set shiftwidth=4
+	set softtabstop=4
+	set expandtab
+	set autoindent
+	set foldmethod=indent
+	set nopaste
 endfu
 com! CM call CodeMode()
 call CodeMode()
-
-func! ReportFromTODO()
-	g/	\[_\].*/d
-	%s/^\[.\].*% //g
-	%s/\[X\]/*/g
-endfunc!
 
 
 " ************************************************************************
@@ -272,155 +245,22 @@ if has("autocmd")
     set showmatch 
     map <F5> <Esc>:!clj '%:p'<CR>
 
-
-    " add an autocommand to update an existing time stamp when writing the file 
-    " It uses the functions above to replace the time stamp and restores cursor 
-    " position afterwards (this is from the FAQ) 
-    autocmd BufWritePre,FileWritePre *   ks|call UpdateTimeStamp()|'s
-
     autocmd FileType javascript noremap <buffer>  <c-f> :call JsBeautify()<cr>
     autocmd FileType html noremap <buffer> <c-f> :call HtmlBeautify()<cr>
     autocmd FileType css noremap <buffer> <c-f> :call CSSBeautify()<cr>
-    "autocmd FileType less noremap <buffer> <c-f> :call CSSBeautify()<cr>
-    autocmd FileType less nnoremap <Leader>m :w <BAR> !lessc % > /Users/mjr/Documents/code/datafly/iep/www/static/compiled/%:t:r.css<CR><space>
-
-    "autocmd FileType python source /Users/mjr/.vim/bundle/vim-ipython/ftplugin/python/ipy.vim
-    "autocmd FileType python IPython
 
 endif " has("autocmd")
-
-" GUI ONLY type stuff.
-if has("gui")
-:menu &MyVim.Current\ File.Convert\ Format.To\ Dos :set fileformat=dos<cr> :w<cr>
-:menu &MyVim.Current\ File.Convert\ Format.To\ Unix :set fileformat=unix<cr> :w<cr>
-:menu &MyVim.Current\ File.Remove\ Trailing\ Spaces\ and\ Tabs :%s/[	]*$//g<cr>
-:menu &MyVim.Current\ File.Remove\ Ctrl-M :%s/^M//g<cr>
-:menu &MyVim.Current\ File.Remove\ All\ Tabs :retab<cr>
-:menu &MyVim.Current\ File.To\ HTML :runtime! syntax/2html.vim<cr>
-" these don't work for some reason
-":amenu &MyVim.Insert.Date<Tab>,date <Esc><Esc>:,date<Cr>
-":amenu &MyVim.Insert.Date\ &Time<Tab>,datetime <Esc><Esc>:let @z=YDATETIME<Cr>"zpa
-:amenu &MyVim.Insert.Last\ &Modified<Tab>,L <Esc><Esc>:let @z=TimeStamp()<CR>"zpa
-:amenu &MyVim.-SEP1- <nul>
-:amenu &MyVim.&Global\ Settings.Toggle\ Display\ Unprintables<Tab>:set\ list!	:set list!<CR>
-:amenu &MyVim.-SEP2- <nul>
-:amenu &MyVim.&Project :Project<CR>
-
-" hide the mouse when characters are typed
 set mousehide
-endif
+
 
 " ************************************************************************
 " A B B R E V I A T I O N S 
 "
-abbr #b /************************************************************************
-abbr #e  ************************************************************************/
-
-abbr hosts C:\WINNT\system32\drivers\etc\hosts
-
-" abbreviation to manually enter a timestamp. Just type YTS in insert mode 
-iab YTS <C-R>=TimeStamp()<CR>
-
-" Date/Time stamps
-" %a - Day of the week
-" %b - Month
-" %d - Day of the month
-" %Y - Year
-" %H - Hour
-" %M - Minute
-" %S - Seconds
-" %Z - Time Zone
-iab YDATETIME <c-r>=strftime(": %a %b %d, %Y %H:%M:%S %Z")<cr>
+"abbr #b /************************************************************************
+"abbr #e  ************************************************************************/
 
 
-" ************************************************************************
-"  F U N C T I O N S
-"
-
-" copy paste
-" set paste
 set clipboard=unnamed
-
-"vnoremap <silent> <leader>y :call Putclip(visualmode(), 1)<CR>
-"nnoremap <silent> <leader>y :call Putclip('n', 1)<CR>
-
-
-" first add a function that returns a time stamp in the desired format 
-if !exists("*TimeStamp")
-    fun TimeStamp()
-        return "Last-modified: " . strftime("%d %b %Y %X")
-    endfun
-endif
-
-" searches the first ten lines for the timestamp and updates using the
-" TimeStamp function
-if !exists("*UpdateTimeStamp")
-    function! UpdateTimeStamp() 
-        " Do the updation only if the current buffer is modified 
-        if &modified == 1 
-            " go to the first line
-            exec "1" 
-            " Search for Last modified: 
-            let modified_line_no = search("Last-modified:") 
-            if modified_line_no != 0 && modified_line_no < 10 
-                " There is a match in first 10 lines 
-                " Go to the : in modified: 
-                exe "s/Last-modified: .*/" . TimeStamp()
-            endif
-        endif
-    endfunction
-endif
-
-" PostgreSQL
-let g:dbext_default_profile_pgsql_local = 'type=PGSQL:user=mjr:passwd=:dbname=analysis'
-let g:dbext_default_profile_pgsql_sanfran = 'type=PGSQL:user=mjr:passwd=:dbname=sanfran'
-let g:dbext_default_buffer_lines = 20
-let g:dbext_default_use_sep_result_buffer = 1 
-
-"Obj C and iOS dev
-let g:clang_library_path = '/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib'
-let g:clang_hl_errors = 1
-let g:clang_auto_select = 1
-inoremap <C-;> <c-x><c-u>
-
-
-map <leader>f :CommandTFlush<CR>\|:CommandT<CR>
-map <leader>xt :call RunKiwiSpecs()<CR>
-
-func! RunKiwiSpecs()
-    call RunBuildCommand("xcodebuild -target VimxCodeSpecs -arch x86_64 -configuration Debug")
-endfunc
-
-func! RunBuildCommand(cmd)
-    echo "Building..."
-    exec "silent !" . a:cmd . " >build/vim.log 2>&1"
-    silent !grep -q '^\*\* BUILD FAILED' build/vim.log
-    redraw!
-    if !v:shell_error
-        set errorformat=
-            \%f:%l:%c:{%*[^}]}:\ error:\ %m,
-            \%f:%l:%c:{%*[^}]}:\ fatal error:\ %m,
-            \%f:%l:%c:{%*[^}]}:\ warning:\ %m,
-            \%f:%l:%c:\ error:\ %m,
-            \%f:%l:%c:\ fatal error:\ %m,
-            \%f:%l:%c:\ warning:\ %m,
-            \%f:%l:\ error:\ %m,
-            \%f:%l:\ fatal error:\ %m,
-            \%f:%l:\ warning:\ %m
-        cfile! build/vim.log
-    else
-        echo "Building... Ok"
-    endif
-endfunc 
-
-
-" Lines added by the Vim-R-plugin command :RpluginConfig (2014-Jan-31 18:07):
-filetype plugin on
-" Change the <LocalLeader> key:
-let maplocalleader = ";"
-" Press the space bar to send lines (in Normal mode) and selections to R:
-vmap <Space> <Plug>RDSendSelection
-nmap <Space> <Plug>RDSendLine
 
 "autocmd StdinReadPre * let s:std_in=1
 "autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | <Plug>NERDTreeTabsToggle | endif

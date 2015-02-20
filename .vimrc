@@ -14,7 +14,6 @@ call vundle#rc()
     "Bundle 'MarcWeber/vim-addon-mw-utils'
     "Bundle 'tomtom/tlib_vim'
     "Bundle 'tpope/vim-rails'
-    "Bundle 'Bogdanp/browser-connect.vim'
     "Bundle 'git://github.com/nathanaelkane/vim-indent-guides.git'
     "Bundle 'davidhalter/jedi-vim'
     "Bundle 'othree/vim-autocomplpop'
@@ -34,7 +33,6 @@ call vundle#rc()
     "Bundle 'honza/vim-snippets'
 " useful in the past:
     "Bundle 'ivanov/vim-ipython'
-    "Bundle 'vim-scripts/dbext.vim'
     "Bundle 'vimoutliner/vimoutliner'
 
 Bundle 'gmarik/vundle'
@@ -46,17 +44,30 @@ Bundle 'mbbill/undotree'
 Bundle 'scrooloose/nerdcommenter'
 Bundle 'kien/ctrlp.vim' 
 
+Bundle 'vim-scripts/dbext.vim'
+
 Bundle 'ervandew/supertab'
 Bundle 'scrooloose/syntastic'
 
 Bundle 'altercation/vim-colors-solarized'
 
+Bundle 'godlygeek/tabular'
+Bundle 'plasticboy/vim-markdown'
 
-Bundle "guns/vim-clojure-static"
+Bundle 'guns/vim-clojure-static'
+Bundle 'tpope/vim-fireplace'
+Bundle 'vim-scripts/paredit.vim'
+Bundle 'kien/rainbow_parentheses.vim'
 
 Bundle 'maksimr/vim-jsbeautify'
-Bundle "Glench/Vim-Jinja2-Syntax" 
+Bundle 'Glench/Vim-Jinja2-Syntax'
 Bundle 'groenewege/vim-less'
+
+Bundle "pangloss/vim-javascript"
+Bundle 'mxw/vim-jsx'
+Bundle 'jordwalke/JSXVimHint'
+Bundle 'tpope/vim-fugitive'
+
 
 filetype plugin indent on     " required!
 " ************************************************************************
@@ -72,9 +83,9 @@ set backspace=indent,eol,start
     "visible whitespace
     set list
     set listchars=tab:>.
+    set nolist wrap linebreak breakat&vim    
 " Set status line
-set statusline=[%02n]\ %f\ %(\[%M%R%H]%)%=\ %4l,%02c%2V\ %P%*
-
+set statusline=[%02n]\ %f\ %{fugitive#statusline()}\ %(\[%M%R%H]%)%=\ %4l,%02c%2V\ %P%*
 
 set mouse=a " use the mouse whenever, wherever
 set foldmethod=indent
@@ -102,7 +113,30 @@ if &t_Co > 2 || has("gui_running")
     syntax on     " Switch syntax highlighting on, when the terminal has colors
     set hlsearch  " Also switch on highlighting the last used search pattern. 
 endi
+let g:rbpt_colorpairs = [
+    \ ['brown',       'RoyalBlue3'],
+    \ ['Darkblue',    'SeaGreen3'],
+    \ ['darkgreen',   'firebrick3'],
+    \ ['darkcyan',    'RoyalBlue3'],
+    \ ['darkred',     'SeaGreen3'],
+    \ ['darkmagenta', 'DarkOrchid3'],
+    \ ['brown',       'firebrick3'],
+    \ ['gray',        'RoyalBlue3'],
+    \ ['black',       'SeaGreen3'],
+    \ ['darkmagenta', 'DarkOrchid3'],
+    \ ['Darkblue',    'firebrick3'],
+    \ ['darkgreen',   'RoyalBlue3'],
+    \ ['darkcyan',    'SeaGreen3'],
+    \ ['darkred',     'DarkOrchid3'],
+    \ ['red',         'firebrick3'],
+    \ ]
 
+let g:rbpt_max = 15
+let g:rbpt_loadcmd_toggle = 0
+au VimEnter * RainbowParenthesesToggle
+au Syntax * RainbowParenthesesLoadRound
+au Syntax * RainbowParenthesesLoadSquare
+au Syntax * RainbowParenthesesLoadBraces
 
 set scrolloff=5
 set nu               "numbered lines
@@ -115,6 +149,7 @@ set scs              " smart search (override 'ic' when pattern has uppers)
 set laststatus=2     " Always display a status line at the bottom of the window
 set showmatch        " showmatch: Show the matching bracket for the last ')'
 set notildeop        " allow tilde (~) to act as an operator -- ~w, etc.
+syntax on
 
 " Commands for :Explore
 let g:explVertical=1    " open vertical split winow
@@ -135,10 +170,13 @@ command! CD cd %:p:h
 map <Leader>e :Explore<cr>
 map <Leader>s :Sexplore<cr> 
 
+let g:ctrlp_map = '<c-s>'
+"let g:ctrlp_cmd = 'CtrlS'
 
 " ************************************************************************
 " CouchDan keybindings
 " ************************************************************************
+"
 "pane movement
 noremap <c-h> <c-w>h
 noremap <c-j> <c-w>j
@@ -169,6 +207,13 @@ map ,L    :let @z=TimeStamp()<Cr>"zpa
 map ,datetime :let @z=strftime("%d %b %Y %X")<Cr>"zpa
 map ,date :let @z=strftime("%d %b %Y")<Cr>"zpa
 
+" first add a function that returns a time stamp in the desired format 
+if !exists("*TimeStamp")
+    fun TimeStamp()
+        return strftime("%d %b %Y %X")
+    endfun
+endif
+
 
 func! YankPage()
 	let linenumber = line(".")
@@ -178,8 +223,9 @@ endfunc
 nmap yp :call YankPage() <Enter>
 map <c-a> ggVG
 
-map j gj 
-map k gk
+
+"map j gj 
+"map k gk
 "func! WordProcessorMode() 
   "setlocal formatoptions=1 
   "setlocal noexpandtab 
@@ -217,6 +263,7 @@ com! CM call CodeMode()
 call CodeMode()
 
 
+let g:dbext_default_profile_pgsql_local = 'type=PGSQL:user=mjr:passwd=:dbname=type_flashcards'
 " ************************************************************************
 " B E G I N  A U T O C O M M A N D S
 "
@@ -249,21 +296,42 @@ if has("autocmd")
     autocmd FileType html noremap <buffer> <c-f> :call HtmlBeautify()<cr>
     autocmd FileType css noremap <buffer> <c-f> :call CSSBeautify()<cr>
 
+    autocmd FileType clojure noremap <buffer> <enter> :Eval<cr>
+    autocmd FileType clojurescript noremap <buffer> <enter> :Eval<cr>
+
 endif " has("autocmd")
 set mousehide
-
+let g:jsCommand='node'
+let $JS_CMD='node'
+let g:syntastic_javascript_checkers = ['jsxhint']
+let g:syntastic_javascript_jsxhint_exec = 'jsx-jshint-wrapper'
 
 " ************************************************************************
 " A B B R E V I A T I O N S 
 "
-"abbr #b /************************************************************************
 "abbr #e  ************************************************************************/
+" abbreviation to manually enter a timestamp. Just type YTS in insert mode
+iab YTS <C-R>=TimeStamp()<CR>
+"iab #-># #########################################################################
+
+" Date/Time stamps
+" %a - Day of the week
+" %b - Month
+" %d - Day of the month
+" %Y - Year
+" %H - Hour
+" %M - Minute
+" %S - Seconds
+" %Z - Time Zone
+iab YDATETIME <c-r>=strftime(": %a %b %d, %Y %H:%M:%S %Z")<cr>
+
 
 
 set clipboard=unnamed
 
-"autocmd StdinReadPre * let s:std_in=1
+autocmd StdinReadPre * let s:std_in=1
 "autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | <Plug>NERDTreeTabsToggle | endif
+
 map <Leader>n <plug>NERDTreeTabsToggle<CR>
 com! UT call UndotreeToggle()
 
@@ -328,4 +396,6 @@ com! UT call UndotreeToggle()
 	"noremap Ш {
 	"noremap Щ }
 	"noremap Ю |
+"
+"
 "

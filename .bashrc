@@ -198,7 +198,6 @@ ex () {
 #     mjr customizations
 ###############################
 alias ":q"="exit"
-alias wchat=weechat-curses
 alias s="ls | GREP_COLOR='1;34' grep --color '.*@'"
 alias l="ls"
 
@@ -245,6 +244,11 @@ function i {
     map singleton-inspect "$@"
 }
 
+#append empty records to a file
+function flesh_out {
+    awk -F "$2" '(NR == 1){fieldcount=NF}; (NR > 1){for (i = 1; i <= (fieldcount - NF); i++) $0=$0$FS}; {print $0}' testin.tsv | awk -F "\t" '{print NF}' $1
+}
+
 function archive {
     for item in "$@"
     do
@@ -261,10 +265,10 @@ function up {
 function note {
     dir=`pwd`
     cd ~/Documents/notes
-    vim -p -c "WP" -c "setlocal nospell" "$@" 
+    vim -p "$@" 
     cd $dir
 }
-alias notes='vim -c "WP" -c "setlocal nospell" ~/Documents/notes'
+alias notes='vim ~/Documents/notes'
 
 alias elasticsearch-f='/Applications/elasticsearch-0.90.7/bin/elasticsearch -f'
 
@@ -348,3 +352,31 @@ export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
 
 # for vim-ipython
 stty stop undef # to unmap ctrl-s
+
+function lolping {
+    psum=0.0
+    count=0
+    while read ping
+    do
+        ptime=$(echo $ping | sed -e 's/^.*time=\(.*\) ms/\1/'  -e 'tx' -e 'd' -e ':x')
+        if [ -n "$ptime" ]; then
+            psum=$(echo "scale = 3; $psum + $ptime" | bc)
+            ((count++))
+            echo time=$ptime avg=$(bc <<< "scale = 3; $psum / $count")
+        fi
+    done < <(ping 216.52.241.254)
+}
+function nametab {
+    export PROMPT_COMMAND="echo -ne '\033]0;$@\007'"
+}
+alias nt=nametab
+function gamechanger {
+    nt gamechanger/${1:-"code"}
+    alias pushmaster="git push origin master:master"
+    alias pushwhai="git push whai feature:master"
+}
+function drawbridge {
+    nt drawbridge/${1:-"code"}
+    alias pushmaster="git push origin master:master"
+    alias pushkatie="git push katie feature:master"
+}

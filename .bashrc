@@ -370,13 +370,18 @@ function nametab {
     export PROMPT_COMMAND="echo -ne '\033]0;$@\007'"
 }
 alias nt=nametab
-function gamechanger {
-    nt gamechanger/${1:-"code"}
+function double-git {
+    nt $1"/code"
+    second=$2
     alias pushmaster="git push origin master:master"
-    alias pushwhai="git push whai feature:master"
+    alias push$second="git push $second feature:master"
 }
-function drawbridge {
-    nt drawbridge/${1:-"code"}
+function cw {
+    nt cw/${1:-"code"}
     alias pushmaster="git push origin master:master"
     alias pushkatie="git push katie feature:master"
+}
+
+function git-vimerge {
+    vim -p $(git --no-pager diff --name-status --diff-filter=U | awk 'BEGIN {x=""} {x=x" "$2;} END {print x}')
 }

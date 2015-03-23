@@ -64,6 +64,7 @@ Bundle 'Glench/Vim-Jinja2-Syntax'
 Bundle 'groenewege/vim-less'
 
 Bundle "pangloss/vim-javascript"
+Bundle 'elzr/vim-json'
 Bundle 'mxw/vim-jsx'
 Bundle 'jordwalke/JSXVimHint'
 Bundle 'tpope/vim-fugitive'
@@ -286,7 +287,6 @@ if has("autocmd")
     " Normally don't automatically format 'text' as it is typed, only do this
     " with comments, at 79 characters.
     autocmd BufNewFile,BufEnter *.c,*.h,*.java,*.jsp set formatoptions-=t tw=79
-    autocmd BufNewFile,BufRead *.json set ft=javascript
     "autocmd BufNewFile,BufRead *.txt,*.xls,*.csv,*.tsv call NoCodeMode()
     
     set showmatch 
@@ -326,7 +326,7 @@ iab YTS <C-R>=TimeStamp()<CR>
 iab YDATETIME <c-r>=strftime(": %a %b %d, %Y %H:%M:%S %Z")<cr>
 
 
-
+set diffopt+=vertical
 set clipboard=unnamed
 
 autocmd StdinReadPre * let s:std_in=1

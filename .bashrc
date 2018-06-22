@@ -2,6 +2,10 @@ if [[ $- != *i* ]] ; then
          # Shell is non-interactive.  Be done now!
          return
 fi
+
+#USER config
+export USER_SHORTPATH=true
+
  
 #enable bash completion
 [ -f /etc/profile.d/bash-completion ] && source /etc/profile.d/bash-completion
@@ -9,13 +13,14 @@ fi
 # make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(lesspipe)"
  
+
+
 # Shell variables
 export PAGER=less
 export EDITOR=vim
-export GOPATH="$HOME/go"
-PLAN9=$HOME/plan9port export PLAN9
-export PATH=$PATH:$GOPATH/bin:$HOME/bin:$HOME/node_modules/.bin:$PLAN9/bin:/usr/local/sbin:/usr/local/Cellar/ruby/2.1.1_1/bin
-export CLOJURESCRIPT_HOME=$HOME/code/clojure/clojurescript
+export GOPATH=$HOME/golang
+export GOROOT=/usr/local/opt/go/libexec
+export PATH=$PATH:$HOME/bin:$HOME/node_modules/.bin:/usr/local/sbin:$GOPATH/bin:$GOROOT/bin
 export LESS='-R'
 export HISTCONTROL=ignoredups
 export HISTSIZE=5000
@@ -37,12 +42,12 @@ shopt -s cdspell        # This will correct minor spelling errors in a cd comman
 shopt -s histappend     # Append to history rather than overwrite
 shopt -s checkwinsize   # Check window after each command
 shopt -s dotglob        # files beginning with . to be returned in the results of path-name expansion.
+shopt -s extglob        # use extended globbing
+#shopt -s globstar don't know why this doesn't work
  
 ## set options
 set -o noclobber        # prevent overwriting files with cat
 set -o ignoreeof        # stops ctrl+d from logging me out
- 
- 
  
 # Set appropriate ls alias
 case $(uname -s) in
@@ -65,9 +70,8 @@ alias cd..="cd .."
 alias mkdir='mkdir -p -v'
 alias df='df -h'
 alias du='du -h -c'
- 
 alias lsd="ls -hdlf */"
-alias chrome='open -a "/Applications/Google Chrome.app"'
+alias myip="ifconfig en0 | grep inet | grep -v inet6 | awk '{print \$2}'"
  
 #PS1='\h:\W \u\$ '
 # Make bash check its window size after a process completes
@@ -113,15 +117,22 @@ sp='$(eval "short_path")'
 short_path() {
    echo "$PWD" | sed "s|$HOME|~|g" | sed 's|/\(...\)[^/]*|/\1|g'
 } 
-if [ $(id -u) -eq 0 ];
-        then # you are root, set red colour prompt
-                export PS1="[\[$txtred\]\u\[$txtylw\]@\[$txtrst\]\h] \[$txtgrn\]\W\[$txtrst\]# "
-        else
-
-                export PS1="\[$txtcyn\]\D{%m-%d} \A \[$bldcyn\]$sp $ \[$txtrst\]"
-                #shopt -s extdebug; trap "tput sgr0" DEBUG
-                export SUDO_PS1="[\[$txtred\]\u\[$txtylw\]@\[$txtrst\]\h] \[$txtgrn\]\W\[$txtrst\]# "
-        export LSCOLORS="fxgxcxdxbxegedabagacad"
+if [ $(id -u) -eq 0 ]; then # you are root, set red colour prompt
+    export PS1="[\[$txtred\]\u\[$txtylw\]@\[$txtrst\]\h] \[$txtgrn\]\W\[$txtrst\]# "
+else
+    if $USER_SHORTPATH; then
+        pth=$sp
+    else 
+        pth=$PWD
+    fi
+    export PS1="\[$txtcyn\]\D{%m-%d} \A \[$bldcyn\]$pth $ \[$txtrst\]"
+    #shopt -s extdebug; trap "tput sgr0" DEBUG
+    export SUDO_PS1="[\[$txtred\]\u\[$txtylw\]@\[$txtrst\]\h] \[$txtgrn\]\W\[$txtrst\]# "
+    export LSCOLORS="fxgxcxdxbxegedabagacad"
+fi
+if [ "$TERM" = "screen" ] && [ "$HAS_256_COLORS" = "yes" ]
+then
+    export TERM=screen-256color
 fi
  
 export GREP_OPTIONS=--color=auto
@@ -270,10 +281,13 @@ function note {
 }
 alias notes='vim ~/Documents/notes'
 
-alias elasticsearch-f='/Applications/elasticsearch-0.90.7/bin/elasticsearch -f'
-
 alias searchjobs="ps -ef | grep -v grep | grep"
 alias numbersum="paste -s -d+ - | bc"
+alias fixaudio="sudo killall coreaudiod"
+function fixbluetooth {
+    sudo kextunload -b com.apple.iokit.BroadcomBluetoothHostControllerUSBTransport
+    sudo kextload -b com.apple.iokit.BroadcomBluetoothHostControllerUSBTransport
+}
 
 #alias es='/usr/local/bin/emacs --daemon'
 #alias emacs='/usr/local/bin/emacsclient -c'
@@ -315,47 +329,25 @@ complete -o bashdefault -o default -o nospace -F _ssh ssh 2>/dev/null \
     || complete -o default -o nospace -F _ssh ssh
 
 
-# Lines added by the Vim-R-plugin command :RpluginConfig (2014-Jan-31 18:08):
-# Change the TERM environment variable (to get 256 colors) and make Vim
-# connecting to X Server even if running in a terminal emulator (to get
-# dynamic update of syntax highlight and Object Browser):
-if [ "x$DISPLAY" != "x" ]
-then
-    export HAS_256_COLORS=yes
-    alias tmux="tmux -2"
-    if [ "$TERM" = "xterm" ]
-    then
-        export TERM=xterm-256color
-    fi
-    if [ "$TERM" == "xterm" ] || [ "$TERM" == "xterm-256color" ]
-    then
-        function tvim(){ tmux -2 new-session "TERM=screen-256color vim $@" ; }
-    else
-        function tvim(){ tmux new-session "vim $@" ; }
-    fi
-else
-    if [ "$TERM" == "xterm" ] || [ "$TERM" == "xterm-256color" ]
-    then
-        export HAS_256_COLORS=yes
-        alias tmux="tmux -2"
-        function tvim(){ tmux -2 new-session "TERM=screen-256color vim $@" ; }
-    else
-        function tvim(){ tmux new-session "vim $@" ; }
-    fi
-fi
-if [ "$TERM" = "screen" ] && [ "$HAS_256_COLORS" = "yes" ]
-then
-    export TERM=screen-256color
-fi
-
 export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
 
+# Add environment variable COCOS_CONSOLE_ROOT for cocos2d-x
+export COCOS_CONSOLE_ROOT=/Users/mjr/Documents/code/internal/cocos2d-js-v3.6/tools/cocos2d-console/bin
+export PATH=$COCOS_CONSOLE_ROOT:$PATH
+
+stty -ixon
 # for vim-ipython
 stty stop undef # to unmap ctrl-s
+# prevent YouCompleteMe from crashing
+export DYLD_FORCE_FLAT_NAMESPACE=1
 
 function lolping {
     psum=0.0
     count=0
+    na=104.160.131.1 # someone posted this
+    eune=184.85.223.210 # dredged from log files
+    euw=prod.euw1.lol.riotgames.com # someone posted this
+    /Contents/LoL/RADS/projects/lol_patcher/managedfiles/0.0.0.0/shards.txt
     while read ping
     do
         ptime=$(echo $ping | sed -e 's/^.*time=\(.*\) ms/\1/'  -e 'tx' -e 'd' -e ':x')
@@ -364,7 +356,13 @@ function lolping {
             ((count++))
             echo time=$ptime avg=$(bc <<< "scale = 3; $psum / $count")
         fi
-    done < <(ping 216.52.241.254)
+    done < <(ping $(eval "echo $`echo $1`"))
+    # patch servers I've found from `ack last_host_ip $pathtoleague/Contents/LoL/Logs/Patcher\ Logs/`
+    # usa - 23.14.92.96
+    # sweden - 92.123.155.49, 92.123.155.35
+    # somewhere in the EU - 92.122.214.202
+    # netherlands - 184.85.223.210, 184.85.223.232
+    # ack `prod.*.lol.riotgames.com $pathtoleague/Contents/LoL/RADS/projects/lol_patcher/managedfiles/0.0.0.*` can help find the "urls", though prod.eun1... is firewalled or something
 }
 function nametab {
     export PROMPT_COMMAND="echo -ne '\033]0;$@\007'"
@@ -376,12 +374,109 @@ function double-git {
     alias pushmaster="git push origin master:master"
     alias push$second="git push $second feature:master"
 }
-function cw {
-    nt cw/${1:-"code"}
+function double-git-init {
+    nt $1"/code"
+    second=$2
+    git branch feature
+    git checkout feature
+    git remote add $second git@bitbucket.org:michaeljosephrosenthal/${1}.git
+    git push -u $second feature:master
+    git branch -u $second/master
     alias pushmaster="git push origin master:master"
-    alias pushkatie="git push katie feature:master"
+    alias push$second="git push $second feature:master"
 }
 
 function git-vimerge {
     vim -p $(git --no-pager diff --name-status --diff-filter=U | awk 'BEGIN {x=""} {x=x" "$2;} END {print x}')
 }
+
+function wget-all { \
+     --recursive \
+     --no-clobber \
+     --page-requisites \
+     --html-extension \
+     --convert-links \
+     --restrict-file-names=windows \
+     --domains $1 \
+     --no-parent
+}
+
+export NVM_DIR="/Users/mjr/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
+
+
+#export DOCKER_CERT_PATH=/Users/mjr/.boot2docker/certs/boot2docker-vm
+#export DOCKER_HOST=tcp://192.168.59.103:2376
+#export DOCKER_TLS_VERIFY=1
+
+function monitor {
+    while true;
+        do vardate=$(date +%Y\-%m\-%d\_%H:%M:%S);
+        echo $vardate;
+        screencapture -t jpg -x ~/Documents/data/monitor/${vardate}.jpg;
+        sleep 500;
+    done;
+}
+function docker-clean {
+    docker rm -v $(docker ps -a -q -f status=exited)
+
+    docker rmi $(docker images -f "dangling=true" -q)
+
+    docker run -v /var/run/docker.sock:/var/run/docker.sock -v /var/lib/docker:/var/lib/docker --rm martin/docker-cleanup-volumes
+}
+
+function git-remote-rename {
+    new_name=$1
+    base=$(git remote -v | head -n 1 | awk '{print $2}' | awk -F '/' '{print $1}')
+    git remote remove origin
+    git remote add origin ${base}/${1}.git
+}
+
+function npm-ls-linked-deps {
+    ls -l node_modules | \
+        grep ^l | \
+        awk '{print $9}' | \
+        sed 's/@//g';
+}
+function npms {
+    npm $@ --color=always 2>&1 | grep -vE 'Module is inside a symlinked module'
+}
+
+pip-diff () {
+    grep -v -f <(cat requirements.txt .dependencies.txt | sed '/^$/d') <(pip freeze -r requirements.txt) | sed '/^$/d'
+}
+
+
+function feature-in () {
+    branch=$1
+    t in $branch
+    git branch $branch
+    git checkout $branch
+}
+
+function feature-out () {
+    branch=$(git rev-parse --abbrev-ref HEAD)
+    echo "Checking out of $branch"
+    git push origin $branch
+    git checkout master
+    t out
+    t d | grep "$branch"
+}
+
+# function git-sync () {
+#     branch=$1
+#     git branch -a | \
+#         grep -v origin | \
+#         awk -F '/' '{ print $3 }' | \
+#         sed '/^\s*$/d' | \
+#         awk '{ print "git push '$branch' :"$1 }'
+#     echo "git fetch $branch --prune"
+# }
+
+set -o vi
+
+#[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+
+#export PATH="$HOME/.yarn/bin:$PATH"
+
+

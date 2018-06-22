@@ -1,6 +1,8 @@
 set hintchars=1234567890
 set gui=nonavigation
 command -nargs=0 readinglist :execute "!osascript -e 'tell application \"Safari\" to add reading list item \"" + content.location.href + "\"'"
+command -nargs=0 chat :sidebar Facebook Messenger
+command -nargs=0 closechat :sbclose
 
 " Bulgarian
 noremap я q

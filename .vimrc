@@ -5,75 +5,116 @@ set path=.,,** " when searching the path, look in . (current directory) and ** (
 " P A C K A G E S
 "
 filetype off                   " required!
-set rtp+=~/.vim/bundle/vundle/
-call vundle#rc()
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
 " Vundle is the vim package manager.
-" Bundles are usually of the form user/repo (https://github.com/user/repo)
+" Plugins are usually of the form user/repo (https://github.com/user/repo)
 " let Vundle manage Vundle
 
 " required by vundle
-Bundle 'gmarik/vundle'
-Bundle 'L9'
+Plugin 'VundleVim/Vundle.vim'
+Plugin 'L9'
 
 " sidebar filesystem navigation
     " \n to open/close, navigate to it like a normal pane
-    Bundle 'scrooloose/nerdtree'
+    Plugin 'scrooloose/nerdtree'
+    "Plugin 'Xuyuanp/nerdtree-git-plugin'
+    Plugin 'gcmt/taboo.vim'
    " makes nerdtree consistent across tabs
-    Bundle 'jistr/vim-nerdtree-tabs'
+    Plugin 'jistr/vim-nerdtree-tabs'
+
+" tmux integration
+" makes ctrl-hjkl move between both vim and tmux panes
+    Plugin 'christoomey/vim-tmux-navigator'
 
 " commenting: \cs for comment, \cu for uncomment
-    Bundle 'scrooloose/nerdcommenter'
+    Plugin 'scrooloose/nerdcommenter'
 
 " :UT to open a tree of undo paths for the current pane.
-    Bundle 'mbbill/undotree'
+    Plugin 'mbbill/undotree'
 
 " for fuzzyfinding files/contents
     " automatically binds to ctrl-p, rebound to ctrl-s later
-    Bundle 'kien/ctrlp.vim'
+    Plugin 'kien/ctrlp.vim'
+    Plugin 'mileszs/ack.vim'
+    Plugin 'henrik/vim-qargs'
 
-" tab completion everywhere
-    Bundle 'ervandew/supertab'
-
-" Linting (error checking) and syntax highlighting
-    Bundle 'scrooloose/syntastic'
-    Bundle 'altercation/vim-colors-solarized'
-    Bundle 'plasticboy/vim-markdown'
-    Bundle 'Glench/Vim-Jinja2-Syntax'
-    Bundle 'groenewege/vim-less'
-    Bundle 'kien/rainbow_parentheses.vim'
+" tab completion everywhere, code completion
+    "Plugin 'ervandew/supertab'
+    "Plugin 'Valloric/YouCompleteMe'
+    Plugin 'Shougo/neocomplete.vim'
 
 " Linting (error checking) and syntax highlighting
-    Bundle 'godlygeek/tabular'
+    "Plugin 'scrooloose/syntastic'
+    Plugin 'altercation/vim-colors-solarized'
+    Plugin 'plasticboy/vim-markdown'
+    Plugin 'lepture/vim-jinja'
+    Plugin 'othree/html5.vim'
+    Plugin 'JulesWang/css.vim'
+    Plugin 'genoma/vim-less'
+    Plugin 'cakebaker/scss-syntax.vim'
+    Plugin 'kien/rainbow_parentheses.vim'
+    Plugin 'hdima/python-syntax'
+
+    Plugin 'jparise/vim-graphql'
+
+    Plugin 'shime/vim-livedown'
+    Plugin 'tmux-plugins/vim-tmux'
+    Plugin 'reedes/vim-pencil'
+
+" Linting (error checking) and syntax highlighting
+    "Plugin 'godlygeek/tabular'
     " :Tab /= on the next line would do:
     " a = 'foo';   => a       = 'foo';
     " bortlty = 1; => bortlty = 1;
 
 " Clojure
-    Bundle 'guns/vim-clojure-static'
-    Bundle 'tpope/vim-fireplace'
-    Bundle 'vim-scripts/paredit.vim'
-
+   "Plugin 'guns/vim-clojure-static'
+   "Plugin 'tpope/vim-fireplace'
+   "Plugin 'vim-scripts/paredit.vim'
 
 " Git plugin for vim
-    Bundle 'tpope/vim-fugitive'
+    Plugin 'tpope/vim-fugitive'
+
+
+" js / ts / flow
+    Plugin 'Shougo/vimproc.vim'
+    Plugin 'leafgarland/typescript-vim'
+    Plugin 'Quramy/vim-js-pretty-template'
+    "Plugin 'ruanyl/vim-fixmyjs'
+
+"Plugin 'w0rp/ale'
+    "Plugin 'Quramy/tsuquyomi'
+    Plugin 'peitalin/vim-jsx-typescript'
+    "Plugin 'flowtype/vim-flow'
+
 
 " js, jsx, and json highlighting / linting:
-    Bundle "pangloss/vim-javascript"
-    Bundle 'elzr/vim-json'
-    Bundle 'mxw/vim-jsx'
-    Bundle 'jordwalke/JSXVimHint'
-    Bundle 'maksimr/vim-jsbeautify' 
+    Plugin 'pangloss/vim-javascript'
+    Plugin 'gkz/vim-ls'
+    "Plugin 'ternjs/tern_for_vim'
+    Plugin 'isRuslan/vim-es6'
+    Plugin 'elzr/vim-json'
+    Plugin 'vito-c/jq.vim'
+    Plugin 'mxw/vim-jsx'
+
+"Plugin 'roxma/vim-hug-neovim-rpc'
+"Plugin 'roxma/nvim-yarp'
+"Plugin 'autozimu/LanguageClient-neovim'
+"
+"Plugin 'reasonml-editor/vim-reason-plus'
+
+Plugin 'editorconfig/editorconfig-vim'
 
 " for connecting to a db directly from vim
-" Bundle 'vim-scripts/dbext.vim'
+" Plugin 'vim-scripts/dbext.vim'
 
 "seem useful:
-    "Bundle 'mattn/emmet-vim'
-    "Bundle 'garbas/vim-snipmate'
-    "Bundle 'honza/vim-snippets'
-
-filetype plugin indent on     " required!
-
+    "Plugin 'mattn/emmet-vim'
+    "Plugin 'garbas/vim-snipmate'
+    "Plugin 'honza/vim-snippets'
+call vundle#end()            " required
+filetype plugin indent on    " required
 
 
 " ************************************************************************
@@ -97,13 +138,6 @@ set clipboard=unnamed
 set foldmethod=indent
 syntax on
 
-" pane movement
-" makes ctrl-hjkl the same as normal mode, just for panes instead of chars
-    noremap <c-h> <c-w>h
-    noremap <c-j> <c-w>j
-    noremap <c-k> <c-w>k
-    noremap <c-l> <c-w>l
-
 "tab movement (ctrl-n for next tab, ctrl-p for previous)
     map <c-n> gt
     map <c-p> gT
@@ -113,15 +147,22 @@ syntax on
 
 " good config for programming
 func! CodeMode()
-	set tabstop=4
-	set shiftwidth=4
-	set softtabstop=4
+	set tabstop=2
+	set shiftwidth=2
+	set softtabstop=2
 	set expandtab
 	set autoindent
 	set foldmethod=indent
 	set nopaste
 endfu
-com! CM call CodeMode()
+
+func! AccountingMode()
+    set tabstop=13
+    set list
+    set listchars=tab:>.
+    set softtabstop=0
+endfu
+
 call CodeMode()
 
 
@@ -133,6 +174,7 @@ call CodeMode()
     set list
     set listchars=tab:>.
     set nolist wrap linebreak breakat&vim    
+
 " Set status line
 set statusline=[%02n]\ %f\ %{fugitive#statusline()}\ %(\[%M%R%H]%)%=\ %4l,%02c%2V\ %P%*
 
@@ -184,20 +226,6 @@ augroup END
     vmap <tab> >gv
     vmap <s-tab> <gv
 
-" Some timestamp stuff
-    " map ,L mz1G/Last modified:/e<Cr>CYDATETIME<Esc>`z
-    map ,L    :let @z=TimeStamp()<Cr>"zpa
-    map ,datetime :let @z=strftime("%d %b %Y %X")<Cr>"zpa
-    map ,date :let @z=strftime("%d %b %Y")<Cr>"zpa
-
-    " first add a function that returns a time stamp in the desired format 
-    if !exists("*TimeStamp")
-        fun TimeStamp()
-            return strftime("%d %b %Y %X")
-        endfun
-    endif
-
-
 func! YankPage()
 	let linenumber = line(".")
 	normal ggyG
@@ -206,9 +234,48 @@ endfunc
 nmap yp :call YankPage() <Enter>
 map <c-a> ggVG
 
+let g:ctrlp_user_command = ['.git/', 'git --git-dir=%s/.git ls-files -oc --exclude-standard']
+
 map <Leader>n <plug>NERDTreeTabsToggle<CR>
+let g:NERDTreeIndicatorMapCustom = {
+    \ "Modified"  : "_",
+    \ "Staged"    : "S",
+    \ "Untracked" : "U",
+    \ "Renamed"   : ">",
+    \ "Unmerged"  : "%",
+    \ "Deleted"   : "D",
+    \ "Dirty"     : "%",
+    \ "Clean"     : "C",
+    \ "Unknown"   : "?"
+    \ }
+let g:nerdtree_tabs_synchronize_view = 0
+let NERDTreeIgnore = ['\.pyc$']
 com! UT call UndotreeToggle()
 
+
+let g:syntastic_mode_map = { 'mode': 'active',
+                           \ 'active_filetypes': ['ruby', 'php', 'javascript', 'jsx', 'tsx'],
+                           \ 'passive_filetypes': ['cpp', 'java', 'js'] }
+                           
+"let g:syntastic_typescript_tsc_args = '--experimentalDecorators true'
+"let g:syntastic_javascript_checkers = ['eslint']
+"let g:syntastic_typescript_checkers = ['tslint']
+"let g:jsx_ext_required = 0
+
+let g:syntastic_python_checkers=['flake8', 'python3']
+
+com! S call SyntasticCheck()
+
+set hidden
+let g:LanguageClient_serverCommands = {
+    \ 'reason': ['ocaml-language-server', '--stdio'],
+    \ 'ocaml': ['ocaml-language-server', '--stdio'],
+    \ }
+
+let g:LanguageClient_autoStart = 1
+
+nnoremap <silent> K :call LanguageClient_textDocument_hover()<CR>
+nnoremap <silent> gd :call LanguageClient_textDocument_definition()<CR>
 
 " ************************************************************************
 " B E G I N  A U T O C O M M A N D S
@@ -231,72 +298,73 @@ if has("autocmd")
 
     " Normally don't automatically format 'text' as it is typed, only do this
     " with comments, at 79 characters.
-    autocmd BufNewFile,BufEnter *.c,*.h,*.java,*.jsp set formatoptions-=t tw=79
+    "autocmd BufNewFile,BufEnter *.c,*.h,*.java,*.jsp set formatoptions-=t tw=79
+    autocmd BufNewFile,BufEnter *.html,*.htm,*.shtml,*.stm set ft=jinja
     
     set showmatch 
     map <F5> <Esc>:!clj '%:p'<CR>
 
-    "maksimr/vim-jsbeautify
-        autocmd FileType javascript noremap <buffer>  <c-f> :call JsBeautify()<cr>
-        autocmd FileType html noremap <buffer> <c-f> :call HtmlBeautify()<cr>
-        autocmd FileType css noremap <buffer> <c-f> :call CSSBeautify()<cr>
+    autocmd FileType javascript,json,typescript setlocal shiftwidth=2
+    autocmd FileType javascript,json,typescript setlocal tabstop=2
+    autocmd FileType javascript,json,typescript setlocal softtabstop=2
 
-        autocmd FileType clojure noremap <buffer> <enter> :Eval<cr>
-        autocmd FileType clojurescript noremap <buffer> <enter> :Eval<cr>
+    autocmd FileType python setlocal shiftwidth=4
+    autocmd FileType python setlocal tabstop=4
+    autocmd FileType python setlocal softtabstop=4
+
+    autocmd FileType typescript let g:fixmyjs_engine = 'tslint'
+    autocmd QuickFixCmdPost [^l]* nested cwindow
+    autocmd QuickFixCmdPost    l* nested lwindow
+    "autocmd BufWritePost *ts make
+
+    func! SyntaxCheckJs ()
+        SyntasticCheck()
+        Fixmyjs()
+    endfunc
+    autocmd FileType javascript,json,typescript com! S call SyntasticCheckJs()
+
+    autocmd FileType html noremap <buffer> <c-f> :call HtmlBeautify()<cr>
+    "autocmd BufNewFile,BufEnter *.less set ft=css
+    "autocmd FileType css noremap <buffer> <c-f> :call CSSBeautify()<cr>
+
+    "autocmd FileType clojure noremap <buffer> <enter> :Eval<cr>
+    "autocmd FileType clojurescript noremap <buffer> <enter> :Eval<cr>
 
 endif " has("autocmd")
 
-let g:jsCommand='node'
-let $JS_CMD='node'
+"let g:jsCommand='node'
+"let $JS_CMD='node'
 
-"jordwalke/JSXVimHint
-    let g:syntastic_javascript_checkers = ['jsxhint']
-    let g:syntastic_javascript_jsxhint_exec = 'jsx-jshint-wrapper'
+"let g:javascript_plugin_flow = 1
 
-" ************************************************************************
-" A B B R E V I A T I O N S 
-"
-"abbr #e  ************************************************************************/
-"iab #-># #########################################################################
+"" neocomplete
+let g:neocomplete#enable_at_startup = 1
+let g:neocomplete#enable_smart_case = 1
+let g:neocomplete#sources#syntax#min_keyword_length = 3
 
-" Date/Time stamps
-    " %a - Day of the week
-    " %b - Month
-    " %d - Day of the month
-    " %Y - Year
-    " %H - Hour
-    " %M - Minute
-    " %S - Seconds
-    " %Z - Time Zone
-    "
-    " abbreviation to manually enter a timestamp. Just type YTS in insert mode
-    iab YTS <C-R>=TimeStamp()<CR>
-    iab YDATETIME <c-r>=strftime(": %a %b %d, %Y %H:%M:%S %Z")<cr>
+" <TAB>: completion.
+inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
+autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+autocmd FileType javascript setlocal omnifunc=tern#Complete
+
+"let g:ycm_server_keep_logfiles = 1
+"let g:ycm_server_log_level = 'debug'
+"let g:ycm_path_to_python_interpreter = '/usr/bin/python'
+"let g:tern_show_argument_hints='on_hold'
+"let g:tern_map_keys=1
+let g:syntastic_javascript_checkers = ['eslint', 'flow']
+let g:syntastic_javascript_flow_exe = 'flow'
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 1
+
 
 set diffopt+=vertical
 autocmd StdinReadPre * let s:std_in=1
 
-" In case you don't use a terminal
-if has('gui_running')
-    set textwidth=78 "78 character width lines
-    set lines=52
-    set cmdheight=2 " 2 for the status line.
-    set columns=110 " add columns for the Project plugin
-    set mouse=a " enable use of mouse
-    let html_use_css=1 " for the TOhtml command
-endif
-if has("gui")
-    " set the gui options to:
-    "   g: grey inactive menu items
-    "   m: display menu bar
-    "   r: display scrollbar on right side of window
-    "   b: display scrollbar at bottom of window
-    "   t: enable tearoff menus on Win32
-    "   T: enable toolbar on Win32
-    set go=gmr
-    set guifont=Courier
-endif
 if &t_Co > 2 || has("gui_running")
     syntax on     " Switch syntax highlighting on, when the terminal has colors
     set hlsearch  " Also switch on highlighting the last used search pattern. 
 endi
+

@@ -333,6 +333,7 @@ function feature-out () {
 # }
 
 set -o vi
+bindkey "^?" backward-delete-char
 
 #[ -f ~/.fzf.bash ] && source ~/.fzf.bash
 

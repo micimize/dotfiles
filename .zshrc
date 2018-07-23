@@ -14,7 +14,7 @@ export ZSH="/Users/mjr/.oh-my-zsh"
 # See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
 ZSH_THEME="powerlevel9k/powerlevel9k"
 POWERLEVEL9K_DISABLE_RPROMPT=true
-POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(time dir background_jobs_joined vi_mode)
+POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(time dir background_jobs_joined vcs vi_mode)
 
 POWERLEVEL9K_TIME_FORMAT="%D{%m-%d %H:%M}"
 POWERLEVEL9K_TIME_FOREGROUND='cyan'
@@ -50,6 +50,8 @@ fi
 # Then, source plugins and add commands to $PATH
 zplug load #--verbose
 
+
+YARN_ENABLED=true
 
 
 # Uncomment the following line to use case-sensitive completion.
@@ -264,10 +266,6 @@ function map {
   fi 
 }
 
-export NVM_DIR="/Users/mjr/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
-
-
 function monitor {
   while true;
   do vardate=$(date +%Y\-%m\-%d\_%H:%M:%S);
@@ -302,7 +300,9 @@ function npms {
 }
 
 pip-diff () {
-grep -v -f <(cat requirements.txt .dependencies.txt | sed '/^$/d') <(pip freeze -r requirements.txt) | sed '/^$/d'
+  grep -v -f \
+    <(cat requirements.txt .dependencies.txt | sed '/^$/d') \
+    <(pip freeze -r requirements.txt) | sed '/^$/d'
 }
 
 
@@ -321,16 +321,6 @@ function feature-out () {
   t out
   t d | grep "$branch"
 }
-
-# function git-sync () {
-#     branch=$1
-#     git branch -a | \
-  #         grep -v origin | \
-  #         awk -F '/' '{ print $3 }' | \
-  #         sed '/^\s*$/d' | \
-  #         awk '{ print "git push '$branch' :"$1 }'
-#     echo "git fetch $branch --prune"
-# }
 
 set -o vi
 bindkey "^?" backward-delete-char

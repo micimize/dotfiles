@@ -1,20 +1,67 @@
-# If you come from bash you might have to change your $PATH.
-# export PATH=$HOME/bin:/usr/local/bin:$PATH
+#zmodload zsh/zprof
+echo $ZSH_COMPDUMP
 
+# 
+# Paths
+#
+export GOPATH=$HOME/golang
+export GOROOT=/usr/local/opt/go/libexec
+
+export PATH=$PATH:$HOME/bin:$HOME/node_modules/.bin:/usr/local/sbin:$GOPATH/bin:$GOROOT/bin:$HOME/flutter/bin:$HOME/Library/Android/sdk/platform-tools/
+
+export ANDROID_SDK=$HOME/Library/Android/sdk
+export PATH=$ANDROID_SDK/emulator:$ANDROID_SDK/tools:$PATH
+
+if [ -d /opt/local/bin ]; then
+  PATH="/opt/local/bin:$PATH"
+fi
+
+if [ -d /usr/lib/cw ] ; then
+  PATH="/usr/lib/cw:$PATH"
+fi
+
+export ZSH_DISABLE_COMPFIX=true # 
 # Path to your oh-my-zsh installation.
 export ZSH="/Users/mjr/.oh-my-zsh"
-# Setting this variable when ZSH_THEME=random
-# cause zsh load theme from this variable instead of
-# looking in ~/.oh-my-zsh/themes/
-# An empty array have no effect
-# ZSH_THEME_RANDOM_CANDIDATES=( "robbyrussell" "agnoster" )
+
+# tmux
+DISABLE_AUTO_TITLE=true
+
 #
-# Set name of the theme to load. Optionally, if you set this to "random"
-# it'll load a random theme each time that oh-my-zsh is loaded.
-# See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
+# omz history settings
+#
+HIST_STAMPS="%Y-%m-%dT%H:%M"
+export HISTORY_IGNORE="(ls|l|s|exit|clear|pwd|vim|note|notes|Lq)"
+export HISTCONTROL=ignoredups
+
+#
+# Plugins (using antigen)
+# 
+# brew installed anitgen
+source /usr/local/share/antigen/antigen.zsh
+
+antigen use oh-my-zsh
+antigen bundle git
+antigen bundle virtualenv
+antigen bundle gpg-agent
+
+antigen bundle zsh-users/zsh-autosuggestions
+antigen bundle iam4x/zsh-iterm-touchbar
+
+antigen apply
+
+# makes zsh-iterm-touchbar work
+YARN_ENABLED=true
+
+unsetopt correct_all  
+setopt correct
+
+#
+# Theme
+# 
 ZSH_THEME="powerlevel9k/powerlevel9k"
 POWERLEVEL9K_DISABLE_RPROMPT=true
-POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(time dir background_jobs_joined vcs vi_mode)
+POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=( virtualenv time dir background_jobs_joined vcs vi_mode)
 
 POWERLEVEL9K_TIME_FORMAT="%D{%m-%d %H:%M}"
 POWERLEVEL9K_TIME_FOREGROUND='cyan'
@@ -29,147 +76,48 @@ POWERLEVEL9K_DIR_HOME_FOREGROUND='magenta'
 POWERLEVEL9K_DIR_HOME_SUBFOLDER_FOREGROUND='magenta'
 POWERLEVEL9K_DIR_DEFAULT_FOREGROUND='magenta'
 
-
 POWERLEVEL9K_VI_INSERT_MODE_STRING="I"
 POWERLEVEL9K_VI_COMMAND_MODE_STRING="N"
 POWERLEVEL9K_VI_MODE_INSERT_BACKGROUND='blue'
 POWERLEVEL9K_VI_MODE_NORMAL_BACKGROUND='yellow'
 
-# zplug
-source ~/.zplug/init.zsh
-zplug "zsh-users/zsh-autosuggestions"
-zplug "iam4x/zsh-iterm-touchbar"
-# Install plugins if there are plugins that have not been installed
-if ! zplug check --verbose; then
-    printf "Install? [y/N]: "
-    if read -q; then
-        echo; zplug install
-    fi
-fi
 
-# Then, source plugins and add commands to $PATH
-zplug load #--verbose
-
-
-YARN_ENABLED=true
-
-
-# Uncomment the following line to use case-sensitive completion.
-# CASE_SENSITIVE="true"
-
-# Uncomment the following line to use hyphen-insensitive completion. Case
-# sensitive completion must be off. _ and - will be interchangeable.
-# HYPHEN_INSENSITIVE="true"
-
-# Uncomment the following line to disable bi-weekly auto-update checks.
-# DISABLE_AUTO_UPDATE="true"
-
-# Uncomment the following line to change how often to auto-update (in days).
-# export UPDATE_ZSH_DAYS=13
-
-# Uncomment the following line to disable colors in ls.
-# DISABLE_LS_COLORS="true"
-
-# Uncomment the following line to disable auto-setting terminal title.
-# DISABLE_AUTO_TITLE="true"
-
-# Uncomment the following line to enable command auto-correction.
-# ENABLE_CORRECTION="true"
-
-# Uncomment the following line to display red dots whilst waiting for completion.
-# COMPLETION_WAITING_DOTS="true"
-
-# Uncomment the following line if you want to disable marking untracked files
-# under VCS as dirty. This makes repository status check for large repositories
-# much, much faster.
-# DISABLE_UNTRACKED_FILES_DIRTY="true"
-
-# Uncomment the following line if you want to change the command execution time
-# stamp shown in the history command output.
-# You can set one of the optional three formats:
-# "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
-# or set a custom format using the strftime function format specifications,
-# see 'man strftime' for details.
-# HIST_STAMPS="mm/dd/yyyy"
-
-# Would you like to use another custom folder than $ZSH/custom?
-# ZSH_CUSTOM=/path/to/new-custom-folder
-
-# Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
-# Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
-# Example format: plugins=(rails git textmate ruby lighthouse)
-# Add wisely, as too many plugins slow down shell startup.
-plugins=(
-  git
-)
+CASE_SENSITIVE="true" # Foo != foo
+# HYPHEN_INSENSITIVE="true" # makes _ and - will be interchangeable. Requires CASE_SENSITIVE="false"
+ENABLE_CORRECTION="true" # Correct typos, etc
+# DISABLE_UNTRACKED_FILES_DIRTY="true" # don't mark untracked files dirty. Makes `git status` faster
 
 source $ZSH/oh-my-zsh.sh
 
-# User configuration
+setopt no_hist_verify
+# should maybe truncate history by a year every year after 5 years have built up,
+# moving the old history to the archive
+HISTSIZE=999999999
+SAVEHIST=$HISTSIZE
 
-# export MANPATH="/usr/local/man:$MANPATH"
+set -o vi
 
-# You may need to manually set your language environment
-# export LANG=en_US.UTF-8
+bindkey "^?" backward-delete-char
+bindkey -v
+bindkey '^R' history-incremental-search-backward
 
-# Preferred editor for local and remote sessions
-# if [[ -n $SSH_CONNECTION ]]; then
-#   export EDITOR='vim'
-# else
-#   export EDITOR='mvim'
-# fi
-
-# Compilation flags
-# export ARCHFLAGS="-arch x86_64"
-
-# ssh
-# export SSH_KEY_PATH="~/.ssh/rsa_id"
-
-# Set personal aliases, overriding those provided by oh-my-zsh libs,
-# plugins, and themes. Aliases can be placed here, though oh-my-zsh
-# users are encouraged to define aliases within the ZSH_CUSTOM folder.
-# For a full list of active aliases, run `alias`.
-#
-# Example aliases
-# alias zshconfig="mate ~/.zshrc"
-# alias ohmyzsh="mate ~/.oh-my-zsh"
-
-
-
-
-# old bash config
-# old bash config
-# old bash config
+alias ":q"="exit"
+alias s="ls | GREP_COLOR='1;34' grep --color '.*@'"
+alias l="ls"
 
 # make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(lesspipe)"
 
-
-# Shell variables
 export PAGER=less
 export EDITOR=vim
-export GOPATH=$HOME/golang
-export GOROOT=/usr/local/opt/go/libexec
-export PATH=$PATH:$HOME/bin:$HOME/node_modules/.bin:/usr/local/sbin:$GOPATH/bin:$GOROOT/bin
 export LESS='-R'
-export HISTCONTROL=ignoredups
-export HISTSIZE=5000
-export HISTFILESIZE=5000
-export HISTIGNORE="&:ls:ll:la:l.:pwd:exit:clear"
-
-if [ -d /opt/local/bin ]; then
-  PATH="/opt/local/bin:$PATH"
-fi
-
-if [ -d /usr/lib/cw ] ; then
-  PATH="/usr/lib/cw:$PATH"
-fi
 
 ## set options
 #set -o noclobber        # prevent overwriting files with cat
 #set -o ignoreeof        # stops ctrl+d from logging me out
 
 # Set appropriate ls alias
+# adds / for dirs, @ for symlinks
 case $(uname -s) in
   Darwin|FreeBSD)
     alias ls="ls -hFG"
@@ -246,13 +194,21 @@ ex () {
 }
 
 
-###############################
-#     mjr customizations
-###############################
-alias ":q"="exit"
-alias s="ls | GREP_COLOR='1;34' grep --color '.*@'"
-alias l="ls"
+function note {
+    dir=`pwd`
+    cd ~/Documents/notes
+    vim -p "$@" 
+    cd $dir
+}
+alias notes='vim ~/Documents/notes'
 
+
+
+#
+# Utility functions
+#
+
+# apply the first function to every subsequent argument
 function map { 
   if [ $# -le 1 ]; then 
     return 
@@ -266,6 +222,7 @@ function map {
   fi 
 }
 
+# take a screenshot ever 5 min
 function monitor {
   while true;
   do vardate=$(date +%Y\-%m\-%d\_%H:%M:%S);
@@ -274,6 +231,8 @@ function monitor {
     sleep 500;
   done;
 }
+
+# clean old docker images
 function docker-clean {
   docker rm -v $(docker ps -a -q -f status=exited)
 
@@ -282,6 +241,7 @@ function docker-clean {
   docker run -v /var/run/docker.sock:/var/run/docker.sock -v /var/lib/docker:/var/lib/docker --rm martin/docker-cleanup-volumes
 }
 
+# rename the origin remote to $1
 function git-remote-rename {
   new_name=$1
   base=$(git remote -v | head -n 1 | awk '{print $2}' | awk -F '/' '{print $1}')
@@ -289,13 +249,16 @@ function git-remote-rename {
   git remote add origin ${base}/${1}.git
 }
 
+# list locally linked node modules (unsure if this works with yarn link)
 function npm-ls-linked-deps {
   ls -l node_modules | \
     grep ^l | \
     awk '{print $9}' | \
     sed 's/@//g';
 }
-function npms {
+
+# see if the current module is linked to locally (unsure if this works with yarn link)
+function npm-symlinked {
   npm $@ --color=always 2>&1 | grep -vE 'Module is inside a symlinked module'
 }
 
@@ -305,6 +268,11 @@ pip-diff () {
     <(pip freeze -r requirements.txt) | sed '/^$/d'
 }
 
+function git-clean () {
+  git branch --merged >/tmp/merged-branches && \
+    vi /tmp/merged-branches && \
+    xargs git branch -d </tmp/merged-branches
+}
 
 function feature-in () {
   branch=$1
@@ -322,11 +290,31 @@ function feature-out () {
   t d | grep "$branch"
 }
 
-set -o vi
-bindkey "^?" backward-delete-char
-
 #[ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
-#export PATH="$HOME/.yarn/bin:$PATH"
+
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+
+alias twindow='tmux display-message -p "#W"'
+alias ping-me="osascript -e 'display notification \"\" with title \"ping from $(twindow)\"'"
 
 
+function reset_touchbar {
+  pkill "Touch Bar agent";
+  killall "ControlStrip";
+}
+
+function flutter_wash {
+  flutter clean
+  flutter packages get
+  flutter packages pub get
+}
+
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/Users/mjr/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/mjr/google-cloud-sdk/path.zsh.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/Users/mjr/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/mjr/google-cloud-sdk/completion.zsh.inc'; fi
+
+#zprof

@@ -42,7 +42,7 @@ Plugin 'L9'
 " tab completion everywhere, code completion
     "Plugin 'ervandew/supertab'
     "Plugin 'Valloric/YouCompleteMe'
-    Plugin 'Shougo/neocomplete.vim'
+    "Plugin 'Shougo/neocomplete.vim'
 
 " Linting (error checking) and syntax highlighting
     "Plugin 'scrooloose/syntastic'
@@ -55,12 +55,15 @@ Plugin 'L9'
     Plugin 'cakebaker/scss-syntax.vim'
     Plugin 'kien/rainbow_parentheses.vim'
     Plugin 'hdima/python-syntax'
+    Plugin 'cespare/vim-toml'
 
     Plugin 'jparise/vim-graphql'
 
     Plugin 'shime/vim-livedown'
     Plugin 'tmux-plugins/vim-tmux'
     Plugin 'reedes/vim-pencil'
+    Plugin 'reedes/vim-wordy'
+    
 
 " Linting (error checking) and syntax highlighting
     "Plugin 'godlygeek/tabular'

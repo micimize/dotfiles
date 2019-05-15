@@ -12,3 +12,6 @@ git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 #vim specific
 git clone https://github.com/gmarik/Vundle.vim.git ~/.vim/bundle/Vundle.vim
 vim +PluginInstall +qall
+
+# globally .gitignore
+git config --global core.excludesfile ~/.gitignore

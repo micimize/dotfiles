@@ -23,6 +23,9 @@ Plugin 'L9'
    " makes nerdtree consistent across tabs
     Plugin 'jistr/vim-nerdtree-tabs'
 
+Plugin 'chrisbra/Recover.vim' " swap file diffing
+
+
 " tmux integration
 " makes ctrl-hjkl move between both vim and tmux panes
     Plugin 'christoomey/vim-tmux-navigator'
@@ -118,6 +121,9 @@ Plugin 'editorconfig/editorconfig-vim'
     "Plugin 'honza/vim-snippets'
 call vundle#end()            " required
 filetype plugin indent on    " required
+
+" store swap files here
+set directory^=$HOME/.vim/tmp//
 
 
 " ************************************************************************

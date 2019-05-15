@@ -50,6 +50,7 @@ antigen use oh-my-zsh
 antigen bundle git
 antigen bundle virtualenv
 antigen bundle gpg-agent
+antigen bundle dotenv
 
 antigen bundle zsh-users/zsh-autosuggestions
 antigen bundle iam4x/zsh-iterm-touchbar

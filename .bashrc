@@ -329,8 +329,6 @@ complete -o bashdefault -o default -o nospace -F _ssh ssh 2>/dev/null \
     || complete -o default -o nospace -F _ssh ssh
 
 
-export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
-
 # Add environment variable COCOS_CONSOLE_ROOT for cocos2d-x
 export COCOS_CONSOLE_ROOT=/Users/mjr/Documents/code/internal/cocos2d-js-v3.6/tools/cocos2d-console/bin
 export PATH=$COCOS_CONSOLE_ROOT:$PATH

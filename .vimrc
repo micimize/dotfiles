@@ -23,7 +23,7 @@ Plugin 'L9'
    " makes nerdtree consistent across tabs
     Plugin 'jistr/vim-nerdtree-tabs'
 
-Plugin 'chrisbra/Recover.vim' " swap file diffing
+"Plugin 'chrisbra/Recover.vim' " swap file diffing
 
 
 " tmux integration
@@ -49,6 +49,7 @@ Plugin 'chrisbra/Recover.vim' " swap file diffing
 
 " Linting (error checking) and syntax highlighting
     "Plugin 'scrooloose/syntastic'
+    Plugin 'dart-lang/dart-vim-plugin'
     Plugin 'altercation/vim-colors-solarized'
     Plugin 'plasticboy/vim-markdown'
     Plugin 'lepture/vim-jinja'
@@ -58,6 +59,7 @@ Plugin 'chrisbra/Recover.vim' " swap file diffing
     Plugin 'cakebaker/scss-syntax.vim'
     Plugin 'kien/rainbow_parentheses.vim'
     Plugin 'hdima/python-syntax'
+    Plugin 'meatballs/vim-xonsh'
     Plugin 'cespare/vim-toml'
 
     Plugin 'jparise/vim-graphql'
@@ -66,6 +68,12 @@ Plugin 'chrisbra/Recover.vim' " swap file diffing
     Plugin 'tmux-plugins/vim-tmux'
     Plugin 'reedes/vim-pencil'
     Plugin 'reedes/vim-wordy'
+    Plugin 'reedes/vim-lexical'
+    Plugin 'reedes/vim-litecorrect'
+    Plugin 'reedes/vim-textobj-sentence'
+      Plugin 'kana/vim-textobj-user' "dependency
+    Plugin 'junegunn/limelight.vim'
+    
     
 
 " Linting (error checking) and syntax highlighting
@@ -172,7 +180,37 @@ func! AccountingMode()
     set softtabstop=0
 endfu
 
+func! ProseMode()
+    set spellsuggest=15
+    call Pencil()
+    call LimeLight()
+endfu
+
+let g:word_count="<unknown>"
+set updatetime=1000
+augroup WordCounter
+  au!  CursorHold,CursorHoldI * call UpdateWordCount()
+augroup END
+
+function WordCount()
+  return g:word_count + " words"
+endfunction
+
+function UpdateWordCount()
+ let lnum = 1
+ let n = 0
+ while lnum <= line('$')
+   let n = n + len(split(getline(lnum)))
+   let lnum = lnum + 1
+ endwhile
+ let g:word_count = n
+endfunction
+
 call CodeMode()
+
+" prosemode
+" Color name (:help cterm-colors) or ANSI code
+let g:limelight_conceal_ctermfg = 241  " Solarized Base1
 
 
 " Indendation, colorscheme, etc
@@ -185,7 +223,7 @@ call CodeMode()
     set nolist wrap linebreak breakat&vim    
 
 " Set status line
-set statusline=[%02n]\ %f\ %{fugitive#statusline()}\ %(\[%M%R%H]%)%=\ %4l,%02c%2V\ %P%*
+set statusline=[%02n]\ %f\ %{fugitive#statusline()}\ %{WordCount()}\ %(\[%M%R%H]%)%=\ %4l,%02c%2V\ %P%*
 
 " kien/rainbow_parentheses.vim - theme that should show up on all backgrounds
 let g:rbpt_colorpairs = [

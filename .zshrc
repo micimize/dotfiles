@@ -1,7 +1,15 @@
 #zmodload zsh/zprof
 
+bindkey '^R' history-incremental-pattern-search-backward
+
+
+source ~/.env
+
+export NO_PROXY=localhost,127.0.0.1
+
+# only compinit once a day
 autoload -Uz compinit
-if [ $(date +'%j') != $(stat -f '%Sm' -t '%j' ~/.zcompdump) ]; then
+if [ $(date +'%j') != $(stat -f '%Sm' -t '%j' $ZSH_COMPDUMP) ]; then
   compinit
 else
   compinit -C
@@ -10,13 +18,28 @@ fi
 # 
 # Paths
 #
+source $HOME/.poetry/env
+
 export GOPATH=$HOME/golang
 export GOROOT=/usr/local/opt/go/libexec
+export PATH=$PATH:$HOME/bin:$HOME/node_modules/.bin:/usr/local/sbin:$GOPATH/bin:$GOROOT/bin:$HOME/Library/Android/sdk/platform-tools/:$HOME/.cargo/bin
 
-export PATH=$PATH:$HOME/bin:$HOME/node_modules/.bin:/usr/local/sbin:$GOPATH/bin:$GOROOT/bin:$HOME/flutter/bin:$HOME/Library/Android/sdk/platform-tools/
+export PATH="$PATH":"$HOME/flutter/.pub-cache/bin"
+export PATH="$PATH":"$HOME/flutter/bin"
 
 export ANDROID_SDK=$HOME/Library/Android/sdk
 export PATH=$ANDROID_SDK/emulator:$ANDROID_SDK/tools:$PATH
+
+export PATH="$PATH":"$HOME/.pub-cache/bin"
+
+# ruby
+export PATH="/Users/mjr/.gem/ruby/2.6.0/bin:/usr/local/opt/ruby/bin:$PATH"
+
+export LDFLAGS="-L/usr/local/opt/ruby/lib"
+export CPPFLAGS="-I/usr/local/opt/ruby/include"
+export PKG_CONFIG_PATH="/usr/local/opt/ruby/lib/pkgconfig"
+
+
 
 if [ -d /opt/local/bin ]; then
   PATH="/opt/local/bin:$PATH"
@@ -30,6 +53,11 @@ export ZSH_DISABLE_COMPFIX=true #
 # Path to your oh-my-zsh installation.
 export ZSH="/Users/mjr/.oh-my-zsh"
 
+
+# massive slowdown
+#export NVM_DIR="$HOME/.nvm"
+#[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+
 # tmux
 DISABLE_AUTO_TITLE=true
 
@@ -40,22 +68,16 @@ HIST_STAMPS="%Y-%m-%dT%H:%M"
 export HISTORY_IGNORE="(ls|l|s|exit|clear|pwd|vim|note|notes|Lq)"
 export HISTCONTROL=ignoredups
 
+. /usr/local/etc/profile.d/z.sh
+
 #
-# Plugins (using antigen)
+# Plugins (using antibody)
 # 
-# brew installed anitgen
-source /usr/local/share/antigen/antigen.zsh
+# brew install getantibody/tap/antibody
 
-antigen use oh-my-zsh
-antigen bundle git
-antigen bundle virtualenv
-antigen bundle gpg-agent
-antigen bundle dotenv
+# antibody bundle < ~/.zsh_plugins.txt > ~/code/personal/dotfiles/zsh/plugins.sh
+source ~/code/personal/dotfiles/zsh/plugins.sh
 
-antigen bundle zsh-users/zsh-autosuggestions
-antigen bundle iam4x/zsh-iterm-touchbar
-
-antigen apply
 
 # makes zsh-iterm-touchbar work
 YARN_ENABLED=true
@@ -66,7 +88,7 @@ setopt correct
 #
 # Theme
 # 
-ZSH_THEME="powerlevel9k/powerlevel9k"
+#ZSH_THEME="powerlevel9k/powerlevel9k"
 POWERLEVEL9K_DISABLE_RPROMPT=true
 POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=( virtualenv time dir background_jobs_joined vcs vi_mode)
 
@@ -88,10 +110,24 @@ POWERLEVEL9K_VI_COMMAND_MODE_STRING="N"
 POWERLEVEL9K_VI_MODE_INSERT_BACKGROUND='blue'
 POWERLEVEL9K_VI_MODE_NORMAL_BACKGROUND='yellow'
 
+# I use this for writing to give myself nice padded layout
+function margin_pane {
+  export POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vi_mode)
+  export POWERLEVEL9K_VI_MODE_INSERT_BACKGROUND='black'
+  export POWERLEVEL9K_VI_MODE_NORMAL_BACKGROUND='black'
+
+  pane_borders='bg=brightblack,fg=brightblack'
+
+  tmux set-option pane-border-style $pane_borders
+  tmux set-option pane-active-border-style $pane_borders
+  tmux select-pane -P 'bg=black'
+  clear
+}
+
 
 CASE_SENSITIVE="true" # Foo != foo
 # HYPHEN_INSENSITIVE="true" # makes _ and - will be interchangeable. Requires CASE_SENSITIVE="false"
-ENABLE_CORRECTION="true" # Correct typos, etc
+# ENABLE_CORRECTION="true" # Correct typos, etc
 # DISABLE_UNTRACKED_FILES_DIRTY="true" # don't mark untracked files dirty. Makes `git status` faster
 
 source $ZSH/oh-my-zsh.sh
@@ -111,6 +147,11 @@ bindkey '^R' history-incremental-search-backward
 alias ":q"="exit"
 alias s="ls | GREP_COLOR='1;34' grep --color '.*@'"
 alias l="ls"
+
+alias date=gdate
+alias isodate="gdate -Ins"
+
+alias chrome="/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome"
 
 # make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(lesspipe)"
@@ -305,6 +346,49 @@ test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell
 alias twindow='tmux display-message -p "#W"'
 alias ping-me="osascript -e 'display notification \"\" with title \"ping from $(twindow)\"'"
 
+function cheap_clone {
+  EXTERNAL_CLONE_DIR="~/code/external"
+  # mkdir -p $EXTERNAL_CLONE_DIR
+
+  GIT_HOST='github.com'
+  BRANCH='master'
+  while [[ $# -gt 0 ]]
+  do
+      key="$1"
+      case $key in
+          -h|--host)
+              GIT_HOST=$2
+              shift # past argument
+              shift # past value
+              ;;
+          -b|--branch)
+              BRANCH=$2
+              shift # past argument
+              shift # past value
+              ;;
+          *)
+              REPO=$key
+              shift # past argument
+              ;;
+      esac
+  done
+
+  if [ -z "$REPO" ]
+  then
+      echo $REPO
+      echo "ERROR: positional argument repo must be supplied"
+      return
+  fi
+  
+  cd $EXTERNAL_CLONE_DIR
+
+  git clone --depth 1 \
+    --single-branch --branch $BRANCH \
+    git@${GIT_HOST}:${REPO}.git ${REPO}
+
+  cd $REPO 
+}
+
 
 function reset_touchbar {
   pkill "Touch Bar agent";
@@ -317,11 +401,55 @@ function flutter_wash {
   flutter packages pub get
 }
 
+function git_diff {
+  while [[ $# -gt 0 ]]
+  do
+      key="$1"
+      case $key in
+          --exclude)
+              exclude=$2
+              shift # past argument
+              shift # past value
+              ;;
+          *)
+            break
+              ;;
+      esac
+  done
+  exclude=$1
+  git diff $@ --name-only | grep -v "$exclude" \
+      | xargs git diff $@ --
+}
+
+alias csvdiff='git diff --color-words="[^[:space:],]+" --no-index'
+alias git_csvdiff='git diff --color-words="[^[:space:],]+"'
+
 
 # The next line updates PATH for the Google Cloud SDK.
 if [ -f '/Users/mjr/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/mjr/google-cloud-sdk/path.zsh.inc'; fi
 
 # The next line enables shell command completion for gcloud.
 if [ -f '/Users/mjr/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/mjr/google-cloud-sdk/completion.zsh.inc'; fi
+
+# poetry() {
+#     if [[ -f pyproject.toml ]]; then
+#         PYVER=$(grep -E '^python =' pyproject.toml | sed -E 's/^python = "\^([0-9].[0-9])"/\1/')
+#         python${PYVER} $(whence -p poetry) "$@"
+#     else
+#         if [[ -v PYTHON ]]; then
+#             python${PYTHON} $(whence -p poetry) "$@"
+#         else
+#             $(whence -p poetry) "$@"
+#         fi
+#     fi
+# }
+
+
+function notify_me {
+  osascript -e 'display notification "NOTIFICATION" with title "NOTIFICATION"'
+}
+
+
+source /Users/mjr/Library/Preferences/org.dystroy.broot/launcher/bash/br
 
 #zprof

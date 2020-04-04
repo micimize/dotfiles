@@ -14,6 +14,12 @@ export USER_SHORTPATH=true
 [ -x /usr/bin/lesspipe ] && eval "$(lesspipe)"
  
 
+# ruby
+export PATH="/Users/mjr/.gem/ruby/2.6.0/bin:/usr/local/opt/ruby/bin:$PATH"
+
+export LDFLAGS="-L/usr/local/opt/ruby/lib"
+export CPPFLAGS="-I/usr/local/opt/ruby/include"
+export PKG_CONFIG_PATH="/usr/local/opt/ruby/lib/pkgconfig"
 
 # Shell variables
 export PAGER=less
@@ -479,3 +485,6 @@ set -o vi
 
 
 
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+source /Users/mjr/Library/Preferences/org.dystroy.broot/launcher/bash/br

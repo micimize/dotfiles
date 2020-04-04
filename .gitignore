@@ -1,3 +1,5 @@
 # vim swap files
 ##################
 .*.sw[a-p]
+
+zsh/plugins.sh

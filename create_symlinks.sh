@@ -5,6 +5,9 @@ do
     ln $rc ~/$rc; # ln (LiNk) that file to a file in ~ (your home directory)
 done
 
+
+ln zsh/p10k.zsh ~/.p10k.zsh; # ln (LiNk) that file to a file in ~ (your home directory)
+
 #tmux plugin manager
 mkdir -p ~/.tmux/plugins/tpm
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm

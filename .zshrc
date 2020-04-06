@@ -1,4 +1,4 @@
-#zmodload zsh/zprof
+# zmodload zsh/zprof
 
 bindkey '^R' history-incremental-pattern-search-backward
 
@@ -9,7 +9,7 @@ export NO_PROXY=localhost,127.0.0.1
 
 # only compinit once a day
 autoload -Uz compinit
-if [ $(date +'%j') != $(stat -f '%Sm' -t '%j' $ZSH_COMPDUMP) ]; then
+if [ $(date +'%j') != $(stat -f '%Sm' -t '%j' ~/.zcompdump) ]; then
   compinit
 else
   compinit -C
@@ -70,15 +70,6 @@ export HISTCONTROL=ignoredups
 
 . /usr/local/etc/profile.d/z.sh
 
-#
-# Plugins (using antibody)
-# 
-# brew install getantibody/tap/antibody
-
-# antibody bundle < ~/.zsh_plugins.txt > ~/code/personal/dotfiles/zsh/plugins.sh
-source ~/code/personal/dotfiles/zsh/plugins.sh
-
-
 # makes zsh-iterm-touchbar work
 YARN_ENABLED=true
 
@@ -88,7 +79,10 @@ setopt correct
 #
 # Theme
 # 
-#ZSH_THEME="powerlevel9k/powerlevel9k"
+#
+ZSH_THEME="powerlevel10k/powerlevel10k"
+POWERLEVEL9K_MODE="awesome-patched"
+
 POWERLEVEL9K_DISABLE_RPROMPT=true
 POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=( virtualenv time dir background_jobs_joined vcs vi_mode)
 
@@ -108,7 +102,11 @@ POWERLEVEL9K_DIR_DEFAULT_FOREGROUND='magenta'
 POWERLEVEL9K_VI_INSERT_MODE_STRING="I"
 POWERLEVEL9K_VI_COMMAND_MODE_STRING="N"
 POWERLEVEL9K_VI_MODE_INSERT_BACKGROUND='blue'
+POWERLEVEL9K_VI_MODE_INSERT_FOREGROUND='white'
 POWERLEVEL9K_VI_MODE_NORMAL_BACKGROUND='yellow'
+
+POWERLEVEL9K_LEGACY_ICON_SPACING=true
+
 
 # I use this for writing to give myself nice padded layout
 function margin_pane {
@@ -129,6 +127,16 @@ CASE_SENSITIVE="true" # Foo != foo
 # HYPHEN_INSENSITIVE="true" # makes _ and - will be interchangeable. Requires CASE_SENSITIVE="false"
 # ENABLE_CORRECTION="true" # Correct typos, etc
 # DISABLE_UNTRACKED_FILES_DIRTY="true" # don't mark untracked files dirty. Makes `git status` faster
+#
+#
+# Plugins (using antibody)
+# 
+# brew install getantibody/tap/antibody
+
+# antibody bundle < ~/.zsh_plugins.txt > ~/code/personal/dotfiles/zsh/plugins.sh
+source ~/code/personal/dotfiles/zsh/plugins.sh
+
+
 
 source $ZSH/oh-my-zsh.sh
 
@@ -452,4 +460,4 @@ function notify_me {
 
 source /Users/mjr/Library/Preferences/org.dystroy.broot/launcher/bash/br
 
-#zprof
+# zprof

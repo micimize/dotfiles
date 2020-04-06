@@ -4,7 +4,8 @@ robbyrussell/oh-my-zsh path:plugins/virtualenv
 robbyrussell/oh-my-zsh path:plugins/gpg-agent
 
 zsh-users/zsh-completions
+zsh-users/zsh-autosuggestions
 iam4x/zsh-iterm-touchbar
 
-bhilburn/powerlevel9k
+romkatv/powerlevel10k
 

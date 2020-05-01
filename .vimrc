@@ -153,6 +153,8 @@ set mouse=a " use the mouse whenever, wherever
 set mousehide
 set clipboard=unnamed
 set foldmethod=indent
+
+"set virtualedit=all
 syntax on
 
 "tab movement (ctrl-n for next tab, ctrl-p for previous)
@@ -182,6 +184,7 @@ endfu
 
 func! ProseMode()
     set spellsuggest=15
+    highlight LineNr ctermfg=0 ctermbg=8
     call Pencil()
     call LimeLight()
 endfu
@@ -279,7 +282,8 @@ func! YankPage()
 	exec ":"linenumber
 endfunc
 nmap yp :call YankPage() <Enter>
-map <c-a> ggVG
+map <c-a> ggVG 
+"ctrl-shift-a is ignored in iterm to make way for obs keybindings
 
 let g:ctrlp_user_command = ['.git/', 'git --git-dir=%s/.git ls-files -oc --exclude-standard']
 

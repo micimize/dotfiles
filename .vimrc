@@ -73,8 +73,9 @@ Plugin 'L9'
     Plugin 'reedes/vim-textobj-sentence'
       Plugin 'kana/vim-textobj-user' "dependency
     Plugin 'junegunn/limelight.vim'
-    
-    
+
+    Plugin 'vimwiki/vimwiki'
+
 
 " Linting (error checking) and syntax highlighting
     "Plugin 'godlygeek/tabular'
@@ -227,6 +228,18 @@ let g:limelight_conceal_ctermfg = 241  " Solarized Base1
 
 " Set status line
 set statusline=[%02n]\ %f\ %{fugitive#statusline()}\ %{WordCount()}\ %(\[%M%R%H]%)%=\ %4l,%02c%2V\ %P%*
+
+
+let g:vimwiki_list = [{
+      \ 'path': '~/code/personal/micimize.com/library',
+      \ 'syntax': 'markdown',
+      \ 'ext': '.md'
+      \ }]
+
+let g:vimwiki_markdown_link_ext = 1
+let g:vimwiki_auto_header = 1
+    
+
 
 " kien/rainbow_parentheses.vim - theme that should show up on all backgrounds
 let g:rbpt_colorpairs = [

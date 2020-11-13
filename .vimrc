@@ -19,7 +19,7 @@ Plugin 'L9'
     " \n to open/close, navigate to it like a normal pane
     Plugin 'scrooloose/nerdtree'
     "Plugin 'Xuyuanp/nerdtree-git-plugin'
-    Plugin 'gcmt/taboo.vim'
+    "Plugin 'gcmt/taboo.vim'
    " makes nerdtree consistent across tabs
     Plugin 'jistr/vim-nerdtree-tabs'
 
@@ -38,9 +38,9 @@ Plugin 'L9'
 
 " for fuzzyfinding files/contents
     " automatically binds to ctrl-p, rebound to ctrl-s later
-    Plugin 'kien/ctrlp.vim'
-    Plugin 'mileszs/ack.vim'
-    Plugin 'henrik/vim-qargs'
+    "Plugin 'kien/ctrlp.vim'
+    "Plugin 'mileszs/ack.vim'
+    "Plugin 'henrik/vim-qargs'
 
 " tab completion everywhere, code completion
     "Plugin 'ervandew/supertab'
@@ -49,32 +49,32 @@ Plugin 'L9'
 
 " Linting (error checking) and syntax highlighting
     "Plugin 'scrooloose/syntastic'
-    Plugin 'dart-lang/dart-vim-plugin'
+    "Plugin 'dart-lang/dart-vim-plugin'
     Plugin 'altercation/vim-colors-solarized'
-    Plugin 'plasticboy/vim-markdown'
-    Plugin 'lepture/vim-jinja'
-    Plugin 'othree/html5.vim'
-    Plugin 'JulesWang/css.vim'
-    Plugin 'genoma/vim-less'
-    Plugin 'cakebaker/scss-syntax.vim'
-    Plugin 'kien/rainbow_parentheses.vim'
-    Plugin 'hdima/python-syntax'
-    Plugin 'meatballs/vim-xonsh'
-    Plugin 'cespare/vim-toml'
+    "Plugin 'plasticboy/vim-markdown'
+    "Plugin 'lepture/vim-jinja'
+    "Plugin 'othree/html5.vim'
+    "Plugin 'JulesWang/css.vim'
+    "Plugin 'genoma/vim-less'
+    "Plugin 'cakebaker/scss-syntax.vim'
+    "Plugin 'kien/rainbow_parentheses.vim'
+    "Plugin 'hdima/python-syntax'
+    "Plugin 'meatballs/vim-xonsh'
+    "Plugin 'cespare/vim-toml'
 
-    Plugin 'jparise/vim-graphql'
+    "Plugin 'jparise/vim-graphql'
 
-    Plugin 'shime/vim-livedown'
+    "Plugin 'shime/vim-livedown'
     Plugin 'tmux-plugins/vim-tmux'
-    Plugin 'reedes/vim-pencil'
-    Plugin 'reedes/vim-wordy'
-    Plugin 'reedes/vim-lexical'
-    Plugin 'reedes/vim-litecorrect'
-    Plugin 'reedes/vim-textobj-sentence'
-      Plugin 'kana/vim-textobj-user' "dependency
-    Plugin 'junegunn/limelight.vim'
+    "Plugin 'reedes/vim-pencil'
+    "Plugin 'reedes/vim-wordy'
+    "Plugin 'reedes/vim-lexical'
+    "Plugin 'reedes/vim-litecorrect'
+    "Plugin 'reedes/vim-textobj-sentence'
+    "Plugin 'kana/vim-textobj-user' "dependency
+    "Plugin 'junegunn/limelight.vim'
 
-    Plugin 'vimwiki/vimwiki'
+    "Plugin 'vimwiki/vimwiki'
 
 
 " Linting (error checking) and syntax highlighting
@@ -93,25 +93,25 @@ Plugin 'L9'
 
 
 " js / ts / flow
-    Plugin 'Shougo/vimproc.vim'
-    Plugin 'leafgarland/typescript-vim'
-    Plugin 'Quramy/vim-js-pretty-template'
+    "Plugin 'Shougo/vimproc.vim'
+    "Plugin 'leafgarland/typescript-vim'
+    "Plugin 'Quramy/vim-js-pretty-template'
     "Plugin 'ruanyl/vim-fixmyjs'
 
 "Plugin 'w0rp/ale'
     "Plugin 'Quramy/tsuquyomi'
-    Plugin 'peitalin/vim-jsx-typescript'
+    "Plugin 'peitalin/vim-jsx-typescript'
     "Plugin 'flowtype/vim-flow'
 
 
 " js, jsx, and json highlighting / linting:
-    Plugin 'pangloss/vim-javascript'
-    Plugin 'gkz/vim-ls'
+    "Plugin 'pangloss/vim-javascript'
+    "Plugin 'gkz/vim-ls'
     "Plugin 'ternjs/tern_for_vim'
-    Plugin 'isRuslan/vim-es6'
+    "Plugin 'isRuslan/vim-es6'
     Plugin 'elzr/vim-json'
-    Plugin 'vito-c/jq.vim'
-    Plugin 'mxw/vim-jsx'
+    "Plugin 'vito-c/jq.vim'
+    "Plugin 'mxw/vim-jsx'
 
 "Plugin 'roxma/vim-hug-neovim-rpc'
 "Plugin 'roxma/nvim-yarp'
@@ -176,13 +176,13 @@ func! CodeMode()
 	set nopaste
 endfu
 
-func! AccountingMode()
-    set tabstop=13
-    set list
-    set listchars=tab:>.
-    set softtabstop=0
-endfu
-
+" func! AccountingMode()
+"     set tabstop=13
+"     set list
+"     set listchars=tab:>.
+"     set softtabstop=0
+" endfu
+" 
 func! ProseMode()
     set spellsuggest=15
     highlight LineNr ctermfg=0 ctermbg=8
@@ -230,36 +230,36 @@ let g:limelight_conceal_ctermfg = 241  " Solarized Base1
 set statusline=[%02n]\ %f\ %{fugitive#statusline()}\ %{WordCount()}\ %(\[%M%R%H]%)%=\ %4l,%02c%2V\ %P%*
 
 
-let g:vimwiki_list = [{
-      \ 'path': '~/code/personal/micimize.com/library',
-      \ 'syntax': 'markdown',
-      \ 'ext': '.md'
-      \ }]
-
-let g:vimwiki_markdown_link_ext = 1
-let g:vimwiki_auto_header = 1
+" let g:vimwiki_list = [{
+"       \ 'path': '~/code/personal/micimize.com/library',
+"       \ 'syntax': 'markdown',
+"       \ 'ext': '.md'
+"       \ }]
+" 
+" let g:vimwiki_markdown_link_ext = 1
+" let g:vimwiki_auto_header = 1
     
 
 
 " kien/rainbow_parentheses.vim - theme that should show up on all backgrounds
-let g:rbpt_colorpairs = [
-  \ [ '13', '#6c71c4'],
-  \ [ '5',  '#d33682'],
-  \ [ '1',  '#dc322f'],
-  \ [ '9',  '#cb4b16'],
-  \ [ '3',  '#b58900'],
-  \ [ '2',  '#859900'],
-  \ [ '6',  '#2aa198'],
-  \ [ '4',  '#268bd2'],
-  \ ]
-augroup rainbow_parentheses
-  au!
-  au VimEnter * RainbowParenthesesActivate
-  au BufEnter * RainbowParenthesesLoadRound
-  au BufEnter * RainbowParenthesesLoadSquare
-  au BufEnter * RainbowParenthesesLoadBraces
-augroup END
-
+" let g:rbpt_colorpairs = [
+"   \ [ '13', '#6c71c4'],
+"   \ [ '5',  '#d33682'],
+"   \ [ '1',  '#dc322f'],
+"   \ [ '9',  '#cb4b16'],
+"   \ [ '3',  '#b58900'],
+"   \ [ '2',  '#859900'],
+"   \ [ '6',  '#2aa198'],
+"   \ [ '4',  '#268bd2'],
+"   \ ]
+" augroup rainbow_parentheses
+"   au!
+"   au VimEnter * RainbowParenthesesActivate
+"   au BufEnter * RainbowParenthesesLoadRound
+"   au BufEnter * RainbowParenthesesLoadSquare
+"   au BufEnter * RainbowParenthesesLoadBraces
+" augroup END
+" 
 
 " ************************************************************************
 " COMMANDS
@@ -417,14 +417,14 @@ autocmd FileType javascript setlocal omnifunc=tern#Complete
 "let g:ycm_path_to_python_interpreter = '/usr/bin/python'
 "let g:tern_show_argument_hints='on_hold'
 "let g:tern_map_keys=1
-let g:syntastic_javascript_checkers = ['eslint', 'flow']
-let g:syntastic_javascript_flow_exe = 'flow'
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 1
-let g:syntastic_check_on_open = 1
-
-
-set diffopt+=vertical
+" let g:syntastic_javascript_checkers = ['eslint', 'flow']
+" let g:syntastic_javascript_flow_exe = 'flow'
+" let g:syntastic_always_populate_loc_list = 1
+" let g:syntastic_auto_loc_list = 1
+" let g:syntastic_check_on_open = 1
+" 
+" 
+" set diffopt+=vertical
 autocmd StdinReadPre * let s:std_in=1
 
 if &t_Co > 2 || has("gui_running")

@@ -122,6 +122,18 @@ function margin_pane {
   clear
 }
 
+unmargin_pane () {
+        export POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(virtualenv time dir background_jobs_joined vcs vi_mode)
+        export POWERLEVEL9K_VI_MODE_INSERT_BACKGROUND='blue'
+        export POWERLEVEL9K_VI_MODE_INSERT_FOREGROUND='white'
+        export POWERLEVEL9K_VI_MODE_NORMAL_BACKGROUND='yellow'
+        export POWERLEVEL9K_VI_MODE_NORMAL_FOREGROUND='brblack'
+        p10k reload
+        tmux set-option pane-border-style ''
+        tmux set-option pane-active-border-style 'fg=green'
+        tmux select-pane -P 'bg=brightblack'
+}
+
 
 CASE_SENSITIVE="true" # Foo != foo
 # HYPHEN_INSENSITIVE="true" # makes _ and - will be interchangeable. Requires CASE_SENSITIVE="false"

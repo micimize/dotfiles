@@ -1,0 +1,80 @@
+// Place your key bindings in this file to overwrite the defaults
+[
+  {
+    "key": "j",
+    "command": "list.focusDown",
+    "when": "listFocus && !inputFocus"
+  },
+  {
+    "key": "k",
+    "command": "list.focusUp",
+    "when": "listFocus && !inputFocus"
+  },
+  {
+    "key": "a f",
+    "command": "explorer.newFile",
+    "when": "filesExplorerFocus && !inputFocus"
+  },
+  {
+    "key": "a d",
+    "command": "explorer.newFolder",
+    "when": "filesExplorerFocus && !inputFocus"
+  },
+  {
+    "key": "r",
+    "command": "renameFile",
+    "when": "filesExplorerFocus && !inputFocus"
+  },
+  /*
+    {
+        "key": "m",
+        "command": "explorer.action.showContextMenu",
+        "when": "filesExplorerFocus && !inputFocus"
+    },
+    */
+  {
+    "key": "/",
+    "command": "workbench.action.quickOpen",
+    "when": "filesExplorerFocus && !inputFocus"
+  },
+  {
+    "key": "enter",
+    "command": "list.select",
+    "when": "explorerViewletVisible && filesExplorerFocus"
+  },
+  {
+    "key": "o",
+    "command": "list.select",
+    "when": "listFocus && !inputFocus"
+  },
+  {
+    // idk how to make this open correctly
+    "key": "t",
+    "command": "list.select",
+    "when": "listFocus && !inputFocus"
+  },
+  {
+    "key": "ctrl+n",
+    "command": "workbench.action.nextEditorInGroup"
+  },
+  {
+    "key": "ctrl+p",
+    "command": "workbench.action.previousEditorInGroup"
+  },
+  {
+    "key": "ctrl+h",
+    "command": "workbench.action.navigateLeft"
+  },
+  {
+    "key": "ctrl+l",
+    "command": "workbench.action.navigateRight"
+  },
+  {
+    "key": "ctrl+k",
+    "command": "workbench.action.navigateUp"
+  },
+  {
+    "key": "ctrl+j",
+    "command": "workbench.action.navigateDown"
+  }
+]

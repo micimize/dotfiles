@@ -17,11 +17,10 @@ Plugin 'L9'
 
 " sidebar filesystem navigation
     " \n to open/close, navigate to it like a normal pane
-    Plugin 'scrooloose/nerdtree'
+    "Plugin 'scrooloose/nerdtree'
     "Plugin 'Xuyuanp/nerdtree-git-plugin'
     Plugin 'gcmt/taboo.vim'
-   " makes nerdtree consistent across tabs
-    Plugin 'jistr/vim-nerdtree-tabs'
+    Plugin 'tpope/vim-vinegar'
 
 "Plugin 'chrisbra/Recover.vim' " swap file diffing
 
@@ -36,6 +35,13 @@ Plugin 'L9'
 " :UT to open a tree of undo paths for the current pane.
     Plugin 'mbbill/undotree'
 
+" vim buffers are more like tabs
+    Plugin 'ap/vim-buftabline'
+    Plugin 'mhinz/vim-sayonara'
+    " automatically enter/exit paste on inhuman input speed
+    " added because paste disables abbreviations
+    Plugin 'roxma/vim-paste-easy'
+
 " for fuzzyfinding files/contents
     " automatically binds to ctrl-p, rebound to ctrl-s later
     Plugin 'kien/ctrlp.vim'
@@ -43,7 +49,7 @@ Plugin 'L9'
     Plugin 'henrik/vim-qargs'
 
 " tab completion everywhere, code completion
-    "Plugin 'ervandew/supertab'
+    Plugin 'ervandew/supertab'
     "Plugin 'Valloric/YouCompleteMe'
     "Plugin 'Shougo/neocomplete.vim'
 
@@ -70,11 +76,12 @@ Plugin 'L9'
     Plugin 'reedes/vim-wordy'
     Plugin 'reedes/vim-lexical'
     Plugin 'reedes/vim-litecorrect'
+    "Plugin 'reedes/vim-textobj-quote'
     Plugin 'reedes/vim-textobj-sentence'
       Plugin 'kana/vim-textobj-user' "dependency
-    Plugin 'junegunn/limelight.vim'
+    "Plugin 'junegunn/limelight.vim'
 
-    Plugin 'vimwiki/vimwiki'
+    "Plugin 'vimwiki/vimwiki'
 
 
 " Linting (error checking) and syntax highlighting
@@ -138,29 +145,47 @@ set directory^=$HOME/.vim/tmp//
 " ************************************************************************
 " making the interface friendly. Mouse always on, numbered lines, etc
 "
-set backspace=indent,eol,start " allow backspacing over everything in insert mode
-set scrolloff=5
-set nu               "numbered lines
-set ruler            "show cursor
-set showcmd          "partial commands
-set incsearch        "incremental search 
-set ignorecase
-set history=10000
-set scs              " smart search (override 'ic' when pattern has uppers)
-set laststatus=2     " Always display a status line at the bottom of the window
-set showmatch        " showmatch: Show the matching bracket for the last ')'
-set notildeop        " allow tilde (~) to act as an operator -- ~w, etc.
-set mouse=a " use the mouse whenever, wherever
-set mousehide
-set clipboard=unnamed
-set foldmethod=indent
+  set backspace=indent,eol,start " allow backspacing over everything in insert mode
+  set scrolloff=5
+  set nu               "numbered lines
+  set ruler            "show cursor
+  "set showcmd          "partial commands
+  set incsearch        "incremental search 
+  set ignorecase
+  set history=10000
+  set scs              " smart search (override 'ic' when pattern has uppers)
+  set laststatus=2     " Always display a status line at the bottom of the window
+  set showmatch        " showmatch: Show the matching bracket for the last ')'
+  set notildeop        " allow tilde (~) to act as an operator -- ~w, etc.
+  set mouse=a " use the mouse whenever, wherever
+  set mousehide
+  set clipboard=unnamed
+  set foldmethod=indent
 
 "set virtualedit=all
 syntax on
 
+" Indendation, colorscheme, etc
+    set t_Co=256
+    colorscheme solarized "altercation/vim-colors-solarized
+    set background=dark
+    "visible whitespace
+    set list
+    set listchars=tab:>.
+    set nolist wrap linebreak breakat&vim    
+
 "tab movement (ctrl-n for next tab, ctrl-p for previous)
-    map <c-n> gt
-    map <c-p> gT
+map <c-n> :bnext<CR>
+map <c-p> :bprev<CR>
+
+" tab quit behavior like buffers
+" Prevent accidental closing of all buffers when doing :wq or :q
+cnoreabbrev wq w<bar>Sayonara
+cnoreabbrev q Sayonara
+
+" added because paste disables abbreviations,
+" breaking the above
+set nopaste
 
 "enter in normal mode to insert in new line
     nmap <Enter> o<Esc>
@@ -173,8 +198,9 @@ func! CodeMode()
 	set expandtab
 	set autoindent
 	set foldmethod=indent
-	set nopaste
 endfu
+
+call CodeMode()
 
 func! AccountingMode()
     set tabstop=13
@@ -183,12 +209,29 @@ func! AccountingMode()
     set softtabstop=0
 endfu
 
+
 func! ProseMode()
-    set spellsuggest=15
-    highlight LineNr ctermfg=0 ctermbg=8
-    call Pencil()
-    call LimeLight()
+  set spellsuggest=15
+  highlight LineNr ctermfg=0 ctermbg=8
+
+  " http://www.terminally-incoherent.com/blog/2013/06/17/using-vim-for-writing-prose/
+  setlocal formatoptions=ant
+  "setlocal textwidth=80
+
+  setlocal wrapmargin=0
+
+  call pencil#init()
+  call lexical#init()
+  call textobj#sentence#init()
+  call litecorrect#init()
+  "call textobj#quote#init()
+    "call LimeLight()
 endfu
+
+augroup pencil
+  autocmd!
+  autocmd FileType markdown,mkd,text call ProseMode()
+augroup END
 
 let g:word_count="<unknown>"
 set updatetime=1000
@@ -210,21 +253,11 @@ function UpdateWordCount()
  let g:word_count = n
 endfunction
 
-call CodeMode()
 
 " prosemode
 " Color name (:help cterm-colors) or ANSI code
-let g:limelight_conceal_ctermfg = 241  " Solarized Base1
+" let g:limelight_conceal_ctermfg = 241  " Solarized Base1
 
-
-" Indendation, colorscheme, etc
-    set t_Co=256
-    colorscheme solarized "altercation/vim-colors-solarized
-    set background=dark
-    "visible whitespace
-    set list
-    set listchars=tab:>.
-    set nolist wrap linebreak breakat&vim    
 
 " Set status line
 set statusline=[%02n]\ %f\ %{fugitive#statusline()}\ %{WordCount()}\ %(\[%M%R%H]%)%=\ %4l,%02c%2V\ %P%*
@@ -300,21 +333,45 @@ map <c-a> ggVG
 
 let g:ctrlp_user_command = ['.git/', 'git --git-dir=%s/.git ls-files -oc --exclude-standard']
 
-map <Leader>n <plug>NERDTreeTabsToggle<CR>
-let g:NERDTreeIndicatorMapCustom = {
-    \ "Modified"  : "_",
-    \ "Staged"    : "S",
-    \ "Untracked" : "U",
-    \ "Renamed"   : ">",
-    \ "Unmerged"  : "%",
-    \ "Deleted"   : "D",
-    \ "Dirty"     : "%",
-    \ "Clean"     : "C",
-    \ "Unknown"   : "?"
-    \ }
-let g:nerdtree_tabs_synchronize_view = 0
-let NERDTreeIgnore = ['\.pyc$']
-com! UT call UndotreeToggle()
+" it would be interesting to look into purely using tmux panes
+" and some other cli util for file navigation
+" https://vi.stackexchange.com/questions/317/can-i-open-a-file-in-an-existing-vim-instance-from-an-external-command
+let g:netrw_banner = 0
+let g:netrw_liststyle = 3
+let g:netrw_browse_split = 4
+let g:netrw_altv = 1
+let g:netrw_winsize = 25
+map <Leader>n :Lexplore<CR>
+
+let g:netrw_list_hide= '.*\.swp$,.*\.swo$,.*\.swm$,.*\.pyc$'
+
+
+augroup netrw_mapping
+  autocmd!
+  autocmd filetype netrw call NetrwMapping()
+augroup END
+
+function! NetrwMapping()
+  nnoremap <buffer> <c-l> :wincmd l<cr>
+endfunction
+
+
+"map <Leader>n <plug>NERDTreeToggle<CR>
+"let NERDTreeAutoDeleteBuffer = 1
+"let g:NERDTreeGitStatusIndicatorMapCustom = {
+"    \ "Modified"  : "_",
+"    \ "Staged"    : "S",
+"    \ "Untracked" : "U",
+"    \ "Renamed"   : ">",
+"    \ "Unmerged"  : "%",
+"    \ "Deleted"   : "D",
+"    \ "Dirty"     : "%",
+"    \ "Clean"     : "C",
+"    \ "Unknown"   : "?"
+"    \ }
+"let NERDTreeIgnore = ['\.pyc$']
+
+com! UT UndotreeToggle
 
 
 let g:syntastic_mode_map = { 'mode': 'active',

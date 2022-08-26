@@ -11,7 +11,7 @@ sessions=`tmux ls -F '#{session_attached} #{session_name}' | grep "$VSCODE_SESSI
 
 if [ -z "$sessions" ]
 then
-  tmux new-session -s "${VSCODE_SESSION}_0" \
+  exec tmux new-session -s "${VSCODE_SESSION}_0" \
     -e VSCODE_SESSION=$VSCODE_SESSION
   exit
 fi
@@ -21,7 +21,7 @@ IFS=" " read -r is_attached session_name <<< "${_first}"
 
 if [ "$is_attached" -eq "0" ]
 then
-  tmux attach-session -t $session_name
+  exec tmux attach-session -t $session_name
   exit
 fi
 
@@ -30,8 +30,16 @@ last_session_num=$(echo $_last_session | rev | cut -d"_" -f1  | rev)
 
 let "this_session_num=last_session_num+1"
 
-tmux new-session -s "${VSCODE_SESSION}_$this_session_num" \
-  -e VSCODE_SESSION=$VSCODE_SESSION
+function pack_sessions {
+  num=0
+  sessions=`tmux ls -F '#{session_name}' | grep "$VSCODE_SESSION*" | sort`
+  while read session; do
+    tmux rename-session -t $session "${VSCODE_SESSION}_$num" 
+    let "num=num+1"
+  done <<<"$sessions"
+}
+
+exec tmux new-session -s "${VSCODE_SESSION}_$this_session_num" -e VSCODE_SESSION="$VSCODE_SESSION"
 
 # TODO: separate command to clean up session names
 # TODO use -L

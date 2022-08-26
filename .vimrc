@@ -17,8 +17,9 @@ Plugin 'L9'
 
 " sidebar filesystem navigation
     " \n to open/close, navigate to it like a normal pane
-    "Plugin 'scrooloose/nerdtree'
-    "Plugin 'Xuyuanp/nerdtree-git-plugin'
+    " Plugin 'preservim/nerdtree'
+    " Plugin 'Xuyuanp/nerdtree-git-plugin'
+    Plugin 'lambdalisue/fern.vim'
     Plugin 'gcmt/taboo.vim'
     Plugin 'tpope/vim-vinegar'
 
@@ -37,7 +38,6 @@ Plugin 'L9'
 
 " vim buffers are more like tabs
     Plugin 'ap/vim-buftabline'
-    Plugin 'mhinz/vim-sayonara'
     " automatically enter/exit paste on inhuman input speed
     " added because paste disables abbreviations
     Plugin 'roxma/vim-paste-easy'
@@ -174,14 +174,43 @@ syntax on
     set listchars=tab:>.
     set nolist wrap linebreak breakat&vim    
 
-"tab movement (ctrl-n for next tab, ctrl-p for previous)
-map <c-n> :bnext<CR>
-map <c-p> :bprev<CR>
 
-" tab quit behavior like buffers
+" https://github.com/preservim/nerdtree/blob/14af89743ac1c31ff9bb43682025eda50333a7d5/lib/nerdtree/opener.vim#L53-L68
+" sdfsfsdf
+"
+" Returns the first window ID containing a file buffer
+"
+" Iterates through window numbers until the last (winnr('$')),
+" Skipping special buffer types & preview windows
+function! FirstFileWindowID()
+    let i = 1
+    while i <= winnr('$')
+        let bnum = winbufnr(i)
+        if bnum !=# -1 && getbufvar(bnum, '&buftype') ==# ''
+                    \ && !getwinvar(i, '&previewwindow')
+            " TODO I don't know what excluding &hidden does in the original,
+            " but may be desirable for correctness
+            return win_getid(i)
+        endif
+        let i += 1
+    endwhile
+    return -1
+endfunction
+
+"tab movement (ctrl-n for next tab, ctrl-p for previous)
+map <c-n> :call win_execute(FirstFileWindowID(), 'bnext')<CR>
+map <c-p> :call win_execute(FirstFileWindowID(), 'bprev')<CR>
+
+
+" Close window when quitting last buffer
+autocmd BufDelete * if len(filter(range(1, bufnr('$')), 'empty(bufname(v:val)) && buflisted(v:val)')) == 1 | quit | endif
+
+" tab-like :q behavior for buffers
 " Prevent accidental closing of all buffers when doing :wq or :q
-cnoreabbrev wq w<bar>Sayonara
-cnoreabbrev q Sayonara
+cnoreabbrev wq w<bar>bdelete
+cnoreabbrev q bdelete
+cnoreabbrev Q quit
+
 
 " added because paste disables abbreviations,
 " breaking the above
@@ -215,12 +244,14 @@ func! ProseMode()
   highlight LineNr ctermfg=0 ctermbg=8
 
   " http://www.terminally-incoherent.com/blog/2013/06/17/using-vim-for-writing-prose/
+  " see :help fo-table
   setlocal formatoptions=ant
-  "setlocal textwidth=80
+  " setlocal textwidth=80
 
   setlocal wrapmargin=0
 
-  call pencil#init()
+  #call pencil#init({'wrap': 'hard', 'autoformat': 0})
+  call pencil#init({'wrap': 'soft', 'autoformat': 0})
   call lexical#init()
   call textobj#sentence#init()
   call litecorrect#init()
@@ -228,10 +259,10 @@ func! ProseMode()
     "call LimeLight()
 endfu
 
-augroup pencil
-  autocmd!
-  autocmd FileType markdown,mkd,text call ProseMode()
-augroup END
+" augroup pencil
+"   autocmd!
+"   autocmd FileType markdown,mkd,text call ProseMode()
+" augroup END
 
 let g:word_count="<unknown>"
 set updatetime=1000
@@ -336,40 +367,56 @@ let g:ctrlp_user_command = ['.git/', 'git --git-dir=%s/.git ls-files -oc --exclu
 " it would be interesting to look into purely using tmux panes
 " and some other cli util for file navigation
 " https://vi.stackexchange.com/questions/317/can-i-open-a-file-in-an-existing-vim-instance-from-an-external-command
-let g:netrw_banner = 0
-let g:netrw_liststyle = 3
-let g:netrw_browse_split = 4
-let g:netrw_altv = 1
-let g:netrw_winsize = 25
-map <Leader>n :Lexplore<CR>
+" let g:netrw_banner = 0
+" let g:netrw_liststyle = 3
+" let g:netrw_browse_split = 4
+" let g:netrw_altv = 1
+" let g:netrw_winsize = 25
+" map <Leader>n :Lexplore<CR>
+" 
+" let g:netrw_list_hide= '.*\.swp$,.*\.swo$,.*\.swm$,.*\.pyc$'
 
-let g:netrw_list_hide= '.*\.swp$,.*\.swo$,.*\.swm$,.*\.pyc$'
 
+" augroup netrw_mapping
+"   autocmd!
+"   autocmd filetype netrw call NetrwMapping()
+" augroup END
+" 
+" function! NetrwMapping()
+"   nnoremap <buffer> <c-l> :wincmd l<cr>
+" endfunction
+ 
 
-augroup netrw_mapping
-  autocmd!
-  autocmd filetype netrw call NetrwMapping()
-augroup END
+" change o to t as regular opening is now
+" like open-in-tab behavior
+" let NERDTreeMapOpenInTab='\t'
+" let NERDTreeMapActivateNode='t'
 
-function! NetrwMapping()
-  nnoremap <buffer> <c-l> :wincmd l<cr>
+" map <Leader>n :NERDTreeToggle<CR>
+" let NERDTreeAutoDeleteBuffer = 1
+" let g:NERDTreeGitStatusIndicatorMapCustom = {
+"     \ "Modified"  : "_",
+"     \ "Staged"    : "S",
+"     \ "Untracked" : "U",
+"     \ "Renamed"   : ">",
+"     \ "Unmerged"  : "%",
+"     \ "Deleted"   : "D",
+"     \ "Dirty"     : "%",
+"     \ "Clean"     : "C",
+"     \ "Unknown"   : "?"
+"     \ }
+" let NERDTreeIgnore = ['\.pyc$']
+map <Leader>n :Fern . -drawer -toggle<CR>
+
+function! s:init_fern() abort
+  nmap <buffer> o <Plug>(fern-action-open)
+  setlocal nonumber
 endfunction
 
-
-"map <Leader>n <plug>NERDTreeToggle<CR>
-"let NERDTreeAutoDeleteBuffer = 1
-"let g:NERDTreeGitStatusIndicatorMapCustom = {
-"    \ "Modified"  : "_",
-"    \ "Staged"    : "S",
-"    \ "Untracked" : "U",
-"    \ "Renamed"   : ">",
-"    \ "Unmerged"  : "%",
-"    \ "Deleted"   : "D",
-"    \ "Dirty"     : "%",
-"    \ "Clean"     : "C",
-"    \ "Unknown"   : "?"
-"    \ }
-"let NERDTreeIgnore = ['\.pyc$']
+augroup fern-custom
+  autocmd! *
+  autocmd FileType fern call s:init_fern()
+augroup END
 
 com! UT UndotreeToggle
 

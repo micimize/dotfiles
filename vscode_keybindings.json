@@ -53,21 +53,22 @@
     "command": "list.select",
     "when": "listFocus && !inputFocus"
   },
-  {
-    "key": "ctrl+n",
-    "command": "workbench.action.nextEditorInGroup"
-  },
-  {
-    "key": "ctrl+p",
-    "command": "workbench.action.previousEditorInGroup"
-  },
+  //
+  // TODO: vscode has default alt+arrows and alt+shift+arrows
+  // for editor.action.moveLinesUpAction and editor.action.copyLinesUpAction.
+  // This is a good idea but I should shave it into vim config
+  // using https://vim.fandom.com/wiki/Moving_lines_up_or_down as reference
+  //
+  // general hjkl
   {
     "key": "ctrl+h",
-    "command": "workbench.action.navigateLeft"
+    "command": "workbench.action.navigateLeft",
+    "when": "!panelFocus || !terminalFocus",
   },
   {
     "key": "ctrl+l",
-    "command": "workbench.action.navigateRight"
+    "command": "workbench.action.navigateRight",
+    "when": "!panelFocus || !terminalFocus",
   },
   {
     "key": "ctrl+k",
@@ -76,5 +77,250 @@
   {
     "key": "ctrl+j",
     "command": "workbench.action.navigateDown"
-  }
+  },
+  {
+    "key": "ctrl+alt+p",
+    "command": "workbench.action.togglePanel",
+  },
+  {
+    "key": "alt+shift+p",
+    "command": "workbench.action.toggleMaximizedPanel",
+  },
+  {
+    "key": "ctrl+alt+k",
+    "command": "workbench.action.terminal.moveToEditor",
+    "when": "panelFocus && terminalFocus"
+  },
+  {
+    "key": "ctrl+alt+j",
+    "command": "workbench.action.terminal.moveToTerminalPanel",
+    "when": "!panelFocus && terminalFocus"
+  },
+  {
+    "key": "ctrl+alt+-",
+    "command": "workbench.action.decreaseViewWidth"
+  },
+  {
+    "key": "ctrl+alt+=",
+    "command": "workbench.action.increaseViewWidth"
+  },
+  {
+    "key": "ctrl+alt+[",
+    "command": "workbench.action.decreaseViewHeight"
+  },
+  {
+    "key": "ctrl+alt+]",
+    "command": "workbench.action.increaseViewHeight"
+  },
+  // - workbench.action.decreaseViewHeight
+  // - workbench.action.decreaseViewSize
+  // - workbench.action.decreaseViewWidth
+  /*
+  {
+    "key": "alt+l",
+    "command": "workbench.action.createTerminalEditorSide",
+    "when": "editorTextFocus"
+  },
+  */
+  // Move focused editor around groups
+  {
+    "key": "alt+l",
+    "command": "workbench.action.moveEditorToRightGroup",
+    "when": "editorTextFocus || terminalFocus && !panelFocus"
+  },
+  {
+    "key": "alt+j",
+    "command": "workbench.action.moveEditorToBelowGroup",
+    "when": "editorTextFocus || terminalFocus && !panelFocus"
+  },
+  {
+    "key": "alt+k",
+    "command": "workbench.action.moveEditorToAboveGroup",
+    "when": "editorTextFocus || terminalFocus && !panelFocus"
+  },
+  {
+    "key": "alt+h",
+    "command": "workbench.action.moveEditorToLeftGroup",
+    "when": "editorTextFocus || terminalFocus && !panelFocus"
+  },
+  // next and previous for editors
+  {
+    "key": "ctrl+n",
+    "command": "workbench.action.nextEditorInGroup"
+  },
+  {
+    "key": "ctrl+p",
+    "command": "workbench.action.previousEditorInGroup"
+  },
+  // next and previous for bottom panels (problems, output, terminal)
+  // TODO alt+n not well behaved when in input
+  {
+    "key": "alt+n",
+    "command": "workbench.action.nextPanelView",
+    "when": "panelFocus"
+  },
+  {
+    "key": "alt+p",
+    "command": "workbench.action.previousPanelView",
+    "when": "panelFocus"
+  },
+  // next and previous for bottom terminal groups
+  {
+    "key": "ctrl+n",
+    "command": "workbench.action.terminal.focusNext",
+    "when": "terminalFocus && terminalHasBeenCreated && panelFocus"
+  },
+  {
+    "key": "ctrl+p",
+    "command": "workbench.action.terminal.focusPrevious",
+    "when": "terminalFocus && terminalHasBeenCreated && panelFocus"
+  },
+  // next and previous for side bar views
+  {
+    "key": "ctrl+n",
+    "command": "workbench.action.nextSideBarView",
+    "when": "sideBarFocus"
+  },
+  {
+    "key": "ctrl+p",
+    "command": "workbench.action.previousSideBarView",
+    "when": "sideBarFocus"
+  },
+  // up and down between open editors and file explorer
+  {
+    "key": "ctrl+k",
+    "command": "workbench.files.action.focusOpenEditorsView",
+    "when": "sideBarFocus && explorerViewletVisible"
+  },
+  {
+    "key": "ctrl+j",
+    "command": "workbench.files.action.focusFilesExplorer",
+    "when": "sideBarFocus && explorerViewletVisible && !filesExplorerFocus"
+  },
+  // up and down in search view
+  //{
+  //    "key": "ctrl+j",
+  //    "command": "search.action.focusSearchList",
+  //    "when": "inSearchEditor && inputBoxFocus || inputBoxFocus && searchViewletVisible"
+  //},
+  // todo ctrl+j should go between inputs before jumping to results, if possible
+  {
+    "key": "ctrl+j",
+    "command": "search.focus.nextInputBox",
+    "when": "inSearchEditor && inputBoxFocus || inputBoxFocus && searchViewletVisible"
+  },
+  {
+    "key": "ctrl+k",
+    "command": "search.action.focusSearchFromResults",
+    "when": "sideBarFocus && searchViewletVisible"
+  },
+  // search type toggles
+  {
+    "key": "ctrl+r",
+    "command": "toggleSearchRegex",
+    "when": "sideBarFocus && searchViewletVisible"
+  },
+  {
+    "key": "ctrl+w",
+    "command": "toggleSearchWholeWord",
+    "when": "sideBarFocus && searchViewletVisible"
+  },
+  {
+    "key": "ctrl+i",
+    "command": "toggleSearchCaseSensitive",
+    "when": "sideBarFocus && searchViewletVisible"
+  },
+  // / like the second / in `sed 's/find/replace'`
+  {
+    "key": "ctrl+/",
+    "command": "workbench.action.replaceInFiles",
+    "when": "sideBarFocus && searchViewletVisible && !replaceActive"
+  },
+  // todo would be better to have a "replace input shown" toggle
+  {
+    "key": "ctrl+/",
+    "command": "closeReplaceInFilesWidget",
+    "when": "sideBarFocus && searchViewletVisible && replaceActive",
+  },
+  // unset esc-> close replace
+  {
+    "key": "escape",
+    "command": "", //"search.action.focusQueryEditorWidget",
+    "when": "replaceInputBoxFocus && searchViewletVisible",
+  },
+  // g for global (this toggles the include/exclude)
+  {
+    "key": "ctrl+g",
+    "command": "workbench.action.search.toggleQueryDetails",
+    "when": "sideBarFocus && searchViewletVisible"
+  },
+  {
+    "key": "ctrl+enter",
+    "command": "jupyter.runFileInteractive",
+    "when": "editorTextFocus && isWorkspaceTrusted && jupyter.ownsSelection && !findInputFocussed && !notebookEditorFocused && !replaceInputFocussed && editorLangId == 'python'"
+  },
+  {
+    "key": "shift+alt+enter",
+    "command": "jupyter.runAndDebugCell"
+  },
+  {
+    "key": "ctrl+shift+enter",
+    "command": "-jupyter.runAndDebugCell"
+  },
+  {
+    "key": "alt+ctrl+o",
+    "command": "workbench.action.terminal.openFileLink"
+  },
+  {
+    "key": "alt+t",
+    "command": "workbench.action.createTerminalEditor"
+  },
+  {
+    "key": "alt+l",
+    "command": "workbench.action.terminal.split",
+    "when": "panelFocus && terminalFocus",
+  },
+  {
+    "key": "alt+h",
+    "command": "workbench.action.terminal.split",
+    "when": "panelFocus && terminalFocus",
+  },
+  {
+    "key": "ctrl+alt+u",
+    "command": "workbench.action.terminal.unsplit",
+    "when": "panelFocus && terminalFocus"
+  },
+  {
+    "key": "ctrl+alt+j",
+    "command": "workbench.action.terminal.join",
+    "when": "panelFocus && terminalFocus"
+  },
+  {
+    "key": "ctrl+alt+r",
+    "command": "workbench.action.terminal.rename"
+  },
+  {
+    "key": "ctrl+alt+right",
+    "command": "workbench.action.terminal.resizePaneRight",
+    "when": "terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported"
+  },
+  {
+    "key": "ctrl+alt+left",
+    "command": "workbench.action.terminal.resizePaneLeft",
+    "when": "terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported"
+  },
+  {
+    "key": "ctrl+l",
+    "command": "workbench.action.terminal.focusNextPane",
+    "when": "panelFocus && terminalFocus"
+  },
+  {
+    "key": "ctrl+h",
+    "command": "workbench.action.terminal.focusPreviousPane",
+    "when": "panelFocus && terminalFocus"
+  },
+  {
+    "key": "ctrl+alt+g",
+    "command": "workbench.action.joinAllGroups"
+  },
 ]

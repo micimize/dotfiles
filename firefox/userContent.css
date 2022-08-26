@@ -1,0 +1,8 @@
+@media (prefers-color-scheme: dark) {
+  #viewerContainer > .pdfViewer {
+      filter: invert(90%) !important;
+  }
+  #viewerContainer > .pdfViewer > .page {
+    border-image: none !important;
+  }
+}

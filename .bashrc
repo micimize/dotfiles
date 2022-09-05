@@ -160,30 +160,14 @@ ssh-del() {
     sed -i -e ${1}d ~/.ssh/known_hosts
 }
  
-psgrep() {
-        if [ ! -z $1 ] ; then
-                echo "Grepping for processes matching $1..."
-                ps aux | grep $1 | grep -v grep
-        else
- 
-                echo "!! Need name to grep for"
-        fi
-}
- 
-# clock - a little clock that appeares in the terminal window.
-# Usage: clock.
-#
-clock ()
-{
-while true;do clear;echo "===========";date +"%r";echo "===========";sleep 1;done
-}
- 
 # showip - show the current IP address if connected to the internet.
 # Usage: showip.
 #
 showip ()
 {
-lynx -dump -hiddenlinks=ignore -nolist http://checkip.dyndns.org:8245/ | awk '{ print $4 }' | sed '/^$/d; s/^[ ]*//g; s/[ ]*$//g' 
+  lynx -dump -hiddenlinks=ignore -nolist http://checkip.dyndns.org:8245/ |
+    awk '{ print $4 }' |
+    sed '/^$/d; s/^[ ]*//g; s/[ ]*$//g' 
 }
  
 ##################
@@ -192,17 +176,17 @@ lynx -dump -hiddenlinks=ignore -nolist http://checkip.dyndns.org:8245/ | awk '{ 
 ex () {
     if [ -f $1 ] ; then
         case $1 in
-            *.tar.bz2)   tar xjf $1        ;;
+            *.tar.bz2)   tar xjf $1     ;;
             *.tar.gz)    tar xzf $1     ;;
-            *.bz2)       bunzip2 $1       ;;
-            *.rar)       rar x $1     ;;
-            *.gz)        gunzip $1     ;;
-            *.tar)       tar xf $1        ;;
-            *.tbz2)      tar xjf $1      ;;
-            *.tgz)       tar xzf $1       ;;
-            *.zip)       unzip $1     ;;
+            *.bz2)       bunzip2 $1     ;;
+            *.rar)       rar x $1       ;;
+            *.gz)        gunzip $1      ;;
+            *.tar)       tar xf $1      ;;
+            *.tbz2)      tar xjf $1     ;;
+            *.tgz)       tar xzf $1     ;;
+            *.zip)       unzip $1       ;;
             *.Z)         uncompress $1  ;;
-            *.7z)        7z x $1    ;;
+            *.7z)        7z x $1        ;;
             *)           echo "'$1' cannot be extracted via extract()" ;;
         esac
     else
@@ -342,53 +326,11 @@ export PATH=$COCOS_CONSOLE_ROOT:$PATH
 stty -ixon
 # for vim-ipython
 stty stop undef # to unmap ctrl-s
-# prevent YouCompleteMe from crashing
-export DYLD_FORCE_FLAT_NAMESPACE=1
 
-function lolping {
-    psum=0.0
-    count=0
-    na=104.160.131.1 # someone posted this
-    eune=184.85.223.210 # dredged from log files
-    euw=prod.euw1.lol.riotgames.com # someone posted this
-    /Contents/LoL/RADS/projects/lol_patcher/managedfiles/0.0.0.0/shards.txt
-    while read ping
-    do
-        ptime=$(echo $ping | sed -e 's/^.*time=\(.*\) ms/\1/'  -e 'tx' -e 'd' -e ':x')
-        if [ -n "$ptime" ]; then
-            psum=$(echo "scale = 3; $psum + $ptime" | bc)
-            ((count++))
-            echo time=$ptime avg=$(bc <<< "scale = 3; $psum / $count")
-        fi
-    done < <(ping $(eval "echo $`echo $1`"))
-    # patch servers I've found from `ack last_host_ip $pathtoleague/Contents/LoL/Logs/Patcher\ Logs/`
-    # usa - 23.14.92.96
-    # sweden - 92.123.155.49, 92.123.155.35
-    # somewhere in the EU - 92.122.214.202
-    # netherlands - 184.85.223.210, 184.85.223.232
-    # ack `prod.*.lol.riotgames.com $pathtoleague/Contents/LoL/RADS/projects/lol_patcher/managedfiles/0.0.0.*` can help find the "urls", though prod.eun1... is firewalled or something
-}
 function nametab {
     export PROMPT_COMMAND="echo -ne '\033]0;$@\007'"
 }
 alias nt=nametab
-function double-git {
-    nt $1"/code"
-    second=$2
-    alias pushmaster="git push origin master:master"
-    alias push$second="git push $second feature:master"
-}
-function double-git-init {
-    nt $1"/code"
-    second=$2
-    git branch feature
-    git checkout feature
-    git remote add $second git@bitbucket.org:michaeljosephrosenthal/${1}.git
-    git push -u $second feature:master
-    git branch -u $second/master
-    alias pushmaster="git push origin master:master"
-    alias push$second="git push $second feature:master"
-}
 
 function git-vimerge {
     vim -p $(git --no-pager diff --name-status --diff-filter=U | awk 'BEGIN {x=""} {x=x" "$2;} END {print x}')
@@ -429,28 +371,6 @@ function docker-clean {
     docker run -v /var/run/docker.sock:/var/run/docker.sock -v /var/lib/docker:/var/lib/docker --rm martin/docker-cleanup-volumes
 }
 
-function git-remote-rename {
-    new_name=$1
-    base=$(git remote -v | head -n 1 | awk '{print $2}' | awk -F '/' '{print $1}')
-    git remote remove origin
-    git remote add origin ${base}/${1}.git
-}
-
-function npm-ls-linked-deps {
-    ls -l node_modules | \
-        grep ^l | \
-        awk '{print $9}' | \
-        sed 's/@//g';
-}
-function npms {
-    npm $@ --color=always 2>&1 | grep -vE 'Module is inside a symlinked module'
-}
-
-pip-diff () {
-    grep -v -f <(cat requirements.txt .dependencies.txt | sed '/^$/d') <(pip freeze -r requirements.txt) | sed '/^$/d'
-}
-
-
 function feature-in () {
     branch=$1
     t in $branch
@@ -467,23 +387,11 @@ function feature-out () {
     t d | grep "$branch"
 }
 
-# function git-sync () {
-#     branch=$1
-#     git branch -a | \
-#         grep -v origin | \
-#         awk -F '/' '{ print $3 }' | \
-#         sed '/^\s*$/d' | \
-#         awk '{ print "git push '$branch' :"$1 }'
-#     echo "git fetch $branch --prune"
-# }
-
 set -o vi
 
 #[ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
 #export PATH="$HOME/.yarn/bin:$PATH"
-
-
 
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 

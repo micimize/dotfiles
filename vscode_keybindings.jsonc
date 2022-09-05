@@ -1,6 +1,17 @@
 // Place your key bindings in this file to overwrite the defaults
 [
   {
+    "key": "ctrl+c",
+    "command": "workbench.action.terminal.copySelection",
+    "when": "terminalFocus && terminalHasBeenCreated && terminalTextSelected || terminalFocus && terminalProcessSupported && terminalTextSelected"
+  },
+  {
+    "key": "ctrl+v",
+    "command": "workbench.action.terminal.paste",
+    "when": "terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported"
+  },
+  // vimifation, etc
+  {
     "key": "j",
     "command": "list.focusDown",
     "when": "listFocus && !inputFocus"
@@ -151,6 +162,15 @@
   {
     "key": "ctrl+p",
     "command": "workbench.action.previousEditorInGroup"
+  },
+  // 
+  {
+    "key": "ctrl+space",
+    "command": "workbench.action.quickOpen"
+  },
+  {
+    "key": "ctrl+shift+space",
+    "command": "workbench.action.showCommands"
   },
   // next and previous for bottom panels (problems, output, terminal)
   // TODO alt+n not well behaved when in input

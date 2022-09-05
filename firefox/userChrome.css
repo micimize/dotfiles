@@ -68,8 +68,8 @@
 #sidebar-header > #sidebar-switcher-target {
   background-color: rgb(71, 71, 73) !important;
   color: black !important;
-  width: 28px !important;
-  height: 28px !important;
+  width: 32px !important;
+  height: 32px !important;
   /*
    * because sidebar header sizing can't be controlled,
    * we need to pass pointer events to <- -> buttons
@@ -84,14 +84,14 @@
 /* Make the header button the size of the nav bar button and transparent */
 #sidebar-header {
   position: fixed !important;
-  margin-left: 68px !important;
-  margin-top: -36px !important;
+  margin-left: 72px !important;
+  margin-top: -40px !important;
   padding-top: 2px !important;
   background-color: transparent !important;
   padding-bottom: 0px !important;
   margin-bottom: 4px !important;
   width: 29px !important;
-  height: 32px !important;
+  height: 36px !important;
   pointer-events: none;
   border-color: transparent !important;
 }

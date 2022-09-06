@@ -1,3 +1,37 @@
+# (cat /Users/mjr/.cache/wal/sequences &)
+set -o nomatch
+
+DISABLE_MAGIC_FUNCTIONS=true
+
+#
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+
+function short_prompt {
+  typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(background_jobs_joined vi_mode)
+  p10k reload
+}
+
+function medium_prompt {
+  typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
+    virtualenv time background_jobs_joined vcs vi_mode
+  )
+  p10k reload
+}
+
+function long_prompt {
+  typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
+    virtualenv time dir background_jobs_joined vcs vi_mode
+  )
+  p10k reload
+}
+
+
 # zmodload zsh/zprof
 
 bindkey '^R' history-incremental-pattern-search-backward
@@ -22,7 +56,7 @@ source $HOME/.poetry/env
 
 export GOPATH=$HOME/golang
 export GOROOT=/usr/local/opt/go/libexec
-export PATH=$PATH:$HOME/bin:$HOME/node_modules/.bin:/usr/local/sbin:$GOPATH/bin:$GOROOT/bin:$HOME/Library/Android/sdk/platform-tools/:$HOME/.cargo/bin
+export PATH=$HOME/bin:$HOME/node_modules/.bin:/usr/local/sbin:$GOPATH/bin:$GOROOT/bin:$HOME/Library/Android/sdk/platform-tools/:$HOME/.cargo/bin:$PATH
 
 export PATH="$PATH":"$HOME/flutter/.pub-cache/bin"
 export PATH="$PATH":"$HOME/flutter/bin"
@@ -39,6 +73,7 @@ export LDFLAGS="-L/usr/local/opt/ruby/lib"
 export CPPFLAGS="-I/usr/local/opt/ruby/include"
 export PKG_CONFIG_PATH="/usr/local/opt/ruby/lib/pkgconfig"
 
+export PATH="/Users/mjr/code/personal/dotfiles/lynx:$PATH"
 
 
 if [ -d /opt/local/bin ]; then
@@ -48,6 +83,7 @@ fi
 if [ -d /usr/lib/cw ] ; then
   PATH="/usr/lib/cw:$PATH"
 fi
+
 
 export ZSH_DISABLE_COMPFIX=true # 
 # Path to your oh-my-zsh installation.
@@ -76,6 +112,8 @@ YARN_ENABLED=true
 unsetopt correct_all  
 setopt correct
 
+setopt extended_glob
+
 #
 # Theme
 # 
@@ -83,55 +121,50 @@ setopt correct
 ZSH_THEME="powerlevel10k/powerlevel10k"
 POWERLEVEL9K_MODE="awesome-patched"
 
-POWERLEVEL9K_DISABLE_RPROMPT=true
-POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=( virtualenv time dir background_jobs_joined vcs vi_mode)
-
-POWERLEVEL9K_TIME_FORMAT="%D{%m-%d %H:%M}"
-POWERLEVEL9K_TIME_FOREGROUND='cyan'
-POWERLEVEL9K_TIME_BACKGROUND='black'
-
-POWERLEVEL9K_SHORTEN_DIR_LENGTH=3
-POWERLEVEL9K_SHORTEN_STRATEGY="truncate_from_right"
-POWERLEVEL9K_DIR_HOME_BACKGROUND='black'
-POWERLEVEL9K_DIR_HOME_SUBFOLDER_BACKGROUND='black'
-POWERLEVEL9K_DIR_DEFAULT_BACKGROUND='black'
-POWERLEVEL9K_DIR_HOME_FOREGROUND='magenta'
-POWERLEVEL9K_DIR_HOME_SUBFOLDER_FOREGROUND='magenta'
-POWERLEVEL9K_DIR_DEFAULT_FOREGROUND='magenta'
-
-POWERLEVEL9K_VI_INSERT_MODE_STRING="I"
-POWERLEVEL9K_VI_COMMAND_MODE_STRING="N"
-POWERLEVEL9K_VI_MODE_INSERT_BACKGROUND='blue'
-POWERLEVEL9K_VI_MODE_INSERT_FOREGROUND='white'
-POWERLEVEL9K_VI_MODE_NORMAL_BACKGROUND='yellow'
-
-POWERLEVEL9K_LEGACY_ICON_SPACING=true
-
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=10'
 
 # I use this for writing to give myself nice padded layout
 function margin_pane {
-  export POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vi_mode)
-  export POWERLEVEL9K_VI_MODE_INSERT_BACKGROUND='black'
-  export POWERLEVEL9K_VI_MODE_NORMAL_BACKGROUND='black'
+  bright='brightblack'
+  dark='black'
+  # vscode bright and normal black are reversed
+  if [[ "$VSCODE_SESSION" != "" ]] {
+    dark='brightblack'
+    bright='black'
+  }
+  
+  export POWERLEVEL9K_VI_MODE_INSERT_BACKGROUND="$dark"
+  export POWERLEVEL9K_VI_MODE_INSERT_FOREGROUND='blue'
+  export POWERLEVEL9K_VI_MODE_NORMAL_BACKGROUND="$dark"
+  export POWERLEVEL9K_VI_MODE_NORMAL_FOREGROUND='yellow'
+  short_prompt
 
-  pane_borders='bg=brightblack,fg=brightblack'
-
+  pane_borders="bg=$bright,fg=$bright"
   tmux set-option pane-border-style $pane_borders
   tmux set-option pane-active-border-style $pane_borders
-  tmux select-pane -P 'bg=black'
+  tmux select-pane -P "bg=$dark"
+
   clear
 }
 
-unmargin_pane () {
-        export POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(virtualenv time dir background_jobs_joined vcs vi_mode)
-        export POWERLEVEL9K_VI_MODE_INSERT_BACKGROUND='blue'
-        export POWERLEVEL9K_VI_MODE_INSERT_FOREGROUND='white'
-        export POWERLEVEL9K_VI_MODE_NORMAL_BACKGROUND='yellow'
-        export POWERLEVEL9K_VI_MODE_NORMAL_FOREGROUND='brblack'
-        p10k reload
-        tmux set-option pane-border-style ''
-        tmux set-option pane-active-border-style 'fg=green'
-        tmux select-pane -P 'bg=brightblack'
+function unmargin_pane {
+  bright='brightblack'
+  brblack='brblack'
+  # vscode bright and normal black are reversed
+  #if [[ "$VSCODE_SESSION" != "" ]] {
+  #  bright='black'
+  #  brblack='black'
+  #}
+
+  export POWERLEVEL9K_VI_MODE_INSERT_BACKGROUND='blue'
+  export POWERLEVEL9K_VI_MODE_INSERT_FOREGROUND='white'
+  export POWERLEVEL9K_VI_MODE_NORMAL_BACKGROUND='yellow'
+  export POWERLEVEL9K_VI_MODE_NORMAL_FOREGROUND="$brblack"
+  long_prompt
+
+  tmux set-option pane-border-style ''
+  tmux set-option pane-active-border-style 'fg=green'
+  tmux select-pane -P "bg=$bright"
 }
 
 
@@ -149,6 +182,10 @@ CASE_SENSITIVE="true" # Foo != foo
 source ~/code/personal/dotfiles/zsh/plugins.sh
 
 
+export PATH="/Users/mjr/code/personal/dotfiles/lynx/""$PATH"
+alias '?'='duck'
+
+
 
 source $ZSH/oh-my-zsh.sh
 
@@ -159,12 +196,14 @@ HISTSIZE=999999999
 SAVEHIST=$HISTSIZE
 
 set -o vi
+# bindkey -e # alt-enter for multi-line
 
 bindkey "^?" backward-delete-char
 bindkey -v
 bindkey '^R' history-incremental-search-backward
 
 alias ":q"="exit"
+alias ":d"="tmux detach-client"
 alias s="ls | GREP_COLOR='1;34' grep --color '.*@'"
 alias l="ls"
 
@@ -172,6 +211,14 @@ alias date=gdate
 alias isodate="gdate -Ins"
 
 alias chrome="/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome"
+
+alias shadows_off="defaults write com.apple.screencapture disable-shadow true && killall SystemUIServer"
+alias shadows_on="defaults write com.apple.screencapture disable-shadow false"
+
+function font_smoothing_level {
+  defaults -currentHost write -g AppleFontSmoothing -int $1
+  echo "font smoothing set to $1 on a scale of 0-2. Restart for it to take effect"
+}
 
 # make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(lesspipe)"
@@ -214,6 +261,12 @@ export GREP_OPTIONS=--color=auto
 ##############################################################################
 # Functions
 ##############################################################################
+#
+# change dir callback
+function chpwd {
+  export G=`git rev-parse --show-toplevel 2> /dev/null`
+}
+
 # Delete line from known_hosts
 # courtesy of rpetre from reddit
 ssh-del() {
@@ -262,13 +315,17 @@ ex () {
 }
 
 
+export NOTES_DIR="/Users/mjr/code/personal/micimize.com/content/_private"
+# export NOTES_DIR="~/Documents/notes"
+
 function note {
     dir=`pwd`
-    cd ~/Documents/notes
+    cd $NOTES_DIR
     vim -p "$@" 
     cd $dir
 }
-alias notes='vim ~/Documents/notes'
+alias notes="vim $NOTES_DIR"
+
 
 
 
@@ -358,6 +415,28 @@ function feature-out () {
   t d | grep "$branch"
 }
 
+function verbose_time {
+  dow=$(date +%w)
+  doy=$(date +%j)
+  woy=$(date +%V)
+  echo -e "
+  \e[2m$(date --iso-8601=seconds)\e[0m"
+  date +"\
+  %A, %B %dXX, %R (%Z), %Y
+  %wXX Day of the Week ($(( 7 - $dow ))/7 remaining)
+  %jXX Day of the Year ($(( 365 - $doy ))/365 remaining)
+  %VXX Week of the Year ($(( 53 - $woy ))/53 remaining)
+  " | \
+  sed -e 's/11XX/11th/' \
+      -e 's/12XX/12th/' \
+      -e 's/13XX/13th/' \
+      -e 's/1XX/1st/'   \
+      -e 's/2XX/2nd/'   \
+      -e 's/3XX/3rd/'   \
+      -e 's/XX/th/'
+}
+
+
 #[ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
 
@@ -441,6 +520,8 @@ function git_diff {
       | xargs git diff $@ --
 }
 
+alias maybe_fix_youtube_because_my_macbook_was_sold_to_me_broken_but_apple_will_never_actually_fix_it_no_sir_E_bob='sudo killall coreaudiod'
+
 alias csvdiff='git diff --color-words="[^[:space:],]+" --no-index'
 alias git_csvdiff='git diff --color-words="[^[:space:],]+"'
 
@@ -463,7 +544,7 @@ if [ -f '/Users/mjr/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/mjr/g
 #         fi
 #     fi
 # }
-
+#
 
 function notify_me {
   osascript -e 'display notification "NOTIFICATION" with title "NOTIFICATION"'
@@ -473,3 +554,50 @@ function notify_me {
 source /Users/mjr/Library/Preferences/org.dystroy.broot/launcher/bash/br
 
 # zprof
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+
+function ruby_bullshit {
+  eval "$(rbenv init -)"
+}
+
+# for use when tmux exits unexpectedly losing the last symlink and you need your session back
+function resurrect_tmux_resurrect {
+  last="$(ls ~/.tmux/resurrect/*.txt | tail -n 1)"
+  ln -sf $last ~/.tmux/resurrect/last
+}
+
+
+# # >>> conda initialize >>>
+# # !! Contents within this block are managed by 'conda init' !!
+#  __conda_setup="$('/usr/local/anaconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+#  if [ $? -eq 0 ]; then
+#      eval "$__conda_setup"
+#  else
+#      if [ -f "/usr/local/anaconda3/etc/profile.d/conda.sh" ]; then
+#          . "/usr/local/anaconda3/etc/profile.d/conda.sh"
+#      else
+#          export PATH="/usr/local/anaconda3/bin:$PATH"
+#      fi
+#  fi
+#  unset __conda_setup
+# # <<< conda initialize <<<
+
+
+# TODO conda activate does not work, 
+# you have to `export PATH="/usr/local/anaconda3/envs/deepchem/bin:$PATH"` atm
+
+alias jumble='wal -c && wal -i ~/Pictures/wallpapers/4k/ --backend solarish --just-solarish-bg'
+alias unjumble='wal -c && wal -i ~/Pictures/wallpapers/black.png --backend solarish --just-solarish-bg'
+export PATH="/usr/local/opt/openssl@3/bin:$PATH"
+
+alias firefox=/Applications/FirefoxDeveloperEdition.app/Contents/MacOS/firefox
+alias ff="firefox -new-tab"
+
+if [ -n "${VSCODE_SESSION}" ]; then
+  source .vscode/*activate.sh
+  medium_prompt
+fi
+

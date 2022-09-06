@@ -1,12 +1,14 @@
 if [[ $- != *i* ]] ; then
-         # Shell is non-interactive.  Be done now!
-         return
+  # Shell is non-interactive.  Be done now!
+  return
 fi
 
 #USER config
 export USER_SHORTPATH=true
 
- 
+export FIREFOX_PROFILE_DIR="$HOME/snap/firefox/common/.mozilla/firefox/bsx5dc2h.default"
+export DOTFILES_DIR="$HOME/code/personal/dotfiles"
+
 #enable bash completion
 [ -f /etc/profile.d/bash-completion ] && source /etc/profile.d/bash-completion
  
@@ -15,18 +17,18 @@ export USER_SHORTPATH=true
  
 
 # ruby
-export PATH="/Users/mjr/.gem/ruby/2.6.0/bin:/usr/local/opt/ruby/bin:$PATH"
+# export PATH="/Users/mjr/.gem/ruby/2.6.0/bin:/usr/local/opt/ruby/bin:$PATH"
 
-export LDFLAGS="-L/usr/local/opt/ruby/lib"
-export CPPFLAGS="-I/usr/local/opt/ruby/include"
-export PKG_CONFIG_PATH="/usr/local/opt/ruby/lib/pkgconfig"
+# export LDFLAGS="-L/usr/local/opt/ruby/lib"
+# export CPPFLAGS="-I/usr/local/opt/ruby/include"
+# export PKG_CONFIG_PATH="/usr/local/opt/ruby/lib/pkgconfig"
 
 # Shell variables
 export PAGER=less
 export EDITOR=vim
-export GOPATH=$HOME/golang
-export GOROOT=/usr/local/opt/go/libexec
-export PATH=$PATH:$HOME/bin:$HOME/node_modules/.bin:/usr/local/sbin:$GOPATH/bin:$GOROOT/bin
+# export GOPATH=$HOME/golang
+# export GOROOT=/usr/local/opt/go/libexec
+# export PATH=$PATH:$HOME/bin:$HOME/node_modules/.bin:/usr/local/sbin:$GOPATH/bin:$GOROOT/bin
 export LESS='-R'
 export HISTCONTROL=ignoredups
 export HISTSIZE=5000
@@ -34,11 +36,11 @@ export HISTFILESIZE=5000
 export HISTIGNORE="&:ls:ll:la:l.:pwd:exit:clear"
  
 if [ -d /opt/local/bin ]; then
-        PATH="/opt/local/bin:$PATH"
+  PATH="/opt/local/bin:$PATH"
 fi
  
 if [ -d /usr/lib/cw ] ; then
-        PATH="/usr/lib/cw:$PATH"
+  PATH="/usr/lib/cw:$PATH"
 fi
  
 complete -cf sudo       # Tab complete for sudo
@@ -57,15 +59,9 @@ set -o ignoreeof        # stops ctrl+d from logging me out
  
 # Set appropriate ls alias
 case $(uname -s) in
-        Darwin|FreeBSD)
-                alias ls="ls -hFG"
-        ;;
-        Linux)
-                alias ls="ls --color=always -hF"
-        ;;
-        NetBSD|OpenBSD)
-                alias ls="ls -hF"
-        ;;
+  Darwin|FreeBSD) alias ls="ls -hFG"      ;;
+  Linux) alias ls="ls --color=always -hF" ;;
+  NetBSD|OpenBSD) alias ls="ls -hF" ;;
 esac
  
 alias rm="rm -i"
@@ -174,24 +170,24 @@ showip ()
 #extract files eg: ex tarball.tar#
 ##################
 ex () {
-    if [ -f $1 ] ; then
-        case $1 in
-            *.tar.bz2)   tar xjf $1     ;;
-            *.tar.gz)    tar xzf $1     ;;
-            *.bz2)       bunzip2 $1     ;;
-            *.rar)       rar x $1       ;;
-            *.gz)        gunzip $1      ;;
-            *.tar)       tar xf $1      ;;
-            *.tbz2)      tar xjf $1     ;;
-            *.tgz)       tar xzf $1     ;;
-            *.zip)       unzip $1       ;;
-            *.Z)         uncompress $1  ;;
-            *.7z)        7z x $1        ;;
-            *)           echo "'$1' cannot be extracted via extract()" ;;
-        esac
-    else
-        echo "'$1' is not a valid file"
-    fi
+  if [ -f $1 ] ; then
+    case $1 in
+      *.tar.bz2)   tar xjf $1     ;;
+      *.tar.gz)    tar xzf $1     ;;
+      *.bz2)       bunzip2 $1     ;;
+      *.rar)       rar x $1       ;;
+      *.gz)        gunzip $1      ;;
+      *.tar)       tar xf $1      ;;
+      *.tbz2)      tar xjf $1     ;;
+      *.tgz)       tar xzf $1     ;;
+      *.zip)       unzip $1       ;;
+      *.Z)         uncompress $1  ;;
+      *.7z)        7z x $1        ;;
+      *)           echo "'$1' cannot be extracted via extract()" ;;
+    esac
+  else
+    echo "'$1' is not a valid file"
+  fi
 }
 
 
@@ -202,60 +198,6 @@ alias ":q"="exit"
 alias s="ls | GREP_COLOR='1;34' grep --color '.*@'"
 alias l="ls"
 
-function map { 
-  if [ $# -le 1 ]; then 
-    return 
-  else 
-    local f=$1 
-    local x=$2 
-    shift 2 
-    local xs=$@ 
-    $f $x 
-    map "$f" $xs 
-  fi 
-}
-
-function singleton-inspect {
-    for FS in "|" "	" "," ";";
-    do 
-       (head -n 5 $1; tail -n 5 $1) | \
-       awk -F "$FS" '(NR > 1 && (fieldcount != NF || NF == 1)){exit 1}; {fieldcount=NF}';
-       if [ $? == 0 ]; then break; fi;
-    done
-    if [ $? == 1 ]; then "couldn't guess delimiter"; exit; fi;
-    echo "delimiter: $(if [ "$FS" == "	" ]; then echo 'tab'; else echo $FS; fi;)"
-    echo "fields:"
-    csvcut -n -d "$FS" $1
-    (head -n 5 $1; tail -n 5 $1) < "$1" | column -s "$FS" -t
-
-    #check all lines for delimiters (assumes dirty data)
-    awk -F "$FS" '(NR == 1){fieldcount=NF}; (NR > 1 && (fieldcount != NF || NF == 1)){print "record "NR" has the wrong field count:"; print $0};' $1;
-    if [[ -n $(ggrep --color='auto' -P -n "[\x80-\xFF]" $1) ]];
-    #expensive encoding checks
-    then echo "Lines with NON-UTF8 characters:"
-        ggrep --color='auto' -P -n "[\x80-\xFF]" $1;
-    fi;
-
-    if [[ -n $(diff $1 <(iconv -f utf-8 -t utf-8 -c $1)) ]];
-    then echo "Lines with CONTROL characters:"
-        awk 'NR==FNR{a[NR]=$0;next}{x=a[FNR];if($0!=x)printf("%s: %s\n",FNR,x)}' $1 <(iconv -f utf-8 -t utf-8 -c $1)
-    fi;
-}
-function i {
-    map singleton-inspect "$@"
-}
-
-#append empty records to a file
-function flesh_out {
-    awk -F "$2" '(NR == 1){fieldcount=NF}; (NR > 1){for (i = 1; i <= (fieldcount - NF); i++) $0=$0$FS}; {print $0}' testin.tsv | awk -F "\t" '{print NF}' $1
-}
-
-function archive {
-    for item in "$@"
-    do
-        mv "$item" ~/archives/incoming
-    done
-}
 function up {
     for((i=0;i<$1;i++))
     do
@@ -273,14 +215,7 @@ alias notes='vim ~/Documents/notes'
 
 alias searchjobs="ps -ef | grep -v grep | grep"
 alias numbersum="paste -s -d+ - | bc"
-alias fixaudio="sudo killall coreaudiod"
-function fixbluetooth {
-    sudo kextunload -b com.apple.iokit.BroadcomBluetoothHostControllerUSBTransport
-    sudo kextload -b com.apple.iokit.BroadcomBluetoothHostControllerUSBTransport
-}
 
-#alias es='/usr/local/bin/emacs --daemon'
-#alias emacs='/usr/local/bin/emacsclient -c'
 
 #log all history always
 promptFunc()
@@ -319,10 +254,6 @@ complete -o bashdefault -o default -o nospace -F _ssh ssh 2>/dev/null \
     || complete -o default -o nospace -F _ssh ssh
 
 
-# Add environment variable COCOS_CONSOLE_ROOT for cocos2d-x
-export COCOS_CONSOLE_ROOT=/Users/mjr/Documents/code/internal/cocos2d-js-v3.6/tools/cocos2d-console/bin
-export PATH=$COCOS_CONSOLE_ROOT:$PATH
-
 stty -ixon
 # for vim-ipython
 stty stop undef # to unmap ctrl-s
@@ -347,10 +278,6 @@ function wget-all { \
      --no-parent
 }
 
-export NVM_DIR="/Users/mjr/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
-
-
 #export DOCKER_CERT_PATH=/Users/mjr/.boot2docker/certs/boot2docker-vm
 #export DOCKER_HOST=tcp://192.168.59.103:2376
 #export DOCKER_TLS_VERIFY=1
@@ -371,28 +298,8 @@ function docker-clean {
     docker run -v /var/run/docker.sock:/var/run/docker.sock -v /var/lib/docker:/var/lib/docker --rm martin/docker-cleanup-volumes
 }
 
-function feature-in () {
-    branch=$1
-    t in $branch
-    git branch $branch
-    git checkout $branch
-}
-
-function feature-out () {
-    branch=$(git rev-parse --abbrev-ref HEAD)
-    echo "Checking out of $branch"
-    git push origin $branch
-    git checkout master
-    t out
-    t d | grep "$branch"
-}
+source $DOTFILES_DIR/vscode/init.sh
 
 set -o vi
 
 #[ -f ~/.fzf.bash ] && source ~/.fzf.bash
-
-#export PATH="$HOME/.yarn/bin:$PATH"
-
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
-source /Users/mjr/Library/Preferences/org.dystroy.broot/launcher/bash/br

@@ -5,7 +5,6 @@ do
     ln $rc ~/$rc; # ln (LiNk) that file to a file in ~ (your home directory)
 done
 
-ln -s `pwd`/vscode_keybindings.jsonc $HOME/.config/Code/User/keybindings.json
 ln -s `pwd`/firefox $FIREFOX_PROFILE_DIR/chrome
 
 

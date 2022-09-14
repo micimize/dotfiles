@@ -4,139 +4,121 @@ set path=.,,** " when searching the path, look in . (current directory) and ** (
 " ************************************************************************
 " P A C K A G E S
 "
-filetype off                   " required!
-set rtp+=~/.vim/bundle/Vundle.vim
-call vundle#begin()
-" Vundle is the vim package manager.
-" Plugins are usually of the form user/repo (https://github.com/user/repo)
-" let Vundle manage Vundle
-
-" required by vundle
-Plugin 'VundleVim/Vundle.vim'
-Plugin 'L9'
-
+call plug#begin()
 " sidebar filesystem navigation
     " \n to open/close, navigate to it like a normal pane
-    " Plugin 'preservim/nerdtree'
-    " Plugin 'Xuyuanp/nerdtree-git-plugin'
-    Plugin 'lambdalisue/fern.vim'
-    Plugin 'gcmt/taboo.vim'
-    Plugin 'tpope/vim-vinegar'
+    " Plug 'preservim/nerdtree'
+    " Plug 'Xuyuanp/nerdtree-git-plugin'
+    Plug 'lambdalisue/fern.vim'
+    Plug 'gcmt/taboo.vim'
+    Plug 'tpope/vim-vinegar'
 
-"Plugin 'chrisbra/Recover.vim' " swap file diffing
+"Plug 'chrisbra/Recover.vim' " swap file diffing
 
 
 " tmux integration
 " makes ctrl-hjkl move between both vim and tmux panes
-    Plugin 'christoomey/vim-tmux-navigator'
+    Plug 'christoomey/vim-tmux-navigator'
 
 " commenting: \cs for comment, \cu for uncomment
-    Plugin 'scrooloose/nerdcommenter'
+    Plug 'scrooloose/nerdcommenter'
 
 " :UT to open a tree of undo paths for the current pane.
-    Plugin 'mbbill/undotree'
+    Plug 'mbbill/undotree'
 
 " vim buffers are more like tabs
-    Plugin 'ap/vim-buftabline'
+    Plug 'ap/vim-buftabline'
     " automatically enter/exit paste on inhuman input speed
     " added because paste disables abbreviations
-    Plugin 'roxma/vim-paste-easy'
+    Plug 'roxma/vim-paste-easy'
 
 " for fuzzyfinding files/contents
     " automatically binds to ctrl-p, rebound to ctrl-s later
-    Plugin 'kien/ctrlp.vim'
-    Plugin 'mileszs/ack.vim'
-    Plugin 'henrik/vim-qargs'
+    Plug 'kien/ctrlp.vim'
+    Plug 'mileszs/ack.vim'
+    Plug 'henrik/vim-qargs'
 
 " tab completion everywhere, code completion
-    Plugin 'ervandew/supertab'
-    "Plugin 'Valloric/YouCompleteMe'
-    "Plugin 'Shougo/neocomplete.vim'
+    Plug 'ervandew/supertab'
+    "Plug 'Valloric/YouCompleteMe'
+    "Plug 'Shougo/neocomplete.vim'
 
 " Linting (error checking) and syntax highlighting
-    "Plugin 'scrooloose/syntastic'
-    Plugin 'dart-lang/dart-vim-plugin'
-    Plugin 'altercation/vim-colors-solarized'
-    Plugin 'plasticboy/vim-markdown'
-    Plugin 'lepture/vim-jinja'
-    Plugin 'othree/html5.vim'
-    Plugin 'JulesWang/css.vim'
-    Plugin 'genoma/vim-less'
-    Plugin 'cakebaker/scss-syntax.vim'
-    Plugin 'kien/rainbow_parentheses.vim'
-    Plugin 'hdima/python-syntax'
-    Plugin 'meatballs/vim-xonsh'
-    Plugin 'cespare/vim-toml'
+    "Plug 'scrooloose/syntastic'
+    "Plug 'dart-lang/dart-vim-plugin'
+    Plug 'altercation/vim-colors-solarized'
+    "Plug 'plasticboy/vim-markdown'
+    "Plug 'lepture/vim-jinja'
+    "Plug 'othree/html5.vim'
+    "Plug 'JulesWang/css.vim'
+    "Plug 'genoma/vim-less'
+    "Plug 'cakebaker/scss-syntax.vim'
+    Plug 'kien/rainbow_parentheses.vim'
+    "Plug 'hdima/python-syntax'
+    "Plug 'meatballs/vim-xonsh'
+    "Plug 'cespare/vim-toml'
 
-    Plugin 'jparise/vim-graphql'
+    "Plug 'jparise/vim-graphql'
 
-    Plugin 'shime/vim-livedown'
-    Plugin 'tmux-plugins/vim-tmux'
-    Plugin 'reedes/vim-pencil'
-    Plugin 'reedes/vim-wordy'
-    Plugin 'reedes/vim-lexical'
-    Plugin 'reedes/vim-litecorrect'
-    "Plugin 'reedes/vim-textobj-quote'
-    Plugin 'reedes/vim-textobj-sentence'
-      Plugin 'kana/vim-textobj-user' "dependency
-    "Plugin 'junegunn/limelight.vim'
+    "Plug 'shime/vim-livedown'
+    Plug 'tmux-plugins/vim-tmux'
+    "Plug 'reedes/vim-pencil'
+    "Plug 'reedes/vim-wordy'
+    "Plug 'reedes/vim-lexical'
+    "Plug 'reedes/vim-litecorrect'
+    "Plug 'reedes/vim-textobj-quote'
+    "Plug 'reedes/vim-textobj-sentence'
+    "Plug 'kana/vim-textobj-user' "dependency
+    "Plug 'junegunn/limelight.vim'
 
-    "Plugin 'vimwiki/vimwiki'
+    "Plug 'vimwiki/vimwiki'
+
 
 
 " Linting (error checking) and syntax highlighting
-    "Plugin 'godlygeek/tabular'
+    "Plug 'godlygeek/tabular'
     " :Tab /= on the next line would do:
     " a = 'foo';   => a       = 'foo';
     " bortlty = 1; => bortlty = 1;
 
 " Clojure
-   "Plugin 'guns/vim-clojure-static'
-   "Plugin 'tpope/vim-fireplace'
-   "Plugin 'vim-scripts/paredit.vim'
+   "Plug 'guns/vim-clojure-static'
+   "Plug 'tpope/vim-fireplace'
+   "Plug 'vim-scripts/paredit.vim'
 
 " Git plugin for vim
-    Plugin 'tpope/vim-fugitive'
+    Plug 'tpope/vim-fugitive'
 
 
 " js / ts / flow
-    Plugin 'Shougo/vimproc.vim'
-    Plugin 'leafgarland/typescript-vim'
-    Plugin 'Quramy/vim-js-pretty-template'
-    "Plugin 'ruanyl/vim-fixmyjs'
+    "Plug 'Shougo/vimproc.vim'
+    "Plug 'leafgarland/typescript-vim'
+    "Plug 'Quramy/vim-js-pretty-template'
+    "Plug 'ruanyl/vim-fixmyjs'
 
-"Plugin 'w0rp/ale'
-    "Plugin 'Quramy/tsuquyomi'
-    Plugin 'peitalin/vim-jsx-typescript'
-    "Plugin 'flowtype/vim-flow'
+"Plug 'w0rp/ale'
+    "Plug 'Quramy/tsuquyomi'
+    "Plug 'peitalin/vim-jsx-typescript'
+    "Plug 'flowtype/vim-flow'
 
 
 " js, jsx, and json highlighting / linting:
-    Plugin 'pangloss/vim-javascript'
-    Plugin 'gkz/vim-ls'
-    "Plugin 'ternjs/tern_for_vim'
-    Plugin 'isRuslan/vim-es6'
-    Plugin 'elzr/vim-json'
-    Plugin 'vito-c/jq.vim'
-    Plugin 'mxw/vim-jsx'
+    "Plug 'pangloss/vim-javascript'
+    "Plug 'gkz/vim-ls'
+    "Plug 'isRuslan/vim-es6'
+    "Plug 'elzr/vim-json'
+    "Plug 'vito-c/jq.vim'
+    "Plug 'mxw/vim-jsx'
 
-"Plugin 'roxma/vim-hug-neovim-rpc'
-"Plugin 'roxma/nvim-yarp'
-"Plugin 'autozimu/LanguageClient-neovim'
+"Plug 'roxma/vim-hug-neovim-rpc'
+"Plug 'roxma/nvim-yarp'
+"Plug 'autozimu/LanguageClient-neovim'
 "
-"Plugin 'reasonml-editor/vim-reason-plus'
+"Plug 'reasonml-editor/vim-reason-plus'
 
-Plugin 'editorconfig/editorconfig-vim'
+Plug 'editorconfig/editorconfig-vim'
 
-" for connecting to a db directly from vim
-" Plugin 'vim-scripts/dbext.vim'
-
-"seem useful:
-    "Plugin 'mattn/emmet-vim'
-    "Plugin 'garbas/vim-snipmate'
-    "Plugin 'honza/vim-snippets'
-call vundle#end()            " required
-filetype plugin indent on    " required
+call plug#end()
 
 " store swap files here
 set directory^=$HOME/.vim/tmp//
@@ -160,6 +142,7 @@ set directory^=$HOME/.vim/tmp//
   set mouse=a " use the mouse whenever, wherever
   set mousehide
   set clipboard=unnamed
+  set clipboard+=unnamedplus
   set foldmethod=indent
 
 "set virtualedit=all

@@ -3,11 +3,23 @@ if [[ $- != *i* ]] ; then
   return
 fi
 
+# if command -v tmux &> /dev/null && [[ ! "$TERM" =~ screen ]] && [[ ! "$TERM" =~ tmux ]] && [ -z "$TMUX" ]; then
+#  exec tmux
+# fi
+
 #USER config
 export USER_SHORTPATH=true
 
 export FIREFOX_PROFILE_DIR="$HOME/snap/firefox/common/.mozilla/firefox/bsx5dc2h.default"
 export DOTFILES_DIR="$HOME/code/personal/dotfiles"
+
+function firefox_hack_recovery {
+  # for parsing jsonlv4: https://gist.github.com/Tblue/62ff47bef7f894e92ed5
+  backup_dir="$FIREFOX_PROFILE_DIR/sessionstore-backups"
+  ls -l "$backup_dir"
+  cp -R "$backup_dir/*" ~/ff_backups/
+  rm "$backup_dir/recovery.jsonlv4"
+}
 
 #enable bash completion
 [ -f /etc/profile.d/bash-completion ] && source /etc/profile.d/bash-completion
@@ -51,6 +63,7 @@ shopt -s histappend     # Append to history rather than overwrite
 shopt -s checkwinsize   # Check window after each command
 shopt -s dotglob        # files beginning with . to be returned in the results of path-name expansion.
 shopt -s extglob        # use extended globbing
+shopt -s direxpand      # prevent dir expansion and $ escaping in tab complete
 #shopt -s globstar don't know why this doesn't work
  
 ## set options

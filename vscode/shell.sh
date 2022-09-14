@@ -1,8 +1,8 @@
-#!/bin/sh
+#!/bin/bash
 # https://medium.com/@joaomoreno/persistent-terminal-sessions-in-vs-code-8fc469ed6b41
 
 _dir=$(basename $PWD)
-_hash=$(pwd | md5)
+_hash=$(pwd | md5sum)
 _hash=${_hash:0:3}
 
 export VSCODE_SESSION="vscode_${_dir}_${_hash}"

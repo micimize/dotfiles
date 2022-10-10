@@ -87,6 +87,8 @@ alias df='df -h'
 alias du='du -h -c'
 alias lsd="ls -hdlf */"
 alias myip="ifconfig en0 | grep inet | grep -v inet6 | awk '{print \$2}'"
+
+alias manage_memory="sudo ncdu -e"
  
 #PS1='\h:\W \u\$ '
 # Make bash check its window size after a process completes
@@ -315,4 +317,9 @@ source $DOTFILES_DIR/vscode/init.sh
 
 set -o vi
 
+stty time 0 # 1/10 s
+bind 'set keyseq-timeout 1' #ms
+# set -sg escape-time 1 # ms
+
 #[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+source ~/.local/share/blesh/ble.sh

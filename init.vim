@@ -200,7 +200,9 @@ cnoreabbrev Q quit
 set nopaste
 
 "enter in normal mode to insert in new line
-    nmap <Enter> o<Esc>
+nmap <Enter> o<Esc>
+
+nnoremap <M-v> <C-v>
 
 " good config for programming
 func! CodeMode()

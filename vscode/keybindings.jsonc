@@ -36,13 +36,11 @@
     "command": "renameFile",
     "when": "filesExplorerFocus && !inputFocus"
   },
-  /*
-    {
-        "key": "m",
-        "command": "explorer.action.showContextMenu",
-        "when": "filesExplorerFocus && !inputFocus"
-    },
-    */
+  {
+      "key": "m",
+      "command": "explorer.action.showContextMenu",
+      "when": "filesExplorerFocus && !inputFocus"
+  },
   {
     "key": "/",
     "command": "workbench.action.quickOpen",
@@ -279,14 +277,14 @@
     "command": "jupyter.runFileInteractive",
     "when": "editorTextFocus && isWorkspaceTrusted && jupyter.ownsSelection && !findInputFocussed && !notebookEditorFocused && !replaceInputFocussed && editorLangId == 'python'"
   },
-  {
-    "key": "shift+alt+enter",
-    "command": "jupyter.runAndDebugCell"
-  },
-  {
-    "key": "ctrl+shift+enter",
-    "command": "-jupyter.runAndDebugCell"
-  },
+  //{
+  //  "key": "shift+alt+enter",
+  //  "command": "jupyter.runAndDebugCell"
+  //},
+  //{
+  //  "key": "ctrl+shift+enter",
+  //  "command": "-jupyter.runAndDebugCell"
+  //},
   {
     "key": "alt+ctrl+o",
     "command": "workbench.action.terminal.openFileLink"
@@ -392,7 +390,7 @@
     "key": "shift+alt+z",
     "command": "workbench.action.terminal.sizeToContentWidth",
     "when": "terminalFocus && terminalHasBeenCreated && terminalIsOpen || terminalFocus && terminalIsOpen && terminalProcessSupported"
-  }
+  },
   {
     "key": "alt+z",
     "command": "-editor.action.toggleWordWrap"
@@ -400,5 +398,10 @@
   {
     "key": "shift+alt+z",
     "command": "editor.action.toggleWordWrap"
-  }
+  },
+  //{
+  //  "key": "shift+enter",
+  //  "command": "-interactive.execute",
+  //  "when": "!notebookKernel && resourceScheme == 'vscode-interactive' || resourceScheme == 'vscode-interactive' && notebookKernel =~ /^ms-toolsai.jupyter\\//"
+  //},
 ]

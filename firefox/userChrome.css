@@ -101,3 +101,18 @@
 #main-window[privatebrowsingmode="temporary"] #nav-bar #sidebar-button {
   display: none !important;
 }
+
+#sidebar-splitter {
+  border-right: 2px solid  black !important;
+  border-left: 4px solid black !important;
+  transition: border-color 0.25s cubic-bezier(0.07, 0.95, 0, 1);
+}
+
+#sidebar-splitter:hover {
+  border-left-color: rgb(31, 31, 31) !important;
+
+}
+
+#sidebar-splitter:active {
+  border-color: rgb(62, 62, 62) !important;
+}

@@ -7,22 +7,10 @@ if command -v tmux &>/dev/null && [[ ! "$TERM" =~ screen ]] && [[ ! "$TERM" =~ t
   tmux
 fi
 
-# blech
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/mjr/.mujoco/mujoco210/bin:/usr/lib/nvidia
-
 #USER config
 export USER_SHORTPATH=true
 
-export FIREFOX_PROFILE_DIR="$HOME/snap/firefox/common/.mozilla/firefox/bsx5dc2h.default"
 export DOTFILES_DIR="$HOME/code/personal/dotfiles"
-
-function firefox_hack_recovery {
-  # for parsing jsonlv4: https://gist.github.com/Tblue/62ff47bef7f894e92ed5
-  backup_dir="$FIREFOX_PROFILE_DIR/sessionstore-backups"
-  ls -l "$backup_dir"
-  cp -R "$backup_dir/*" ~/ff_backups/
-  rm "$backup_dir/recovery.jsonlv4"
-}
 
 #enable bash completion
 [ -f /etc/profile.d/bash-completion ] && source /etc/profile.d/bash-completion
@@ -31,21 +19,13 @@ function firefox_hack_recovery {
 # make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(lesspipe)"
 
-# ruby
-# export PATH="/Users/mjr/.gem/ruby/2.6.0/bin:/usr/local/opt/ruby/bin:$PATH"
-
-# export LDFLAGS="-L/usr/local/opt/ruby/lib"
-# export CPPFLAGS="-I/usr/local/opt/ruby/include"
-# export PKG_CONFIG_PATH="/usr/local/opt/ruby/lib/pkgconfig"
-
 # Shell variables
 export PAGER=less
 export EDITOR=vim
-# export GOPATH=$HOME/golang
-# export GOROOT=/usr/local/opt/go/libexec
-# export PATH=$PATH:$HOME/bin:$HOME/node_modules/.bin:/usr/local/sbin:$GOPATH/bin:$GOROOT/bin
+
 export PATH=$PATH:/home/mjr/.local/bin
 export LESS='-R'
+
 export HISTCONTROL=ignoredups
 export HISTSIZE=5000
 export HISTFILESIZE=5000
@@ -61,36 +41,34 @@ fi
 
 complete -cf sudo # Tab complete for sudo
 
-## shopt options
+## shopt & set options
 shopt -s cdspell      # This will correct minor spelling errors in a cd command.
 shopt -s histappend   # Append to history rather than overwrite
 shopt -s checkwinsize # Check window after each command
 shopt -s dotglob      # files beginning with . to be returned in the results of path-name expansion.
 shopt -s extglob      # use extended globbing
 shopt -s direxpand    # prevent dir expansion and $ escaping in tab complete
-#shopt -s globstar don't know why this doesn't work
+shopt -s globstar     # ** matches ./ and subdirs recursively. Cannot be used for files
+set -o noclobber      # prevent overwriting files with cat
+set -o ignoreeof      # stops ctrl+d from logging me out
 
-## set options
-set -o noclobber # prevent overwriting files with cat
-set -o ignoreeof # stops ctrl+d from logging me out
+function _set_user_friendly_aliases {
+  case $(uname -s) in
+    Darwin | FreeBSD) alias ls="ls -hFG" ;;
+    Linux) alias ls="ls --color=always -hF" ;;
+    NetBSD | OpenBSD) alias ls="ls -hF" ;;
+  esac
 
-# Set appropriate ls alias
-case $(uname -s) in
-Darwin | FreeBSD) alias ls="ls -hFG" ;;
-Linux) alias ls="ls --color=always -hF" ;;
-NetBSD | OpenBSD) alias ls="ls -hF" ;;
-esac
-
-alias rm="rm -i"
-alias mv="mv -i"
-alias cp="cp -i"
-alias ll="ls -hl"
-alias cd..="cd .."
-alias mkdir='mkdir -p -v'
-alias df='df -h'
-alias du='du -h -c'
-alias lsd="ls -hdlf */"
-alias myip="ifconfig en0 | grep inet | grep -v inet6 | awk '{print \$2}'"
+  alias rm="rm -i"
+  alias mv="mv -i"
+  alias cp="cp -i"
+  alias ll="ls -hl"
+  alias mkdir='mkdir -p -v'
+  alias df='df -h'
+  alias du='du -h -c'
+  alias lsd="ls -hdlf */"
+}
+_set_user_friendly_aliases
 
 alias manage_memory="sudo ncdu -e"
 
@@ -178,29 +156,29 @@ ssh-del() {
 # Usage: showip.
 #
 showip() {
-  lynx -dump -hiddenlinks=ignore -nolist http://checkip.dyndns.org:8245/ |
-    awk '{ print $4 }' |
-    sed '/^$/d; s/^[ ]*//g; s/[ ]*$//g'
+  lynx -dump -hiddenlinks=ignore -nolist http://checkip.dyndns.org:8245/ \
+    | awk '{ print $4 }' \
+    | sed '/^$/d; s/^[ ]*//g; s/[ ]*$//g'
 }
 
 ##################
 #extract files eg: ex tarball.tar#
 ##################
-ex() {
+function extract() {
   if [ -f $1 ]; then
     case $1 in
-    *.tar.bz2) tar xjf $1 ;;
-    *.tar.gz) tar xzf $1 ;;
-    *.bz2) bunzip2 $1 ;;
-    *.rar) rar x $1 ;;
-    *.gz) gunzip $1 ;;
-    *.tar) tar xf $1 ;;
-    *.tbz2) tar xjf $1 ;;
-    *.tgz) tar xzf $1 ;;
-    *.zip) unzip $1 ;;
-    *.Z) uncompress $1 ;;
-    *.7z) 7z x $1 ;;
-    *) echo "'$1' cannot be extracted via extract()" ;;
+      *.tar.bz2) tar xjf $1 ;;
+      *.tar.gz) tar xzf $1 ;;
+      *.bz2) bunzip2 $1 ;;
+      *.rar) rar x $1 ;;
+      *.gz) gunzip $1 ;;
+      *.tar) tar xf $1 ;;
+      *.tbz2) tar xjf $1 ;;
+      *.tgz) tar xzf $1 ;;
+      *.zip) unzip $1 ;;
+      *.Z) uncompress $1 ;;
+      *.7z) 7z x $1 ;;
+      *) echo "'$1' cannot be extracted via extract()" ;;
     esac
   else
     echo "'$1' is not a valid file"
@@ -220,6 +198,7 @@ function up {
     let inc+=1
   done
 }
+
 function note {
   dir=$(pwd)
   cd ~/Documents/notes
@@ -263,28 +242,29 @@ _ssh() {
   fi
 }
 
-complete -o bashdefault -o default -o nospace -F _ssh ssh 2>/dev/null ||
-  complete -o default -o nospace -F _ssh ssh
+complete -o bashdefault -o default -o nospace -F _ssh ssh 2>/dev/null \
+  || complete -o default -o nospace -F _ssh ssh
 
+# TODO idk what
 stty -ixon
 # for vim-ipython
 stty stop undef # to unmap ctrl-s
 
+# TODO not really useful now. Need to replace with something that will work with vscode
 function nametab {
   export PROMPT_COMMAND="echo -ne '\033]0;$@\007'"
 }
 alias nt=nametab
 
-alias clockui='plasmawindowed org.kde.plasma.digitalclock'
-
+# random git helpers
 function git-vimerge {
   vim -p $(git --no-pager diff --name-status --diff-filter=U | awk 'BEGIN {x=""} {x=x" "$2;} END {print x}')
 }
 
 function git-track-all {
-  git branch -r | grep -v '\->' |
-    sed "s,\x1B\[[0-9;]*[a-zA-Z],,g" |
-    while read remote; do git branch --track "${remote#origin/}" "$remote"; done
+  git branch -r | grep -v '\->' \
+    | sed "s,\x1B\[[0-9;]*[a-zA-Z],,g" \
+    | while read remote; do git branch --track "${remote#origin/}" "$remote"; done
   echo 'Now tracking all remote branches.'
   echo 'To update, run `git fetch --all && git pull --all`'
 }
@@ -300,6 +280,7 @@ function wget-all {
     --no-parent
 }
 
+# look at all the colors
 function colors_256 {
   for i in {0..255}; do
     printf "\x1b[48;5;%sm%3d\e[0m " "$i" "$i"
@@ -309,18 +290,6 @@ function colors_256 {
   done
 }
 
-#export DOCKER_CERT_PATH=/Users/mjr/.boot2docker/certs/boot2docker-vm
-#export DOCKER_HOST=tcp://192.168.59.103:2376
-#export DOCKER_TLS_VERIFY=1
-
-function monitor {
-  while true; do
-    vardate=$(date +%Y\-%m\-%d\_%H:%M:%S)
-    echo $vardate
-    screencapture -t jpg -x ~/Documents/data/monitor/${vardate}.jpg
-    sleep 500
-  done
-}
 function docker-clean {
   docker rm -v $(docker ps -a -q -f status=exited)
 
@@ -329,32 +298,11 @@ function docker-clean {
   docker run -v /var/run/docker.sock:/var/run/docker.sock -v /var/lib/docker:/var/lib/docker --rm martin/docker-cleanup-volumes
 }
 
-source $DOTFILES_DIR/vscode/init.sh
-
-source /home/mjr/code/personal/dotfiles/blackbox.sh
-
-function pip_uninstall_editable {
-  echo "this function should be a reference of last resort, really."
-  echo "shoud not be necessary - pip uninstall $1 will work within the correct env and directory"
-  echo '
-  # note - more a reference than anything
-  packages=/home/mjr/.local/lib/python3.10/site-packages
-  package=$1
-
-  easy_install_pth=$packages/easy-install.pth
-
-  rm $packages/$package.egg-link
-  sed "/^${package}$/d;/^$/d" $easy_install_pth
-  # if empty remove (idk if this matters)
-  [ -s $easy_install_registry ] || rm $easy_install_pth
-
-  echo "maybe probably cleaned up the atrocious mess pip made of $package."
-  echo "did not delete the egg info."
-  '
-}
+source "$DOTFILES_DIR/vscode/init.sh"
 
 set -o vi
 
+# TODO what are these for
 stty time 0                 # 1/10 s
 bind 'set keyseq-timeout 1' #ms
 # set -sg escape-time 1 # ms
@@ -363,37 +311,7 @@ bind 'set keyseq-timeout 1' #ms
 
 source ~/.local/share/blesh/ble.sh
 
-# >>> conda initialize >>>
-# # !! Contents within this block are managed by 'conda init' !!
-# __conda_setup="$('/opt/conda/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
-# if [ $? -eq 0 ]; then
-#     eval "$__conda_setup"
-# else
-#     if [ -f "/opt/conda/etc/profile.d/conda.sh" ]; then
-#         . "/opt/conda/etc/profile.d/conda.sh"
-#     else
-#         export PATH="/opt/conda/bin:$PATH"
-#     fi
-# fi
-# unset __conda_setup
-# # <<< conda initialize <<<
-
-alias copy='xclip -sel clip'
-
-function refresh_gpu {
-  sudo rmmod nvidia_uvm
-  sudo modprobe nvidia_uvm
-}
-
-alias is_audio_playing="pacmd list-sink-inputs | grep -c 'state: RUNNING'"
-function no_sleep_while_music {
-  while :; do
-    if [ $(xprintidle) -gt 100000 ]; then
-      if [ $(is_audio_playing) ]; then
-        xdotool key shift
-      fi
-    fi
-
-    sleep 30
-  done
-}
+case $(uname -s) in
+  Darwin | FreeBSD) source "$DOTFILES_DIR/macos.sh" ;;
+  Linux) source "$DOTFILES_DIR/blackbox.sh" ;;
+esac

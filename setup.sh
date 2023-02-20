@@ -1,4 +1,17 @@
 #!/bin/bash
+set -u
+set -x
+
+_DIR=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
+source <(cat "$_DIR/bashrc" | grep "^export")
+cd "$_DIR"
+
+case $(uname -s) in
+  Darwin | FreeBSD) source "$DOTFILES_DIR/macos/setup.sh" ;;
+  Linux) source "$DOTFILES_DIR/blackbox/setup.sh" ;;
+esac
+
+ln
 
 ln tmux.conf ~/.tmux.conf
 

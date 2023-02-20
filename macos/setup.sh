@@ -17,20 +17,6 @@ if ! command -v brew &>/dev/null; then
   $(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)
 fi
 
-brew install neovim tmux ncdu
+brew install bash neovim tmux ncdu
 
 ln -s $_DIR/slate.js $HOME/.slate.js
-
-echo "
-probably have to run manually:
-chsh -s /bin/bash
-
-iterm theme: macos/iterm_solarized.josn in iterm
-karabiner settings: macos/karabiner.json 
-
-after installing vscode and firefox:
-$DOTFILES_DIR/vscode/create_symlinks.sh
-$DOTFILES_DIR/vscode/create_symlinks.sh
-
-
-"

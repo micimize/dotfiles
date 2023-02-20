@@ -1,9 +1,6 @@
-## /bin/sh
+#!/bin/bash
 set -u
 set -x
-
-_DIR=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
-source <(cat "$_DIR/../bashrc" | grep "^export")
 
 if [ ! -d "$BLESH_DIR" ]; then
   mkdir -p "$BLESH_DIR"
@@ -15,8 +12,9 @@ fi
 # install homebrew
 if ! command -v brew &>/dev/null; then
   $(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)
+  brew install bash neovim tmux ncdu python3 ruby
 fi
 
-brew install bash neovim tmux ncdu
-
-ln -s $_DIR/slate.js $HOME/.slate.js
+if [ ! -f "$HOME/.slate.js" ]; then
+  ln -s $_DIR/slate.js $HOME/.slate.js
+fi

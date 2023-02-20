@@ -22,3 +22,5 @@ TODO:
 * attempt to setup gitlab and github
 * clone writing repo
 * This doesn't setup xcode, vscode, iterm, etc, etc
+* nvim errors on macos
+* vscode dir is wrong

@@ -2,6 +2,8 @@
 
 #export PATH="$HOME/.yarn/bin:$PATH"
 
+export FIREFOX_PROFILE_DIR="$HOME/Library/Application Support/Firefox/Profiles/lwo34esx.dev-edition-default"
+
 export NVM_DIR="/Users/mjr/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" # This loads nvm
 

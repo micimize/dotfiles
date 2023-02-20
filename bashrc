@@ -7,14 +7,13 @@ if command -v tmux &>/dev/null && [[ ! "$TERM" =~ screen ]] && [[ ! "$TERM" =~ t
   tmux
 fi
 
-#USER config
 export USER_SHORTPATH=true
 
-# TODO consider env.sh
 export DOTFILES_DIR="$HOME/code/personal/dotfiles"
 export BLESH_DIR="$HOME/.local/share/blesh"
+export XDG_CONFIG_HOME="$HOME/.config"
 
-#enable bash completion
+# enable bash completion
 [ -f /etc/profile.d/bash-completion ] && source /etc/profile.d/bash-completion
 [ -f /etc/bash_completion ] && source /etc/bash_completion
 

@@ -2,8 +2,12 @@
 set -u
 set -x
 
-_DIR=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
-source <(cat "$_DIR/bashrc" | grep "^export")
+_DIR=$(dirname -- "$( readlink -f -- "$0"; )")
+eval $(grep "^export" "$_DIR/bashrc")
+case $(uname -s) in
+  Darwin | FreeBSD) eval $(grep "^export" "$_DIR/macos/macos.sh") ;;
+  Linux | FreeBSD) eval $(grep "^export" "$_DIR/blackbox/blackbox.sh") ;;
+esac
 cd "$_DIR"
 
 case $(uname -s) in
@@ -17,7 +21,7 @@ if [ -f "$HOME/.tmux.conf" ]; then
 else
   ln "$_DIR/tmux.conf" "$HOME/.tmux.conf"
 
-  #tmux plugin manager
+  # tmux plugin manager
   function _install_tmux_plugins {
     mkdir -p ~/.tmux/plugins/tpm
     # TODO this is not really maintained
@@ -33,10 +37,11 @@ else
   # TODO maybe I can just link whole dir
   ln "$_DIR/init.vim" "$HOME/.config/nvim/init.vim"
 
-  #vim specific
   function _install_nvim_plugins {
     plug_raw_source=https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-    curl -fLo ~/.local/share/nvim/site/autoload --create-dirs $plug_raw_source
+    autoload_dir="${XDG_DATA_HOME:-$HOME/.local/share}/nvim/site/autoload"
+    curl -fLo "$autoload_dir/plug.vim" --create-dirs $plug_raw_source
+    # ~/.local/share/nvim/site/autoload
     nvim --headless +PlugInstall +qall
   }
   _install_nvim_plugins
@@ -52,7 +57,7 @@ fi
 
 if [ ! -d "$HOME/vscode" ]; then
   echo "warning: $HOME/vscode doesn't exist"
-elif [ -f "$HOME/vscode/.vscode/shell.sh" ]; then
+elif [ -f "$HOME/.vscode/shell.sh" ]; then
   echo "already configured: firefox"
 else
   ln "$_DIR/vscode/keybindings.jsonc" "$HOME/vscode/.config/Code/User/keybindings.json"

@@ -151,7 +151,7 @@ syntax on
 
 " Indendation, colorscheme, etc
     set t_Co=256
-    colorscheme solarized "altercation/vim-colors-solarized
+    " colorscheme solarized "altercation/vim-colors-solarized
     set background=dark
     "visible whitespace
     set list
@@ -310,13 +310,16 @@ let g:rbpt_colorpairs = [
   \ [ '6',  '#2aa198'],
   \ [ '4',  '#268bd2'],
   \ ]
-augroup rainbow_parentheses
-  au!
-  au VimEnter * RainbowParenthesesActivate
-  au BufEnter * RainbowParenthesesLoadRound
-  au BufEnter * RainbowParenthesesLoadSquare
-  au BufEnter * RainbowParenthesesLoadBraces
-augroup END
+  
+if has("RainbowParenthesesActivate")
+  augroup rainbow_parentheses
+    au!
+    au VimEnter * RainbowParenthesesActivate
+    au BufEnter * RainbowParenthesesLoadRound
+    au BufEnter * RainbowParenthesesLoadSquare
+    au BufEnter * RainbowParenthesesLoadBraces
+  augroup END
+endif
 
 
 " ************************************************************************

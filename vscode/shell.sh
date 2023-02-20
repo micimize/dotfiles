@@ -1,6 +1,12 @@
 #!/bin/bash
 # https://medium.com/@joaomoreno/persistent-terminal-sessions-in-vs-code-8fc469ed6b41
 
+# if [[ $- != *i* ]] ; then
+  # Shell is non-interactive. No reason to muck about with tmux
+#  exec /bin/bash
+#fi
+
+
 _dir=$(basename $PWD)
 _hash=$(pwd | md5sum)
 _hash=${_hash:0:3}
@@ -21,7 +27,7 @@ IFS=" " read -r is_attached session_name <<< "${_first}"
 
 if [ "$is_attached" -eq "0" ]
 then
-  exec tmux attach-session -t $session_name
+  exec tmux attach-session -d -t $session_name
   exit
 fi
 
@@ -38,6 +44,7 @@ function pack_sessions {
     let "num=num+1"
   done <<<"$sessions"
 }
+pack_sessions
 
 exec tmux new-session -s "${VSCODE_SESSION}_$this_session_num" -e VSCODE_SESSION="$VSCODE_SESSION"
 

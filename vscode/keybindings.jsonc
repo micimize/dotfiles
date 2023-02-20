@@ -37,9 +37,9 @@
     "when": "filesExplorerFocus && !inputFocus"
   },
   {
-      "key": "m",
-      "command": "explorer.action.showContextMenu",
-      "when": "filesExplorerFocus && !inputFocus"
+    "key": "m",
+    "command": "explorer.action.showContextMenu",
+    "when": "filesExplorerFocus && !inputFocus"
   },
   {
     "key": "/",
@@ -154,12 +154,24 @@
   },
   // next and previous for editors
   {
+    "command": "-vscode-neovim.send",
     "key": "ctrl+n",
-    "command": "workbench.action.nextEditorInGroup"
+    "when": "neovim.mode != cmdline_normal"
+  },
+  {
+    "key": "ctrl+n",
+    "command": "workbench.action.nextEditorInGroup",
+    "when": "neovim.mode != cmdline_normal"
+  },
+  {
+    "command": "-vscode-neovim.send",
+    "key": "ctrl+p",
+    "when": "neovim.mode != cmdline_normal"
   },
   {
     "key": "ctrl+p",
-    "command": "workbench.action.previousEditorInGroup"
+    "command": "workbench.action.previousEditorInGroup",
+    "when": "neovim.mode != cmdline_normal"
   },
   // 
   {
@@ -362,7 +374,7 @@
     "key": "shift+alt+c",
     "command": "toggleSearchEditorCaseSensitive",
     "when": "inSearchEditor && searchInputBoxFocus"
-  }
+  },
   {
     "key": "alt+c",
     "command": "-workbench.action.terminal.toggleFindCaseSensitive",
@@ -372,7 +384,7 @@
     "key": "shift+alt+c",
     "command": "workbench.action.terminal.toggleFindCaseSensitive",
     "when": "terminalFindFocused && terminalHasBeenCreated || terminalFindFocused && terminalProcessSupported || terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported"
-  }
+  },
   {
     "key": "alt+z",
     "command": "-editor.action.toggleWordWrap"
@@ -380,7 +392,7 @@
   {
     "key": "shift+alt+z",
     "command": "editor.action.toggleWordWrap"
-  }
+  },
   {
     "key": "alt+z",
     "command": "-workbench.action.terminal.sizeToContentWidth",

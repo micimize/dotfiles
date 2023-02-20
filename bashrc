@@ -3,9 +3,12 @@ if [[ $- != *i* ]] ; then
   return
 fi
 
-# if command -v tmux &> /dev/null && [[ ! "$TERM" =~ screen ]] && [[ ! "$TERM" =~ tmux ]] && [ -z "$TMUX" ]; then
-#  exec tmux
-# fi
+if command -v tmux &> /dev/null && [[ ! "$TERM" =~ screen ]] && [[ ! "$TERM" =~ tmux ]] && [ -z "$TMUX" ]; then
+ tmux
+fi
+
+# blech
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/mjr/.mujoco/mujoco210/bin:/usr/lib/nvidia
 
 #USER config
 export USER_SHORTPATH=true
@@ -23,6 +26,7 @@ function firefox_hack_recovery {
 
 #enable bash completion
 [ -f /etc/profile.d/bash-completion ] && source /etc/profile.d/bash-completion
+[ -f /etc/bash_completion ] && source /etc/bash_completion
  
 # make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(lesspipe)"
@@ -41,6 +45,7 @@ export EDITOR=vim
 # export GOPATH=$HOME/golang
 # export GOROOT=/usr/local/opt/go/libexec
 # export PATH=$PATH:$HOME/bin:$HOME/node_modules/.bin:/usr/local/sbin:$GOPATH/bin:$GOROOT/bin
+export PATH=$PATH:/home/mjr/.local/bin
 export LESS='-R'
 export HISTCONTROL=ignoredups
 export HISTSIZE=5000
@@ -278,9 +283,20 @@ function nametab {
 }
 alias nt=nametab
 
+alias clockui='plasmawindowed org.kde.plasma.digitalclock'
+
 function git-vimerge {
     vim -p $(git --no-pager diff --name-status --diff-filter=U | awk 'BEGIN {x=""} {x=x" "$2;} END {print x}')
 }
+
+function git-track-all {
+  git branch -r | grep -v '\->' |
+    sed "s,\x1B\[[0-9;]*[a-zA-Z],,g" |
+    while read remote; do git branch --track "${remote#origin/}" "$remote"; done
+  echo 'Now tracking all remote branches.'
+  echo 'To update, run `git fetch --all && git pull --all`'
+}
+
 
 function wget-all { \
      --recursive \
@@ -292,6 +308,16 @@ function wget-all { \
      --domains $1 \
      --no-parent
 }
+
+function colors_256 {
+  for i in {0..255} ; do
+      printf "\x1b[48;5;%sm%3d\e[0m " "$i" "$i"
+      if (( i == 15 )) || (( i > 15 )) && (( (i-15) % 6 == 0 )); then
+          printf "\n";
+      fi
+  done
+}
+
 
 #export DOCKER_CERT_PATH=/Users/mjr/.boot2docker/certs/boot2docker-vm
 #export DOCKER_HOST=tcp://192.168.59.103:2376
@@ -315,6 +341,30 @@ function docker-clean {
 
 source $DOTFILES_DIR/vscode/init.sh
 
+source /home/mjr/code/personal/dotfiles/blackbox.sh
+
+
+function pip_uninstall_editable {
+  echo "this function should be a reference of last resort, really."
+  echo "shoud not be necessary - pip uninstall $1 will work within the correct env and directory"
+  echo '
+  # note - more a reference than anything
+  packages=/home/mjr/.local/lib/python3.10/site-packages
+  package=$1
+
+  easy_install_pth=$packages/easy-install.pth
+
+  rm $packages/$package.egg-link
+  sed "/^${package}$/d;/^$/d" $easy_install_pth
+  # if empty remove (idk if this matters)
+  [ -s $easy_install_registry ] || rm $easy_install_pth
+
+  echo "maybe probably cleaned up the atrocious mess pip made of $package."
+  echo "did not delete the egg info."
+  '
+}
+
+
 set -o vi
 
 stty time 0 # 1/10 s
@@ -322,4 +372,43 @@ bind 'set keyseq-timeout 1' #ms
 # set -sg escape-time 1 # ms
 
 #[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+
 source ~/.local/share/blesh/ble.sh
+
+# >>> conda initialize >>>
+# # !! Contents within this block are managed by 'conda init' !!
+# __conda_setup="$('/opt/conda/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+# if [ $? -eq 0 ]; then
+#     eval "$__conda_setup"
+# else
+#     if [ -f "/opt/conda/etc/profile.d/conda.sh" ]; then
+#         . "/opt/conda/etc/profile.d/conda.sh"
+#     else
+#         export PATH="/opt/conda/bin:$PATH"
+#     fi
+# fi
+# unset __conda_setup
+# # <<< conda initialize <<<
+
+alias copy='xclip -sel clip'
+
+function refresh_gpu {
+  sudo rmmod nvidia_uvm
+  sudo modprobe nvidia_uvm
+}
+
+
+alias is_audio_playing="pacmd list-sink-inputs | grep -c 'state: RUNNING'"
+function no_sleep_while_music {
+  while :; do
+    if  [ $(xprintidle) -gt 100000 ]
+    then
+      if  [ `is_audio_playing` ]
+      then
+        xdotool key shift
+      fi
+    fi
+
+    sleep 30
+  done
+}

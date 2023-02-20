@@ -1,4 +1,4 @@
-set shell=/bin/bash
+
 set path=.,,** " when searching the path, look in . (current directory) and ** (every direcory recursively starting at current)
 
 " ************************************************************************
@@ -9,6 +9,7 @@ call plug#begin()
     " \n to open/close, navigate to it like a normal pane
     " Plug 'preservim/nerdtree'
     " Plug 'Xuyuanp/nerdtree-git-plugin'
+    "
     Plug 'lambdalisue/fern.vim'
     Plug 'gcmt/taboo.vim'
     Plug 'tpope/vim-vinegar'
@@ -180,19 +181,27 @@ function! FirstFileWindowID()
     return -1
 endfunction
 
-"tab movement (ctrl-n for next tab, ctrl-p for previous)
-map <c-n> :call win_execute(FirstFileWindowID(), 'bnext')<CR>
-map <c-p> :call win_execute(FirstFileWindowID(), 'bprev')<CR>
-
-
-" Close window when quitting last buffer
-autocmd BufDelete * if len(filter(range(1, bufnr('$')), 'empty(bufname(v:val)) && buflisted(v:val)')) == 1 | quit | endif
-
 " tab-like :q behavior for buffers
 " Prevent accidental closing of all buffers when doing :wq or :q
-cnoreabbrev wq w<bar>bdelete
-cnoreabbrev q bdelete
-cnoreabbrev Q quit
+if exists('g:vscode')
+  "cnoreabbrev q <Cmd>call VSCodeNotify("workbench.action.closeActiveEditor")<CR>
+  "cnoreabbrev qa <Cmd>call VSCodeNotify("workbench.action.closeEditorsInGroup")<CR>
+  "cnoreabbrev tabo[nly] <Cmd>call VSCodeNotify("workbench.action.closeOtherEditors")<CR>
+  nnoremap zz <Cmd>call VSCodeNotify("workbench.action.closeActiveEditor")<CR>
+else
+  " Close window when quitting last buffer
+  autocmd BufDelete * if len(filter(range(1, bufnr('$')), 'empty(bufname(v:val)) && buflisted(v:val)')) == 1 | quit | endif
+
+
+  cnoreabbrev wq w<bar>bdelete
+  cnoreabbrev q bdelete
+  cnoreabbrev Q quit
+  nnoremap zz bdelete
+
+  "tab movement (ctrl-n for next tab, ctrl-p for previous)
+  map <c-n> :call win_execute(FirstFileWindowID(), 'bnext')<CR>
+  map <c-p> :call win_execute(FirstFileWindowID(), 'bprev')<CR>
+endif
 
 
 " added because paste disables abbreviations,
@@ -427,8 +436,8 @@ let g:LanguageClient_serverCommands = {
 
 let g:LanguageClient_autoStart = 1
 
-nnoremap <silent> K :call LanguageClient_textDocument_hover()<CR>
-nnoremap <silent> gd :call LanguageClient_textDocument_definition()<CR>
+"nnoremap <silent> K :call LanguageClient_textDocument_hover()<CR>
+"nnoremap <silent> gd :call LanguageClient_textDocument_definition()<CR>
 
 " ************************************************************************
 " B E G I N  A U T O C O M M A N D S
@@ -521,3 +530,39 @@ if &t_Co > 2 || has("gui_running")
     set hlsearch  " Also switch on highlighting the last used search pattern. 
 endi
 
+
+if exists('g:vscode')
+  nnoremap gh <Cmd>call VSCodeNotify("workbench.action.navigateBack")<CR>
+  nnoremap gl <Cmd>call VSCodeNotify("workbench.action.navigateForward")<CR>
+  nnoremap gE <Cmd>call VSCodeNotify("editor.action.marker.prev")<CR>
+  nnoremap ge <Cmd>call VSCodeNotify("editor.action.marker.next")<CR>
+  nnoremap gI <Cmd>call VSCodeNotify("editor.action.marker.prevInFiles")<CR>
+  nnoremap gi <Cmd>call VSCodeNotify("editor.action.marker.nextInFiles")<CR>
+
+  nnoremap <leader>n <Cmd>call VSCodeNotify("workbench.action.toggleSidebarVisibility")<CR>
+  " nnoremap u <Cmd>call VSCodeNotify("undo")<CR>
+  "nnoremap <C-r> <Cmd>call VSCodeNotify("redo")<CR>
+  nnoremap <leader>r <Cmd>call VSCodeNotify("editor.action.codeAction", "refactor")<CR>
+  nnoremap <leader>f <Cmd>call VSCodeNotify("extension.flutterStylizer", "refactor")<CR>
+    " TODO this was multi-step but from a different life
+    " "command": "extension.flutterStylizer"
+    " "workbench.action.files.save",
+    " "cursorMove", args": { to": "down" }
+    " "cursorMove", args": { to": "up" }
+    " "editorScroll", args": { to": "up", by": "halfPage" }kk
+  nnoremap <leader>q <Cmd>call VSCodeNotify("editor.action.codeAction", { "apply": "first" })<CR>
+    " "preferred": true,
+  nnoremap <leader>w <Cmd>call VSCodeNotify("editor.foldAllMarkerRegions")<CR>
+  nnoremap <leader>Q <Cmd>call VSCodeNotify("editor.action.codeAction")<CR>
+    " "preferred": true,
+  " debug start
+  nnoremap <leader>ds <Cmd>call VSCodeNotify("workbench.action.debug.start")<CR>
+  " git authors
+  nnoremap <leader>ga <Cmd>call VSCodeNotify("gitlens.toggleCodeLens")<CR>
+  " git blame
+  nnoremap <leader>gb <Cmd>call VSCodeNotify("gitlens.toggleFileBlame")<CR>
+  " git heatmap
+  nnoremap <leader>gh <Cmd>call VSCodeNotify("gitlens.toggleFileHeatmap")<CR>
+  " git line info
+  nnoremap <leader>gl <Cmd>call VSCodeNotify("gitlens.toggleLineBlame")<CR>
+endif

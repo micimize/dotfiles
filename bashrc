@@ -312,6 +312,6 @@ bind 'set keyseq-timeout 1' #ms
 source ~/.local/share/blesh/ble.sh
 
 case $(uname -s) in
-  Darwin | FreeBSD) source "$DOTFILES_DIR/macos.sh" ;;
-  Linux) source "$DOTFILES_DIR/blackbox.sh" ;;
+  Darwin | FreeBSD) source "$DOTFILES_DIR/macos/macos.sh" ;;
+  Linux) source "$DOTFILES_DIR/blackbox/blackbox.sh" ;;
 esac

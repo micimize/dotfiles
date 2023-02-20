@@ -10,7 +10,13 @@ fi
 #USER config
 export USER_SHORTPATH=true
 
+# TODO consider env.sh
 export DOTFILES_DIR="$HOME/code/personal/dotfiles"
+export BLESH_DIR="$HOME/.local/share/blesh"
+
+export CODE="$HOME/code"
+export WORK_CODE="$CODE/work"
+export OPEN_SOURCE_CODE="$CODE/libraries"
 
 #enable bash completion
 [ -f /etc/profile.d/bash-completion ] && source /etc/profile.d/bash-completion
@@ -309,7 +315,7 @@ bind 'set keyseq-timeout 1' #ms
 
 #[ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
-source ~/.local/share/blesh/ble.sh
+source "$BLESH_DIR/ble.sh"
 
 case $(uname -s) in
   Darwin | FreeBSD) source "$DOTFILES_DIR/macos/macos.sh" ;;

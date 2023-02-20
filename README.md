@@ -15,4 +15,10 @@ mac notes:
 after installing vscode and firefox:
 `./setup.sh` which should be idempotent and refuse to configure that which already seems configured
 
-This doesn't setup xcode, vscode, iterm, etc, etc
+
+TODO:
+* https://github.com/andresgongora/synth-shell
+* link/setup tridactyl
+* attempt to setup gitlab and github
+* clone writing repo
+* This doesn't setup xcode, vscode, iterm, etc, etc

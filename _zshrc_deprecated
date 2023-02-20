@@ -123,49 +123,6 @@ POWERLEVEL9K_MODE="awesome-patched"
 
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=10'
 
-# I use this for writing to give myself nice padded layout
-function margin_pane {
-  bright='brightblack'
-  dark='black'
-  # vscode bright and normal black are reversed
-  if [[ "$VSCODE_SESSION" != "" ]] {
-    dark='brightblack'
-    bright='black'
-  }
-  
-  export POWERLEVEL9K_VI_MODE_INSERT_BACKGROUND="$dark"
-  export POWERLEVEL9K_VI_MODE_INSERT_FOREGROUND='blue'
-  export POWERLEVEL9K_VI_MODE_NORMAL_BACKGROUND="$dark"
-  export POWERLEVEL9K_VI_MODE_NORMAL_FOREGROUND='yellow'
-  short_prompt
-
-  pane_borders="bg=$bright,fg=$bright"
-  tmux set-option pane-border-style $pane_borders
-  tmux set-option pane-active-border-style $pane_borders
-  tmux select-pane -P "bg=$dark"
-
-  clear
-}
-
-function unmargin_pane {
-  bright='brightblack'
-  brblack='brblack'
-  # vscode bright and normal black are reversed
-  #if [[ "$VSCODE_SESSION" != "" ]] {
-  #  bright='black'
-  #  brblack='black'
-  #}
-
-  export POWERLEVEL9K_VI_MODE_INSERT_BACKGROUND='blue'
-  export POWERLEVEL9K_VI_MODE_INSERT_FOREGROUND='white'
-  export POWERLEVEL9K_VI_MODE_NORMAL_BACKGROUND='yellow'
-  export POWERLEVEL9K_VI_MODE_NORMAL_FOREGROUND="$brblack"
-  long_prompt
-
-  tmux set-option pane-border-style ''
-  tmux set-option pane-active-border-style 'fg=green'
-  tmux select-pane -P "bg=$bright"
-}
 
 
 CASE_SENSITIVE="true" # Foo != foo
@@ -211,14 +168,6 @@ alias date=gdate
 alias isodate="gdate -Ins"
 
 alias chrome="/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome"
-
-alias shadows_off="defaults write com.apple.screencapture disable-shadow true && killall SystemUIServer"
-alias shadows_on="defaults write com.apple.screencapture disable-shadow false"
-
-function font_smoothing_level {
-  defaults -currentHost write -g AppleFontSmoothing -int $1
-  echo "font smoothing set to $1 on a scale of 0-2. Restart for it to take effect"
-}
 
 # make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(lesspipe)"

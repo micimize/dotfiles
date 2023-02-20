@@ -203,11 +203,11 @@ function up {
 
 function note {
   dir=$(pwd)
-  cd ~/Documents/notes
+  cd ~/notes
   vim -p "$@"
   cd $dir
 }
-alias notes='vim ~/Documents/notes'
+alias notes='vim ~/notes'
 
 alias searchjobs="ps -ef | grep -v grep | grep"
 alias numbersum="paste -s -d+ - | bc"
@@ -310,6 +310,50 @@ bind 'set keyseq-timeout 1' #ms
 # set -sg escape-time 1 # ms
 
 #[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+
+# I use this for writing to give myself nice padded layout
+function margin_pane {
+  bright='brightblack'
+  dark='black'
+  # vscode bright and normal black are reversed
+  if [[ "$VSCODE_SESSION" != "" ]] {
+    dark='brightblack'
+    bright='black'
+  }
+  
+  # export POWERLEVEL9K_VI_MODE_INSERT_BACKGROUND="$dark"
+  # export POWERLEVEL9K_VI_MODE_INSERT_FOREGROUND='blue'
+  # export POWERLEVEL9K_VI_MODE_NORMAL_BACKGROUND="$dark"
+  # export POWERLEVEL9K_VI_MODE_NORMAL_FOREGROUND='yellow'
+  short_prompt
+
+  pane_borders="bg=$bright,fg=$bright"
+  tmux set-option pane-border-style $pane_borders
+  tmux set-option pane-active-border-style $pane_borders
+  tmux select-pane -P "bg=$dark"
+
+  clear
+}
+
+function unmargin_pane {
+  bright='brightblack'
+  brblack='brblack'
+  # vscode bright and normal black are reversed
+  #if [[ "$VSCODE_SESSION" != "" ]] {
+  #  bright='black'
+  #  brblack='black'
+  #}
+
+  # export POWERLEVEL9K_VI_MODE_INSERT_BACKGROUND='blue'
+  # export POWERLEVEL9K_VI_MODE_INSERT_FOREGROUND='white'
+  # export POWERLEVEL9K_VI_MODE_NORMAL_BACKGROUND='yellow'
+  # export POWERLEVEL9K_VI_MODE_NORMAL_FOREGROUND="$brblack"
+  long_prompt
+
+  tmux set-option pane-border-style ''
+  tmux set-option pane-active-border-style 'fg=green'
+  tmux select-pane -P "bg=$bright"
+}
 
 case $(uname -s) in
   Darwin | FreeBSD) source "$DOTFILES_DIR/macos/macos.sh" ;;

@@ -15,6 +15,20 @@ case $(uname -s) in
   Linux) source "$DOTFILES_DIR/blackbox/setup.sh" ;;
 esac
 
+if [ -f "$HOME/.bashrc" ]; then
+  echo "already configured: bashrc"
+else
+  ln "$_DIR/bashrc" "$HOME/.bashrc"
+  if [ ! -d "$BLESH_DIR" ]; then
+    mkdir -p "$BLESH_DIR/src"
+    pushd "$BLESH_DIR/src"
+    git clone --recursive https://github.com/akinomyoga/ble.sh.git .
+    make install PREFIX=~/.local
+    popd
+  fi
+fi
+
+
 # NOTE: using hard links avoids fragility
 if [ -f "$HOME/.tmux.conf" ]; then
   echo "already configured: tmux"

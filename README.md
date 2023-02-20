@@ -17,10 +17,11 @@ after installing vscode and firefox:
 
 
 TODO:
-* https://github.com/andresgongora/synth-shell
+* ble-import vim-airline
 * link/setup tridactyl
 * attempt to setup gitlab and github
 * clone writing repo
 * This doesn't setup xcode, vscode, iterm, etc, etc
 * nvim errors on macos
 * vscode dir is wrong
+* blesh fancy prompt, margin_pane sysem

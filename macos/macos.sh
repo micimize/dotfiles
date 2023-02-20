@@ -1,5 +1,9 @@
 #/bin/bash
 
+# export PATH="/usr/local/opt/binutils/bin:$PATH"
+
+alias stat=gstat
+
 #export PATH="$HOME/.yarn/bin:$PATH"
 
 export FIREFOX_PROFILE_DIR="$HOME/Library/Application Support/Firefox/Profiles/lwo34esx.dev-edition-default"

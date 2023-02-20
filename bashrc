@@ -7,7 +7,7 @@ if command -v tmux &>/dev/null && [[ ! "$TERM" =~ screen ]] && [[ ! "$TERM" =~ t
   tmux
 fi
 
-export USER_SHORTPATH=true
+export USE_SHORTPATH=true
 
 export DOTFILES_DIR="$HOME/code/personal/dotfiles"
 export BLESH_DIR="$HOME/.local/share/blesh"
@@ -115,12 +115,13 @@ txtrst='\e[0m'    # Text Reset
 ##############################################################################
 sp='$(eval "short_path")'
 short_path() {
-  echo "$PWD" | sed "s|$HOME|~|g" | sed 's|/\(...\)[^/]*|/\1|g'
+  dir=$(dirname `echo "$PWD" | sed "s|$HOME|~|g" | sed 's|/\(...\)[^/]*|/\1|g'`)
+  echo "$dir/${PWD##*/}"
 }
 if [ $(id -u) -eq 0 ]; then # you are root, set red colour prompt
   export PS1="[\[$txtred\]\u\[$txtylw\]@\[$txtrst\]\h] \[$txtgrn\]\W\[$txtrst\]# "
 else
-  if $USER_SHORTPATH; then
+  if $USE_SHORTPATH; then
     pth=$sp
   else
     pth=$PWD
@@ -315,10 +316,10 @@ function margin_pane {
   bright='brightblack'
   dark='black'
   # vscode bright and normal black are reversed
-  if [[ "$VSCODE_SESSION" != "" ]] {
+  if [[ "$VSCODE_SESSION" != "" ]]; then
     dark='brightblack'
     bright='black'
-  }
+  fi
   
   # export POWERLEVEL9K_VI_MODE_INSERT_BACKGROUND="$dark"
   # export POWERLEVEL9K_VI_MODE_INSERT_FOREGROUND='blue'
@@ -358,5 +359,36 @@ case $(uname -s) in
   Darwin | FreeBSD) source "$DOTFILES_DIR/macos/macos.sh" ;;
   Linux) source "$DOTFILES_DIR/blackbox/blackbox.sh" ;;
 esac
+
+##-----------------------------------------------------
+## synth-shell-greeter.sh
+# if [ -f /Users/mjr/.config/synth-shell/synth-shell-greeter.sh ] && [ -n "$( echo $- | grep i )" ]; then
+#  	source /Users/mjr/.config/synth-shell/synth-shell-greeter.sh
+# fi
+
+SYNTH_SHELL_DIR="$HOME/.config/synth-shell"
+##-----------------------------------------------------
+## synth-shell-prompt.sh
+# if [ -f $SYNTH_SHELL_DIR/synth-shell-prompt.sh ] && [ -n "$( echo $- | grep i )" ]; then
+# source $SYNTH_SHELL_DIR/synth-shell-prompt.sh
+# fi
+
+##-----------------------------------------------------
+## better-ls
+# if [ -f /Users/mjr/.config/synth-shell/better-ls.sh ] && [ -n "$( echo $- | grep i )" ]; then
+#	source /Users/mjr/.config/synth-shell/better-ls.sh
+# fi
+
+##-----------------------------------------------------
+## alias
+# if [ -f /Users/mjr/.config/synth-shell/alias.sh ] && [ -n "$( echo $- | grep i )" ]; then
+#	source /Users/mjr/.config/synth-shell/alias.sh
+# fi
+
+##-----------------------------------------------------
+## better-history
+# if [ -f /Users/mjr/.config/synth-shell/better-history.sh ] && [ -n "$( echo $- | grep i )" ]; then
+#	 source /Users/mjr/.config/synth-shell/better-history.sh
+# fi
 
 source "$BLESH_DIR/ble.sh"

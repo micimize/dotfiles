@@ -14,10 +14,6 @@ export USER_SHORTPATH=true
 export DOTFILES_DIR="$HOME/code/personal/dotfiles"
 export BLESH_DIR="$HOME/.local/share/blesh"
 
-export CODE="$HOME/code"
-export WORK_CODE="$CODE/work"
-export OPEN_SOURCE_CODE="$CODE/libraries"
-
 #enable bash completion
 [ -f /etc/profile.d/bash-completion ] && source /etc/profile.d/bash-completion
 [ -f /etc/bash_completion ] && source /etc/bash_completion

@@ -1,0 +1,13 @@
+*.ckpt
+node_modules
+venv
+.venv
+.steam
+.cache
+CacheStorage
+heroic
+Games
+.cargo
+.gradle
+Android
+AndroidSDK

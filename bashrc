@@ -71,7 +71,7 @@ function _set_user_friendly_aliases {
 }
 _set_user_friendly_aliases
 
-alias manage_memory="sudo ncdu -e"
+alias manage_memory="sudo ncdu -e $@"
 
 #PS1='\h:\W \u\$ '
 # Make bash check its window size after a process completes
@@ -115,7 +115,7 @@ txtrst='\e[0m'    # Text Reset
 ##############################################################################
 sp='$(eval "short_path")'
 short_path() {
-  dir=$(dirname `echo "$PWD" | sed "s|$HOME|~|g" | sed 's|/\(...\)[^/]*|/\1|g'`)
+  dir=$(dirname $(echo "$PWD" | sed "s|$HOME|~|g" | sed 's|/\(...\)[^/]*|/\1|g'))
   echo "$dir/${PWD##*/}"
 }
 if [ $(id -u) -eq 0 ]; then # you are root, set red colour prompt
@@ -320,7 +320,7 @@ function margin_pane {
     dark='brightblack'
     bright='black'
   fi
-  
+
   # export POWERLEVEL9K_VI_MODE_INSERT_BACKGROUND="$dark"
   # export POWERLEVEL9K_VI_MODE_INSERT_FOREGROUND='blue'
   # export POWERLEVEL9K_VI_MODE_NORMAL_BACKGROUND="$dark"

@@ -2,7 +2,7 @@
 set -u
 set -x
 
-_DIR=$(dirname -- "$( readlink -f -- "$0"; )")
+_DIR=$(dirname -- "$(readlink -f -- "$0")")
 eval $(grep "^export" "$_DIR/bashrc")
 case $(uname -s) in
   Darwin | FreeBSD) eval $(grep "^export" "$_DIR/macos/macos.sh") ;;
@@ -27,7 +27,6 @@ else
     popd
   fi
 fi
-
 
 # NOTE: using hard links avoids fragility
 if [ -f "$HOME/.tmux.conf" ]; then
@@ -67,6 +66,22 @@ elif [ -d "$FIREFOX_PROFILE_DIR/chrome" ]; then
   echo "already configured: firefox"
 else
   ln -s "$_DIR/firefox" $FIREFOX_PROFILE_DIR/chrome
+  ln -s "_$DIR/firefox/tridactylrc" "$HOME/.config/tridactylrc"
+fi
+
+if [ -f "$HOME/.config/tridactyl/tridactylrc" ]; then
+  echo "already configured: tridactyl"
+else
+  ln -s "_$DIR/tridactyl" "$HOME/.config/tridactyl"
+  function _install_tridactyl_native {
+    tridactyl_installer=https://raw.githubusercontent.com/tridactyl/native_messenger/master/installers/install.sh
+    version=1.22.1
+    temp_file=/tmp/trinativeinstall.sh
+    curl -fsSl $tridactyl_installer -o $temp_file
+    sh $temp_file $version
+    rm -f $temp_file
+  }
+  _install_tridactyl_native
 fi
 
 if [ ! -d "$HOME/vscode" ]; then

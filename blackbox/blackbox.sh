@@ -63,3 +63,10 @@ function refresh_gpu {
   sudo rmmod nvidia_uvm
   sudo modprobe nvidia_uvm
 }
+
+# make blackbox display utils eval-able for keyboard mappings
+for arg in "$@"; do
+  if [[ $arg =~ ^display ]]; then
+    eval $arg
+  fi
+done

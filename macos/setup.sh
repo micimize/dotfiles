@@ -5,7 +5,7 @@ set -x
 # install homebrew
 if ! command -v brew &>/dev/null; then
   $(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)
-  brew install bash neovim tmux ncdu binutils \
+  brew install bash neovim tmux ncdu \
     python3 ruby # maybe unneeded
 fi
 

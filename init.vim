@@ -4,6 +4,7 @@ set path=.,,** " when searching the path, look in . (current directory) and ** (
 " ************************************************************************
 " P A C K A G E S
 "
+" TODO: Install hangs with this init.vim on macos
 call plug#begin()
 " sidebar filesystem navigation
     " \n to open/close, navigate to it like a normal pane
@@ -16,13 +17,12 @@ call plug#begin()
 
 "Plug 'chrisbra/Recover.vim' " swap file diffing
 
-
 " tmux integration
 " makes ctrl-hjkl move between both vim and tmux panes
     Plug 'christoomey/vim-tmux-navigator'
 
 " commenting: \cs for comment, \cu for uncomment
-    Plug 'scrooloose/nerdcommenter'
+    Plug 'preservim/nerdcommenter'
 
 " :UT to open a tree of undo paths for the current pane.
     Plug 'mbbill/undotree'
@@ -39,29 +39,14 @@ call plug#begin()
     Plug 'mileszs/ack.vim'
     Plug 'henrik/vim-qargs'
 
-" tab completion everywhere, code completion
-    Plug 'ervandew/supertab'
+  " tab completion everywhere, code completion
+  " Plug 'ervandew/supertab'
     "Plug 'Valloric/YouCompleteMe'
     "Plug 'Shougo/neocomplete.vim'
 
-" Linting (error checking) and syntax highlighting
-    "Plug 'scrooloose/syntastic'
-    "Plug 'dart-lang/dart-vim-plugin'
+  " Linting (error checking) and syntax highlighting
     Plug 'altercation/vim-colors-solarized'
-    "Plug 'plasticboy/vim-markdown'
-    "Plug 'lepture/vim-jinja'
-    "Plug 'othree/html5.vim'
-    "Plug 'JulesWang/css.vim'
-    "Plug 'genoma/vim-less'
-    "Plug 'cakebaker/scss-syntax.vim'
     Plug 'kien/rainbow_parentheses.vim'
-    "Plug 'hdima/python-syntax'
-    "Plug 'meatballs/vim-xonsh'
-    "Plug 'cespare/vim-toml'
-
-    "Plug 'jparise/vim-graphql'
-
-    "Plug 'shime/vim-livedown'
     Plug 'tmux-plugins/vim-tmux'
     "Plug 'reedes/vim-pencil'
     "Plug 'reedes/vim-wordy'
@@ -71,53 +56,12 @@ call plug#begin()
     "Plug 'reedes/vim-textobj-sentence'
     "Plug 'kana/vim-textobj-user' "dependency
     "Plug 'junegunn/limelight.vim'
-
     "Plug 'vimwiki/vimwiki'
 
+  " Git plugin for vim
+  "  Plug 'tpope/vim-fugitive'
 
-
-" Linting (error checking) and syntax highlighting
-    "Plug 'godlygeek/tabular'
-    " :Tab /= on the next line would do:
-    " a = 'foo';   => a       = 'foo';
-    " bortlty = 1; => bortlty = 1;
-
-" Clojure
-   "Plug 'guns/vim-clojure-static'
-   "Plug 'tpope/vim-fireplace'
-   "Plug 'vim-scripts/paredit.vim'
-
-" Git plugin for vim
-    Plug 'tpope/vim-fugitive'
-
-
-" js / ts / flow
-    "Plug 'Shougo/vimproc.vim'
-    "Plug 'leafgarland/typescript-vim'
-    "Plug 'Quramy/vim-js-pretty-template'
-    "Plug 'ruanyl/vim-fixmyjs'
-
-"Plug 'w0rp/ale'
-    "Plug 'Quramy/tsuquyomi'
-    "Plug 'peitalin/vim-jsx-typescript'
-    "Plug 'flowtype/vim-flow'
-
-
-" js, jsx, and json highlighting / linting:
-    "Plug 'pangloss/vim-javascript'
-    "Plug 'gkz/vim-ls'
-    "Plug 'isRuslan/vim-es6'
-    "Plug 'elzr/vim-json'
-    "Plug 'vito-c/jq.vim'
-    "Plug 'mxw/vim-jsx'
-
-"Plug 'roxma/vim-hug-neovim-rpc'
-"Plug 'roxma/nvim-yarp'
-"Plug 'autozimu/LanguageClient-neovim'
-"
-"Plug 'reasonml-editor/vim-reason-plus'
-
-Plug 'editorconfig/editorconfig-vim'
+  " Plug 'editorconfig/editorconfig-vim'
 
 call plug#end()
 
@@ -151,7 +95,7 @@ syntax on
 
 " Indendation, colorscheme, etc
     set t_Co=256
-    " colorscheme solarized "altercation/vim-colors-solarized
+    colorscheme solarized "altercation/vim-colors-solarized
     set background=dark
     "visible whitespace
     set list
@@ -297,8 +241,6 @@ let g:vimwiki_list = [{
 let g:vimwiki_markdown_link_ext = 1
 let g:vimwiki_auto_header = 1
     
-
-
 " kien/rainbow_parentheses.vim - theme that should show up on all backgrounds
 let g:rbpt_colorpairs = [
   \ [ '13', '#6c71c4'],
@@ -311,15 +253,13 @@ let g:rbpt_colorpairs = [
   \ [ '4',  '#268bd2'],
   \ ]
   
-if has("RainbowParenthesesActivate")
-  augroup rainbow_parentheses
-    au!
-    au VimEnter * RainbowParenthesesActivate
-    au BufEnter * RainbowParenthesesLoadRound
-    au BufEnter * RainbowParenthesesLoadSquare
-    au BufEnter * RainbowParenthesesLoadBraces
-  augroup END
-endif
+augroup rainbow_parentheses
+  au!
+  au VimEnter * RainbowParenthesesActivate
+  au BufEnter * RainbowParenthesesLoadRound
+  au BufEnter * RainbowParenthesesLoadSquare
+  au BufEnter * RainbowParenthesesLoadBraces
+augroup END
 
 
 " ************************************************************************

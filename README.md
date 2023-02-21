@@ -22,6 +22,6 @@ TODO:
 * attempt to setup gitlab and github
 * clone writing repo
 * This doesn't setup xcode, vscode, iterm, etc, etc
-* nvim errors on macos
+* nvim PlugInstall hangs with this init.vim on macos but works ok when pasted into another vim file
 * vscode dir is wrong
 * blesh fancy prompt, margin_pane sysem

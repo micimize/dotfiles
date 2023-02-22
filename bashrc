@@ -28,8 +28,8 @@ export PATH=$PATH:/home/mjr/.local/bin
 export LESS='-R'
 
 export HISTCONTROL=ignoredups
-export HISTSIZE=5000
-export HISTFILESIZE=5000
+export HISTSIZE=1000000
+export HISTFILESIZE=1000000
 export HISTIGNORE="&:ls:ll:la:l.:pwd:exit:clear"
 
 if [ -d /opt/local/bin ]; then
@@ -115,8 +115,12 @@ txtrst='\e[0m'    # Text Reset
 ##############################################################################
 sp='$(eval "short_path")'
 short_path() {
-  dir=$(dirname $(echo "$PWD" | sed "s|$HOME|~|g" | sed 's|/\(...\)[^/]*|/\1|g'))
-  echo "$dir/${PWD##*/}"
+  if [[ $PWD == $HOME ]]; then
+    echo "~"
+  else
+    dir=$(dirname $(echo "$PWD" | sed "s|$HOME|~|g" | sed 's|/\(...\)[^/]*|/\1|g'))
+    echo "$dir/${PWD##*/}"
+  fi
 }
 if [ $(id -u) -eq 0 ]; then # you are root, set red colour prompt
   export PS1="[\[$txtred\]\u\[$txtylw\]@\[$txtrst\]\h] \[$txtgrn\]\W\[$txtrst\]# "

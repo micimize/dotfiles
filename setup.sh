@@ -19,6 +19,12 @@ if [ -f "$HOME/.bashrc" ]; then
   echo "already configured: bashrc"
 else
   ln "$_DIR/bashrc" "$HOME/.bashrc"
+fi
+
+if [ -f "$HOME/.blerc" ]; then
+  echo "already configured: blerc"
+else
+  ln "$_DIR/blerc" "$HOME/.blerc"
   if [ ! -d "$BLESH_DIR" ]; then
     mkdir -p "$BLESH_DIR/src"
     pushd "$BLESH_DIR/src"

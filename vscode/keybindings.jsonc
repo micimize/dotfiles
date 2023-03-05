@@ -411,6 +411,10 @@
     "key": "shift+alt+z",
     "command": "editor.action.toggleWordWrap"
   },
+  {
+    "key": "ctrl+b",
+    "command": "-workbench.action.toggleSidebarVisibility"
+  }
   //{
   //  "key": "shift+enter",
   //  "command": "-interactive.execute",

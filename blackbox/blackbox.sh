@@ -31,13 +31,15 @@ function no_sleep_while_music {
 export RES_4K=4096x2160
 export RES_QHD=2560x1440
 
+# typically HDMI-0 or 1
+current_display_name=$(xrandr --listactivemonitors | grep "HDMI" | awk '{print $4}')
 function display_4k {
-  xrandr --output HDMI-0 --mode $RES_4K
+  xrandr --output $current_display_name --mode $RES_4K
 }
 export -f display_4k
 
 function display_qhd {
-  xrandr --output HDMI-0 --mode $RES_QHD
+  xrandr --output $current_display_name --mode $RES_QHD
 }
 export -f display_qhd
 

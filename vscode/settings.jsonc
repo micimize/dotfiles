@@ -1,0 +1,765 @@
+{
+  "better-comments.tags": [
+    {
+      "tag": "!",
+      "color": "#FF2D00",
+      "strikethrough": false,
+      "backgroundColor": "transparent"
+    },
+    {
+      "tag": "?",
+      "color": "#3498DB",
+      "strikethrough": false,
+      "backgroundColor": "transparent"
+    },
+    {
+      "tag": "//",
+      "color": "#474747",
+      "strikethrough": true,
+      "backgroundColor": "transparent"
+    },
+    {
+      "tag": "todo",
+      "color": "#FF8C00",
+      "strikethrough": false,
+      "backgroundColor": "transparent"
+    },
+    {
+      "tag": "*",
+      "color": "#98C379",
+      "strikethrough": false,
+      "backgroundColor": "transparent"
+    }
+  ],
+  "[python]": {
+    "editor.codeActionsOnSave": {
+      //"source.organizeImports": true
+    },
+    "editor.defaultFormatter": "ms-python.python",
+    "editor.tabSize": 4,
+  },
+  "python.formatting.provider": "black",
+  "python.languageServer": "Pylance",
+  "python.analysis.autoImportCompletions": true,
+  "python.analysis.typeCheckingMode": "basic",
+  "editor.tokenColorCustomizations": {
+    "[Solarized Dark]": {
+      "textMateRules": [
+        {
+          "name": "Regexp",
+          "scope": "string.regexp",
+          "settings": {
+            "foreground": "#6c71c4"
+          }
+        },
+        {
+          "name": "Number",
+          "scope": "constant.numeric",
+          "settings": {
+            "foreground": "#d25a94"
+          }
+        },
+        {
+          "name": "User-defined constant",
+          "scope": [
+            "constant.character",
+            "constant.other"
+          ],
+          "settings": {
+            "foreground": "#d25a94"
+          }
+        },
+        /*{
+          // Taken from https://github.com/braver/vscode-solarized/blob/master/themes/braver-solarized-dark-with-workbench-color-theme.json
+          "name": "Variable",
+          "scope": "variable",
+          "settings": {
+            "foreground": "#d6dbdb",
+            //"fontStyle": "bold"
+          }
+        }*/
+        {
+          "name": "String interpolation",
+          "scope": [
+            "variable"
+          ],
+          "settings": {
+            "foreground": "#c26894"
+          }
+        }
+      ]
+    }
+  },
+  "[handlebars]": {
+    "editor.formatOnSave": false
+  },
+  "workbench.list.keyboardNavigation": "simple",
+  "workbench.editor.limit.enabled": true,
+  "workbench.editor.limit.excludeDirty": true,
+  "workbench.editor.limit.perEditorGroup": true,
+  "workbench.editor.limit.value": 5,
+  "vim.statusBarColorControl": false,
+  "editor.quickSuggestionsDelay": 100,
+  "editor.quickSuggestions": {
+    "comments": "on",
+    "strings": "on",
+    "other": "on"
+  }, // setting to false helps typing performance
+  "editor.fontSize": 12,
+  "editor.formatOnSave": true,
+  "telemetry.telemetryLevel": "off",
+  "workbench.editor.enablePreview": false,
+  "workbench.editor.labelFormat": "medium",
+  "editor.tabSize": 2,
+  "editor.detectIndentation": false,
+  "workbench.sideBar.location": "left",
+  "editor.renderWhitespace": "none",
+  "workbench.startupEditor": "welcomePage",
+  "tslint.autoFixOnSave": true,
+  "tslint.enable": true,
+  "editor.peekWidgetDefaultFocus": "editor",
+  "vim.easymotion": true,
+  "vim.incsearch": true,
+  "vim.useSystemClipboard": true,
+  "vim.useCtrlKeys": true,
+  "vim.hlsearch": true,
+  "vim.foldfix": true,
+  "vim.normalModeKeyBindings": [
+    {
+      "before": [
+        "g",
+        "h"
+      ],
+      "after": [],
+      "commands": [
+        {
+          "command": "workbench.action.navigateBack",
+          "args": []
+        }
+      ]
+    },
+    {
+      "before": [
+        "g",
+        "l"
+      ],
+      "after": [],
+      "commands": [
+        {
+          "command": "workbench.action.navigateForward",
+          "args": []
+        }
+      ]
+    },
+    {
+      "before": [
+        "g",
+        "E"
+      ],
+      "after": [],
+      "commands": [
+        {
+          "command": "editor.action.marker.prev",
+          "args": []
+        }
+      ]
+    },
+    {
+      "before": [
+        "g",
+        "e"
+      ],
+      "after": [],
+      "commands": [
+        {
+          "command": "editor.action.marker.next",
+          "args": []
+        }
+      ]
+    },
+    {
+      "before": [
+        "g",
+        "I"
+      ],
+      "after": [],
+      "commands": [
+        {
+          "command": "editor.action.marker.prevInFiles",
+          "args": []
+        }
+      ]
+    },
+    {
+      "before": [
+        "g",
+        "i"
+      ],
+      "after": [],
+      "commands": [
+        {
+          "command": "editor.action.marker.nextInFiles",
+          "args": []
+        }
+      ]
+    },
+    {
+      "before": [
+        "g",
+        "p"
+      ],
+      "after": [],
+      "commands": [
+        {
+          "command": "editor.action.peekDefinition",
+          "args": []
+        }
+      ]
+    },
+    {
+      "before": [
+        "z",
+        "z"
+      ],
+      "after": [],
+      "commands": [
+        {
+          "command": "workbench.action.closeActiveEditor",
+          "args": []
+        }
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "n"
+      ],
+      "after": [],
+      "commands": [
+        {
+          "command": "workbench.action.toggleSidebarVisibility",
+          "args": []
+        }
+      ]
+    },
+    {
+      "before": [
+        "t",
+        "s" // \n is nerd tree legacy, ts is toggle sidebar
+      ],
+      "after": [],
+      "commands": [
+        {
+          "command": "workbench.action.toggleSidebarVisibility",
+          "args": []
+        }
+      ]
+    },
+    {
+      "before": [
+        "t",
+        "a" // ta toggle activity bar
+      ],
+      "after": [],
+      "commands": [
+        {
+          "command": "workbench.action.toggleActivityBarVisibility",
+          "args": []
+        }
+      ]
+    },
+    {
+      "before": [
+        "t",
+        "w" // tw toggle "window" or "workspace" bar idk I want it next to \a and \s
+      ],
+      "after": [],
+      "commands": [
+        {
+          "command": "workbench.action.toggleMenuBar",
+          "args": []
+        }
+      ]
+    },
+    {
+      "before": [
+        "t",
+        "z" // toggle ztatus bar
+      ],
+      "after": [],
+      "commands": [
+        {
+          "command": "workbench.action.toggleStatusbarVisibility",
+          "args": []
+        }
+      ]
+    },
+    {
+      "before": [
+        "t",
+        "c" // toggle code outline
+      ],
+      "after": [],
+      "commands": [
+        {
+          "command": "editor.action.toggleMinimap",
+          "args": []
+        }
+      ]
+    },
+    // TODO tf toggle focus mode but requires some fancy if-else or when blocks
+    {
+      "before": [
+        "u"
+      ],
+      "after": [],
+      "commands": [
+        {
+          "command": "undo"
+        }
+      ]
+    },
+    {
+      "before": [
+        "<C-r>"
+      ],
+      "after": [],
+      "commands": [
+        {
+          "command": "redo"
+        }
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "r"
+      ],
+      "after": [],
+      "commands": [
+        {
+          "command": "editor.action.codeAction",
+          "args": {
+            "kind": "refactor"
+          }
+        }
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "l"
+      ],
+      "after": [],
+      "commands": [
+        {
+          "command": "dendron.lookupNote"
+        },
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "f"
+      ],
+      "after": [],
+      "commands": [
+        {
+          "command": "extension.flutterStylizer"
+        },
+        "workbench.action.files.save",
+        {
+          "command": "cursorMove",
+          "args": {
+            "to": "down"
+          }
+        },
+        {
+          "command": "cursorMove",
+          "args": {
+            "to": "up"
+          }
+        },
+        {
+          "command": "editorScroll",
+          "args": {
+            "to": "up",
+            "by": "halfPage"
+          }
+        }
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "q"
+      ],
+      "after": [],
+      "commands": [
+        {
+          "command": "editor.action.codeAction",
+          "args": {
+            //"preferred": true,
+            "apply": "first",
+          },
+        },
+        /*
+        {
+          "command": "editor.action.marker.next",
+          "args": []
+        },
+        {
+          "command": "editor.action.marker.next",
+          "args": []
+        },
+        {
+          "command": "editor.foldAllMarkerRegions",
+        }
+        */
+      ],
+    },
+    {
+      "before": [
+        "<leader>",
+        "w"
+      ],
+      "after": [],
+      "commands": [
+        {
+          "command": "editor.foldAllMarkerRegions",
+        }
+      ],
+    },
+    {
+      "before": [
+        "<leader>",
+        "Q"
+      ],
+      "after": [],
+      "commands": [
+        {
+          "command": "editor.action.codeAction",
+          "args": {
+            //"preferred": true,
+          },
+        },
+      ],
+    },
+    {
+      "before": [
+        "<leader>",
+        "d", // debug
+        "s" // start
+      ],
+      "after": [],
+      "commands": [
+        {
+          "command": "workbench.action.debug.start",
+          "args": []
+        },
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "g", // git
+        "a" // authors
+      ],
+      "after": [],
+      "commands": [
+        {
+          "command": "gitlens.toggleCodeLens",
+          "args": []
+        }
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "g", // git
+        "b" // blame
+      ],
+      "after": [],
+      "commands": [
+        {
+          "command": "gitlens.toggleFileBlame",
+          "args": []
+        }
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "g", // git
+        "h" // heatmap
+      ],
+      "after": [],
+      "commands": [
+        {
+          "command": "gitlens.toggleFileHeatmap",
+          "args": []
+        }
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "g", // git
+        "l" // info line
+      ],
+      "after": [],
+      "commands": [
+        {
+          "command": "gitlens.toggleLineBlame",
+          "args": []
+        }
+      ]
+    }
+  ],
+  "vim.visualModeKeyBindingsNonRecursive": [
+    {
+      "before": [
+        ">"
+      ],
+      "commands": [
+        "editor.action.indentLines"
+      ]
+    },
+    {
+      "before": [
+        "<"
+      ],
+      "commands": [
+        "editor.action.outdentLines"
+      ]
+    },
+  ],
+  "workbench.statusBar.feedback.visible": false,
+  "terminal.integrated.fontSize": 12,
+  // https://github.com/be5invis/Iosevka/blob/main/doc/custom-build.md
+  // /home/mjr/code/libraries/Iosevka
+  //"terminal.integrated.fontFamily": "Hack",
+  //"terminal.integrated.fontFamily": "'Droid Sans Mono', 'monospace', monospace",
+  //"editor.fontFamily": "'Droid Sans Mono', 'monospace', monospace",
+  //"editor.fontFamily": "Menlo, Monaco, 'Courier New', monospace",
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "explorer.confirmDragAndDrop": false,
+  "extensions.ignoreRecommendations": false,
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "[graphql]": {},
+  "gitlens.advanced.messages": {
+    "suppressGitDisabledWarning": true,
+    // "suppressShowKeyBindingsNotice": true
+  },
+  "gitlens.heatmap.toggleMode": "window",
+  "gitlens.blame.toggleMode": "window",
+  "gitlens.blame.heatmap.location": "left",
+  "files.": {},
+  "files.associations": {
+    "*.bq": "sql",
+    "*.dart.tmpl": "dart",
+    "*.vim": "viml",
+  },
+  "update.enableWindowsBackgroundUpdates": false,
+  "extensions.autoCheckUpdates": false,
+  "editor.suggestSelection": "first",
+  // "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
+  "files.exclude": {
+    ".git/": true,
+    ".mypy_cache": true,
+    ".pytest_cache": true,
+    ".venv/": true,
+    ".vscode/": true,
+    "**/__pycache__/": true,
+    "**/.classpath": true,
+    "**/.factorypath": true,
+    "**/.project": true,
+    "**/.settings": true,
+    "**/*.egg-info/": true,
+    "dist/": true,
+    "env/": true,
+    "node_modules/": true,
+    "pip-wheel-metadata": true,
+    "venv/": true
+  },
+  "git.autofetch": true,
+  "editor.formatOnPaste": true,
+  "editor.formatOnType": true,
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "zenMode.hideActivityBar": false,
+  "zenMode.fullScreen": false,
+  "zenMode.centerLayout": false,
+  "zenMode.hideLineNumbers": false,
+  "git.ignoreMissingGitWarning": true,
+  "dart.warnWhenEditingFilesOutsideWorkspace": false,
+  "dart.openDevTools": "flutter",
+  "dart.debugExternalLibraries": true,
+  "dart.debugSdkLibraries": false,
+  "local-history.path": "${workspaceFolder}/.vscode/",
+  "[dart]": {
+    "editor.formatOnSave": true,
+    "editor.formatOnType": true,
+    "editor.codeActionsOnSave": {},
+    // used for streaming guidance
+    //"editor.rulers": [
+    //  {
+    //    "column": 80,
+    //    "color": "#073642",
+    //  }
+    //],
+    "editor.selectionHighlight": false,
+    "editor.suggest.snippetsPreventQuickSuggestions": false,
+    "editor.suggestSelection": "first",
+    "editor.tabCompletion": "onlySnippets",
+    "editor.wordBasedSuggestions": false
+  },
+  "jupyter.runStartupCommands": [
+    "%colors nocolor",
+  ],
+  "dart.previewLsp": true,
+  //"terminal.integrated.inheritEnv": false,
+  "githubPullRequests.telemetry.enabled": false,
+  "workbench.editorAssociations": {
+    "*.ipynb": "jupyter.notebook.ipynb"
+  },
+  "workbench.preferredDarkColorTheme": "Visual Studio Dark",
+  "workbench.preferredLightColorTheme": "Solarized Light",
+  "redhat.telemetry.enabled": false,
+  "terminal.integrated.fontWeightBold": 700,
+  "workbench.settings.useSplitJSON": true,
+  "workbench.colorTheme": "Solarized Dark",
+  /**/
+  "workbench.colorCustomizations": {
+    "[Solarized Dark]": {
+      "activityBar.background": "#1c1c1c",
+      "debugExceptionWidget.background": "#1c1c1c",
+      "debugToolBar.background": "#1c1c1c",
+      "dropdown.background": "#1c1c1c",
+      "editor.background": "#1c1c1c",
+      "editorGroup.border": "#1c1c1c",
+      "editorWidget.background": "#1c1c1c",
+      "input.background": "#1c1c1c",
+      "peekViewResult.background": "#1c1c1c",
+      "peekViewTitle.background": "#1c1c1c",
+      "statusBar.background": "#1c1c1c",
+      "statusBar.debuggingBackground": "#1c1c1c",
+      "statusBar.noFolderBackground": "#1c1c1c",
+      "statusBarItem.prominentBackground": "#1c1c1c",
+      "statusBarItem.prominentHoverBackground": "#1c1c1c",
+      "tab.activeBackground": "#1c1c1c",
+      "tab.border": "#1c1c1c",
+      "titleBar.activeBackground": "#1c1c1c",
+      "sideBar.background": "#151515",
+      "editor.lineHighlightBackground": "#232323",
+      "inputValidation.infoBackground": "#232323",
+      "terminal.ansiBrightBlack": "#232323",
+      "terminal.ansiBlack": "#1c1c1c",
+      "editorGroupHeader.tabsBackground": "#282828",
+      "tab.inactiveBackground": "#282828",
+      "editorHoverWidget.background": "#282828",
+      "list.activeSelectionBackground": "#333333",
+      "quickInputList.focusBackground": "#333333",
+      "list.dropBackground": "#23232399",
+      "list.hoverBackground": "#232323bb",
+      "list.inactiveSelectionBackground": "#232323ee",
+      "editor.selectionBackground": "#b79a4234",
+      "editor.selectionHighlightBackground": "#c8c8c824",
+      "editor.wordHighlightStrongBackground": "#c8c8c824",
+      "editor.wordHighlightBackground": "#c8c8c80f"
+    }
+  },
+  "dart.debugExternalPackageLibraries": true,
+  "[yaml]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "search.searchEditor.reusePriorSearchConfiguration": true,
+  "search.showLineNumbers": true,
+  "search.smartCase": true,
+  "vim.visualstar": true,
+  "jupyter.sendSelectionToInteractiveWindow": false,
+  "[jsonc]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "terminal.integrated.macOptionIsMeta": true,
+  "terminal.integrated.commandsToSkipShell": [
+    "workbench.action.moveEditorToRightGroup",
+    "workbench.action.moveEditorToLeftGroup",
+    "workbench.action.moveEditorToBelowGroup",
+    "workbench.action.moveEditorToAboveGroup",
+    "workbench.action.terminal.openFileLink",
+    "workbench.action.createTerminalEditor",
+    "workbench.action.decreaseViewHeight",
+    "workbench.action.increaseViewSize",
+    "workbench.action.increaseViewHeight",
+    "workbench.action.increaseViewWidth",
+    "workbench.action.decreaseViewHeight",
+    "workbench.action.decreaseViewWidth",
+    "workbench.action.togglePanel",
+    "workbench.action.toggleMaximizePanel",
+    "workbench.action.terminal.moveToEditor",
+    "workbench.action.terminal.moveToTerminalPanel",
+    "workbench.action.terminal.split",
+    "workbench.action.terminal.unsplit",
+    "workbench.action.terminal.join",
+    "workbench.action.terminal.rename",
+    "workbench.action.navigateLeft",
+    "workbench.action.navigateRight",
+    "workbench.action.navigateUp",
+    "workbench.action.navigateDown",
+    "workbench.action.terminal.focusPreviousPane",
+    "workbench.action.terminal.focusNextPane",
+    "workbench.action.terminal.focusNextPane",
+  ],
+  "terminal.integrated.inheritEnv": true,
+  "terminal.integrated.profiles.osx": {
+    "tmux": {
+      "path": "~/.vscode/shell.sh",
+      "overrideName": true,
+    },
+  },
+  "terminal.integrated.profiles.linux": {
+    "vsctmux": {
+      "path": "~/.vscode/shell.sh",
+      "overrideName": true,
+    }
+  },
+  "terminal.integrated.showExitAlert": false,
+  "terminal.integrated.tabs.showActiveTerminal": "always",
+  "terminal.integrated.defaultProfile.osx": "tmux",
+  "terminal.integrated.defaultProfile.linux": "vsctmux",
+  "terminal.integrated.shell.linux": "/home/mjr/.vscode/shell.sh",
+  "lifeline.swap": true,
+  "lifeline.clock.format": "ddd, MMM HH:mm",
+  "terminal.integrated.enableMultiLinePasteWarning": false,
+  "jupyter.allowUnauthorizedRemoteConnection": true,
+  "jupyter.interactiveWindowMode": "perFile",
+  "jupyter.askForKernelRestart": false,
+  "window.enableMenuBarMnemonics": false,
+  "extensions.experimental.affinity": {
+    "ms-toolsai.jupyter": 2,
+    "ms-toolsai.jupyter-renderers": 2,
+    "ms-python.python": 2,
+    "ms-python.vscode-pylance": 2,
+    "asvetliakov.vscode-neovim": 1
+  },
+  "jupyter.logging.level": "verbose",
+  "triggerTaskOnSave.on": true,
+  "workbench.editor.splitInGroupLayout": "vertical",
+  "editor.wordWrap": "off",
+  "notebook.output.textLineLimit": 10000,
+  // google style shfmt https://github.com/mvdan/sh/blob/master/cmd/shfmt/shfmt.1.scd?plain=1#L111
+  "shellformat.flag": "-i 4 -ci -bn",
+  "explorer.confirmDelete": false,
+  "[dockerfile]": {
+    "editor.defaultFormatter": "ms-azuretools.vscode-docker"
+  },
+  "window.zoomLevel": -1,
+  "window.menuBarVisibility": "toggle",
+  "workbench.activityBar.visible": false,
+  //"isort.importStrategy": "fromEnvironment"
+}

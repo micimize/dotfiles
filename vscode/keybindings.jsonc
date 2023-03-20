@@ -414,7 +414,7 @@
   {
     "key": "ctrl+b",
     "command": "-workbench.action.toggleSidebarVisibility"
-  }
+  },
   //{
   //  "key": "shift+enter",
   //  "command": "-interactive.execute",

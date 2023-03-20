@@ -90,13 +90,19 @@ else
   _install_tridactyl_native
 fi
 
+# case $(uname -s) in
+#   Darwin | FreeBSD) _VSCODE_DIR="$HOME/vscode/.config/Code/User/";;
+#   Linux) _VSCODE_DIR="$HOME/vscode/.config/Code/User/";;
+# esac
+
 if [ ! -d "$HOME/vscode" ]; then
   echo "warning: $HOME/vscode doesn't exist"
 elif [ -f "$HOME/.vscode/shell.sh" ]; then
   echo "already configured: firefox"
 else
-  ln "$_DIR/vscode/keybindings.jsonc" "$HOME/vscode/.config/Code/User/keybindings.json"
-  ln "$_DIR/shell.sh" "$HOME/vscode/.vscode/shell.sh"
+  ln "$_DIR/vscode/keybindings.jsonc" "$HOME/.config/Code/User/keybindings.json"
+  ln "$_DIR/vscode/settings.jsonc" "$HOME/.config/Code/User/settings.json"
+  ln "$_DIR/shell.sh" "$HOME/.vscode/shell.sh"
 fi
 
 # globally .gitignore

@@ -59,7 +59,7 @@ call plug#begin()
     "Plug 'vimwiki/vimwiki'
 
   " Git plugin for vim
-  "  Plug 'tpope/vim-fugitive'
+    Plug 'tpope/vim-fugitive'
 
   " Plug 'editorconfig/editorconfig-vim'
 
@@ -362,22 +362,8 @@ let g:syntastic_mode_map = { 'mode': 'active',
                            \ 'active_filetypes': ['ruby', 'php', 'javascript', 'jsx', 'tsx'],
                            \ 'passive_filetypes': ['cpp', 'java', 'js'] }
                            
-"let g:syntastic_typescript_tsc_args = '--experimentalDecorators true'
-"let g:syntastic_javascript_checkers = ['eslint']
-"let g:syntastic_typescript_checkers = ['tslint']
-"let g:jsx_ext_required = 0
-
-let g:syntastic_python_checkers=['flake8', 'python3']
-
-com! S call SyntasticCheck()
 
 set hidden
-let g:LanguageClient_serverCommands = {
-    \ 'reason': ['ocaml-language-server', '--stdio'],
-    \ 'ocaml': ['ocaml-language-server', '--stdio'],
-    \ }
-
-let g:LanguageClient_autoStart = 1
 
 "nnoremap <silent> K :call LanguageClient_textDocument_hover()<CR>
 "nnoremap <silent> gd :call LanguageClient_textDocument_definition()<CR>

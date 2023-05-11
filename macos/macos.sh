@@ -3,6 +3,7 @@
 # export PATH="/usr/local/opt/binutils/bin:$PATH"
 
 alias stat=gstat
+alias vim=nvim
 
 #export PATH="$HOME/.yarn/bin:$PATH"
 

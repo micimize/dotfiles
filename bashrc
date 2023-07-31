@@ -216,11 +216,26 @@ alias notes='vim ~/notes'
 alias searchjobs="ps -ef | grep -v grep | grep"
 alias numbersum="paste -s -d+ - | bc"
 
+export _last_seen_pwd=""
+function auto_venv {
+  if [[ "$PWD" != "$_last_seen_pwd" ]]; then
+    export _last_seen_pwd="$PWD"
+    # TODO: nested venvs
+    if [[ "$VIRTUAL_ENV" != "" && "$PWD" != "$VIRTUAL_ENV"* ]]; then
+      deactivate || true
+    fi
+    if [[ "$VIRTUAL_ENV" == "" ]]; then 
+      [ -d ".venv" ] && source ".venv/bin/activate"
+    fi
+  fi
+}
+
 #log all history always
 promptFunc() {
   # right before prompting for the next command, save the previous
   # command in a file.
   echo "$(date +%Y-%m-%d--%H-%M-%S) $(hostname) $PWD $(history 1)" >>~/.full_history
+  auto_venv
 }
 PROMPT_COMMAND=promptFunc
 function histgrep {

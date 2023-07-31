@@ -124,7 +124,108 @@
   "vim.useCtrlKeys": true,
   "vim.hlsearch": true,
   "vim.foldfix": true,
-  "vim.normalModeKeyBindings": [
+  /*"vim.normalModeKeyBindingsNonRecursive": [
+    {
+      "before": [
+        "down"
+      ],
+      "after": [
+        "g",
+        "j"
+      ]
+    },
+    {
+      "before": [
+        "up"
+      ],
+      "after": [
+        "g",
+        "k"
+      ]
+    },
+    {
+      "before": [
+        "j"
+      ],
+      "after": [
+        "g",
+        "j"
+      ]
+    },
+    {
+      "before": [
+        "k"
+      ],
+      "after": [
+        "g",
+        "k"
+      ]
+    }
+  ],*/
+  "vim.normalModeKeyBindingsNonRecursive": [
+    /*
+    // Start softwrap support
+    {
+      "before": [
+        "down"
+      ],
+      "after": [
+        "g",
+        "j"
+      ]
+    },
+    {
+      "before": [
+        "up"
+      ],
+      "after": [
+        "g",
+        "k"
+      ]
+    },
+    {
+      "before": [
+        "j"
+      ],
+      "after": [
+        "g",
+        "j"
+      ]
+    },
+    {
+      "before": [
+        "k"
+      ],
+      "after": [
+        "g",
+        "k"
+      ]
+    },
+    // workaround for https://github.com/VSCodeVim/Vim/issues/2032
+    {
+      "before": [
+        "k"
+      ],
+      "after": [
+        "g",
+        "k"
+      ]
+    }        {
+      "before": [
+        "g",
+        "$"
+      ],
+      "commands": [
+        {
+          "command": "cursorMove",
+          "args": {
+            "to": "wrappedLineEnd"
+          }
+        }
+      ]
+    },
+    */
+    // history, marker, file nav 
     {
       "before": [
         "g",
@@ -517,6 +618,60 @@
     }
   ],
   "vim.visualModeKeyBindingsNonRecursive": [
+    /*
+    // Start softwrap support
+    {
+      "before": [
+        "down"
+      ],
+      "after": [
+        "g",
+        "j"
+      ]
+    },
+    {
+      "before": [
+        "up"
+      ],
+      "after": [
+        "g",
+        "k"
+      ]
+    },
+    {
+      "before": [
+        "j"
+      ],
+      "after": [
+        "g",
+        "j"
+      ]
+    },
+    // workaround for https://github.com/VSCodeVim/Vim/issues/2032
+    {
+      "before": [
+        "k"
+      ],
+      "after": [
+        "g",
+        "k"
+      ]
+    }        {
+      "before": [
+        "g",
+        "$"
+      ],
+      "commands": [
+        {
+          "command": "cursorMove",
+          "args": {
+            "to": "wrappedLineEnd"
+          }
+        }
+      ]
+    },
+    */
+    // Start indent > < control
     {
       "before": [
         ">"
@@ -620,6 +775,7 @@
   },
   "jupyter.runStartupCommands": [
     "%colors nocolor",
+    "del __file__",
   ],
   "dart.previewLsp": true,
   //"terminal.integrated.inheritEnv": false,
@@ -681,7 +837,6 @@
   "search.showLineNumbers": true,
   "search.smartCase": true,
   "vim.visualstar": true,
-  "jupyter.sendSelectionToInteractiveWindow": false,
   "[jsonc]": {
     "editor.defaultFormatter": "vscode.json-language-features"
   },
@@ -737,7 +892,6 @@
   "lifeline.clock.format": "ddd, MMM HH:mm",
   "terminal.integrated.enableMultiLinePasteWarning": false,
   "jupyter.allowUnauthorizedRemoteConnection": true,
-  "jupyter.interactiveWindowMode": "perFile",
   "jupyter.askForKernelRestart": false,
   "window.enableMenuBarMnemonics": false,
   "extensions.experimental.affinity": {
@@ -750,7 +904,7 @@
   "jupyter.logging.level": "verbose",
   "triggerTaskOnSave.on": true,
   "workbench.editor.splitInGroupLayout": "vertical",
-  "editor.wordWrap": "off",
+  // "editor.wordWrap": "off",
   "notebook.output.textLineLimit": 10000,
   // google style shfmt https://github.com/mvdan/sh/blob/master/cmd/shfmt/shfmt.1.scd?plain=1#L111
   "shellformat.flag": "-i 4 -ci -bn",
@@ -758,8 +912,25 @@
   "[dockerfile]": {
     "editor.defaultFormatter": "ms-azuretools.vscode-docker"
   },
-  "window.zoomLevel": -1,
   "window.menuBarVisibility": "toggle",
-  "workbench.activityBar.visible": false,
+  "github.copilot.enable": {
+    "*": true,
+    "yaml": false,
+    "plaintext": false,
+    "markdown": false
+  },
+  "editor.inlineSuggest.enabled": true,
+  "jupyter.interactiveWindow.creationMode": "perFile",
+  "jupyter.interactiveWindow.textEditor.executeSelection": false,
+  "window.zoomLevel": -2,
+  "[markdown]": {
+    "editor.formatOnSave": false,
+  },
+  "editor.wordWrap": "off",
+  /*
+  "editor.wrappingIndent": "indent",
+  "editor.wordWrap": "bounded",
+  "editor.wordWrapColumn": 140,
+  */
   //"isort.importStrategy": "fromEnvironment"
 }

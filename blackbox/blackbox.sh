@@ -5,6 +5,12 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/mjr/.mujoco/mujoco210/bin:/usr/lib
 
 export FIREFOX_PROFILE_DIR="$HOME/snap/firefox/common/.mozilla/firefox/bsx5dc2h.default"
 
+# ALVR and other android libs
+export JAVA_HOME=/usr/lib/jvm/default-java
+export ANDROID_HOME=~/AndroidSDK
+export ANDROID_NDK_HOME=~/AndroidSDK/ndk/25.2.9519653/
+
+
 function firefox_hack_recovery {
   # for parsing jsonlv4: https://gist.github.com/Tblue/62ff47bef7f894e92ed5
   backup_dir="$FIREFOX_PROFILE_DIR/sessionstore-backups"

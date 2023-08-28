@@ -13,11 +13,10 @@
  */
 
 /* TODO https://caniuse.com/css-nesting */
-/* Hide tab bar because we're using tree tabs */
 
-#main-window:not(#main-window[privatebrowsingmode="temporary"])
-#TabsToolbar {
-   visibility: collapse !important;
+/* Hide tab bar because we're using tree tabs */
+#main-window:not(#main-window[privatebrowsingmode="temporary"]) #TabsToolbar {
+  visibility: collapse !important;
 }
 
 #sidebar {
@@ -42,17 +41,15 @@
  * We're going to turn the sidebar header button
  * into an inline nav button that overlays this
  */
-#main-window:not(#main-window[privatebrowsingmode="temporary"])
-#nav-bar toolbarspring:first-child {
+#main-window:not(#main-window[privatebrowsingmode="temporary"]) #nav-bar toolbarspring:first-child {
   max-width: 75px !important;
   width: 75px !important;
   min-width: 75px !important;
 }
 
 /* Hide text and close button from sidebar header */
-#sidebar-header > #sidebar-switcher-target > *:not(:first-child),
-#sidebar-header > #sidebar-close
-{
+#sidebar-header>#sidebar-switcher-target>*:not(:first-child),
+#sidebar-header>#sidebar-close {
   visibility: collapse !important;
 }
 
@@ -65,11 +62,11 @@
  * we need to pass pointer events to <- -> buttons.
  * thus the pointer-events
  */
-#sidebar-header > #sidebar-switcher-target {
-  background-color: rgb(71, 71, 73) !important;
+#sidebar-header>#sidebar-switcher-target {
+  background-color: rgb(61, 60, 69);
   color: black !important;
-  width: 32px !important;
-  height: 32px !important;
+  /* width: 32px !important; height: 32px !important; */
+  padding: 7px !important;
   /*
    * because sidebar header sizing can't be controlled,
    * we need to pass pointer events to <- -> buttons
@@ -77,8 +74,8 @@
   pointer-events: all;
 }
 
-#sidebar-header > #sidebar-switcher-target image {
-  filter: invert(90%);
+#sidebar-header>#sidebar-switcher-target image {
+  filter: brightness(180%);
 }
 
 /* Make the header button the size of the nav bar button and transparent */
@@ -103,7 +100,7 @@
 }
 
 #sidebar-splitter {
-  border-right: 2px solid  black !important;
+  border-right: 2px solid black !important;
   border-left: 4px solid black !important;
   transition: border-color 0.25s cubic-bezier(0.07, 0.95, 0, 1);
 }

@@ -936,7 +936,7 @@
     "editor.formatOnSave": false,
   },
   "editor.wordWrap": "off",
-  "window.zoomLevel": -2,
+  "window.zoomLevel": -1,
   /*
   "editor.wrappingIndent": "indent",
   "editor.wordWrap": "bounded",

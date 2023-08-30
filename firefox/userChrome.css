@@ -1,5 +1,5 @@
 /*
- * Assuming OSX dark theme and compact nav.
+ * Assuming OSX dark theme and compact nav using sidebery
  * Should be readily customizable for whatever setup.
  * To inspect browser elements, you'll want to:
  * - Enable browser chrome and add-on debugging toolboxes in dev tools 
@@ -14,7 +14,7 @@
 
 /* TODO https://caniuse.com/css-nesting */
 
-/* Hide tab bar because we're using tree tabs */
+/* Hide tab bar because we're using sidebar tabs */
 #main-window:not(#main-window[privatebrowsingmode="temporary"]) #TabsToolbar {
   visibility: collapse !important;
 }
@@ -36,10 +36,9 @@
 }
 
 /*
- * Put a "Flexible Space" as the first element in your nav bar,
- * then make the sidebar button the first element. 
- * We're going to turn the sidebar header button
- * into an inline nav button that overlays this
+ * Use the navbar ordering "<-", "->", "sidebar button", "refresh
+ * This css will pull the sidebery button out and over the sidebar button when active,
+ * while still surfacing the sidebar button when inactive
  */
 #main-window:not(#main-window[privatebrowsingmode="temporary"]) #nav-bar toolbarspring:first-child {
   max-width: 75px !important;

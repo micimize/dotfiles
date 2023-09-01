@@ -24,7 +24,7 @@ export XDG_CONFIG_HOME="$HOME/.config"
 export PAGER=less
 export EDITOR=vim
 
-export PATH=$PATH:/home/mjr/.local/bin
+export PATH=$PATH:/home/mjr/.local/bin:/home/mjr/.cargo/bin
 export LESS='-R'
 
 export HISTCONTROL=ignoredups
@@ -122,6 +122,7 @@ short_path() {
     echo "$dir/${PWD##*/}"
   fi
 }
+
 if [ $(id -u) -eq 0 ]; then # you are root, set red colour prompt
   export PS1="[\[$txtred\]\u\[$txtylw\]@\[$txtrst\]\h] \[$txtgrn\]\W\[$txtrst\]# "
 else
@@ -217,17 +218,29 @@ alias searchjobs="ps -ef | grep -v grep | grep"
 alias numbersum="paste -s -d+ - | bc"
 
 export _last_seen_pwd=""
+
+function _current_venv_info {
+  if [[ "$VIRTUAL_ENV" != "" ]]; then
+    venv=$(realpath --relative-to $PWD $VIRTUAL_ENV)
+    version=$(cat $VIRTUAL_ENV/pyvenv.cfg | grep version | sed 's/version = \(.*\)\..*$/\1/g' | tail -n1)
+    echo "($venv v$version)"
+  fi
+}
+function _on_auto_venv {
+  echo
+}
 function auto_venv {
   if [[ "$PWD" != "$_last_seen_pwd" ]]; then
     export _last_seen_pwd="$PWD"
     # TODO: nested venvs
-    if [[ "$VIRTUAL_ENV" != "" && "$PWD" != "$VIRTUAL_ENV"* ]]; then
+    if [[ "$VIRTUAL_ENV" != "" && "$PWD" != "$(dirname $VIRTUAL_ENV)"* ]]; then
       deactivate || true
     fi
     if [[ "$VIRTUAL_ENV" == "" ]]; then 
       [ -d ".venv" ] && source ".venv/bin/activate"
     fi
   fi
+  _on_auto_venv
 }
 
 #log all history always
@@ -410,4 +423,5 @@ SYNTH_SHELL_DIR="$HOME/.config/synth-shell"
 #	 source /Users/mjr/.config/synth-shell/better-history.sh
 # fi
 
+eval "$(starship init bash)"
 source "$BLESH_DIR/ble.sh"

@@ -1,0 +1,100 @@
+# cargo install starship --locked
+
+format = """
+$time\
+${custom.dir}\
+$git_branch\
+$git_status\
+$python\
+$jobs\
+[](fg:black bg:brightblack) \
+"""
+
+# [](fg:black bg:yellow)\
+# [](fg:yellow bg:black)\
+# $python\ $nodejs\ $rust\
+# [](fg:bright-black bg:black)\
+
+# Disable the blank line at the start of the prompt
+add_newline = false
+
+[time]
+disabled = false
+time_format = "%m-%d %R"
+style = "fg:cyan bg:black"
+format = '[ $time ]($style)'
+
+[directory]
+truncate_to_repo = false
+style = "fg:purple bg:black"
+format = "[$path ]($style)"
+truncation_length = 3
+truncation_symbol = "…/"
+
+[directory.substitutions]
+# Order matters (most precise first)
+"Documents" = "󰈙 "
+"Downloads" = " "
+"Music" = " "
+"Pictures" = " "
+
+[docker_context]
+symbol = " "
+style = "bg:#06969A"
+format = '[ $symbol $context ]($style) $path'
+
+[git_branch]
+symbol = ""
+style = "fg:yellow bg:black"
+# truncation_length = 5
+format = '[$branch ]($style)'
+
+[git_status]
+style = "fg:yellow bg:black"
+format = '[$all_status$ahead_behind ]($style)'
+
+[git_metrics]
+disabled = true
+added_style = "green"
+
+[nodejs]
+symbol = ""
+style = "fg:blue bg:black"
+format = '[ $symbol ($version) ]($style)'
+
+[rust]
+symbol = ""
+style = "fg:red bg:black"
+format = '[ $symbol ($version) ]($style)'
+
+[python]
+version_format = 'py$major.$minor'
+style = "bg:black fg:white"
+format = '[$virtualenv ]($style)'
+detect_files = []
+detect_extensions = [ ]
+
+[jobs]
+style = "bg:black fg:blue"
+symbol = "&"
+format = '[$number$symbol ]($style)[](fg:black bg:brightblack) '
+
+[custom.dir]
+when = true
+style = "bg:black fg:purple"
+command = '''
+short_path() {
+  if [[ $PWD == $HOME ]]; then
+    echo "~"
+  else
+    _dir=$(echo "$PWD" | sed "s|$HOME|~|g")
+    more_than_three_chars='/\([^/][^/][^/]\)[^/]\+'
+    purple='\\e[1;35m'
+    magenta_black_bg='\\e[0;35m\\e[40m'
+    dir=$(dirname $(echo "$_dir" | sed "s|$more_than_three_chars|/$purple\1$magenta_black_bg|g"))
+    echo "$dir/${PWD##*/}"
+  fi
+};
+short_path
+'''
+format = "[$output ]($style)"

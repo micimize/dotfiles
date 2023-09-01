@@ -107,3 +107,6 @@ fi
 
 # globally .gitignore
 git config --global core.excludesfile ~/.gitignore
+
+# Install starship.rs prompt
+cargo install starship --locked

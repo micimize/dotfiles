@@ -6,7 +6,7 @@ set -x
 _DIR=$(dirname -- "$(readlink -f -- "$0")")
 eval $(grep -h "^export" "$_DIR/bash/"*)
 
-if [ "$1" == "--overwrite" ]; then
+if [ "${1:-}" == "--overwrite" ]; then
   echo "Overwriting existing files"
   _OVERWRITE="true"
 else
@@ -19,13 +19,13 @@ function setup_block {
   additional="${3:-}"
   mkdir -p "$(dirname "$target_file")"
 
-  if [[ ( -f "$target_file" || -L "$target_file" ) ]]; then
+  if [[ ( -f "$target_file" || -L "$target_file" ) && "_OVERWRITE" == "true" ]]; then
     echo "overwriting $target_file"
     rm -f "$target_file"
   fi
 
   if [[ -f "$target_file" || -L "$target_file" ]]; then
-    echo "already exists: $target_file"
+    echo -e "\nalready exists: $target_file\n"
   else
     echo -e "\n\nInstalling $1 to $target_file\n"
     ln -s "$source_file" "$target_file"

@@ -2,6 +2,7 @@
 
 format = """
 $time\
+$username\
 ${custom.dir}\
 $git_branch\
 $git_status\

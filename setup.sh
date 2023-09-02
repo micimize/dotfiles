@@ -14,20 +14,21 @@ else
 fi
 
 function setup_block {
-  source_file="$1"
+  source_file=(realpath "$_DIR/$1")
   target_file="${2/#\~/$HOME}"
   additional="${3:-}"
   mkdir -p "$(dirname "$target_file")"
-  if [[ ( -f "$target_file" || -L "$target_file" )  && "$_OVERWRITE" == "true" ]]; then
+
+  if [[ ( -f "$target_file" || -L "$target_file" ) ]]; then
     echo "overwriting $target_file"
     rm -f "$target_file"
   fi
 
   if [[ -f "$target_file" || -L "$target_file" ]]; then
-    echo "already configured: $target_file"
+    echo "already exists: $target_file"
   else
-    echo -e "\n\nInstalling $source_file to $target_file\n"
-    ln "$_DIR/$source_file" "$target_file"
+    echo -e "\n\nInstalling $1 to $target_file\n"
+    ln -s "$source_file" "$target_file"
     if [ "$additional" != "" ]; then
       echo -e "\n\nRunning $additional\n"
       $additional

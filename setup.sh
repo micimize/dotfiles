@@ -14,7 +14,7 @@ else
 fi
 
 function setup_block {
-  source_file=(realpath "$_DIR/$1")
+  source_file=$(realpath "$_DIR/$1")
   target_file="${2/#\~/$HOME}"
   additional="${3:-}"
   mkdir -p "$(dirname "$target_file")"

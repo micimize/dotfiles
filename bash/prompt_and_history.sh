@@ -82,6 +82,5 @@ _prompt_func() {
 }
 PROMPT_COMMAND=_prompt_func
 
-export PS1="$"
-source "$BLESH_DIR/ble.sh"
 eval "$(starship init bash)"
+source "$BLESH_DIR/ble.sh"

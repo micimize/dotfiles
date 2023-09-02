@@ -74,13 +74,12 @@ alias manage_memory="sudo ncdu -e $@"
 
 #shopt -s extdebug; trap "tput sgr0" DEBUG
 
+
 source "$BASHFILES_DIR/aesthetics.sh"
 source "$BASHFILES_DIR/completions.sh"
-source "$BASHFILES_DIR/utils.sh"
 source "$BASHFILES_DIR/prompt_and_history.sh"
+source "$BASHFILES_DIR/utils.sh"
 source "$DOTFILES_DIR/vscode/init.sh"
-
-#[ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
 case $(uname -s) in
   Darwin | FreeBSD) source "$DOTFILES_DIR/macos/macos.sh" ;;

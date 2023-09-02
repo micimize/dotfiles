@@ -6,6 +6,11 @@ bleopt canvas_winch_action=redraw-prev
 # legible syntax errors
 ble-face syntax_error=bg=88,bold
 
+ble-import -d integration/fzf-completion
+ble-import -d integration/fzf-key-bindings
+_ble_contrib_fzf_git_config=key-binding:sabbrev:arpeggio
+ble-import -d integration/fzf-git
+
 ## Ctrl-C behavior
 function ble/widget/discard-and-cancel {
   ble/widget/discard-line
@@ -62,3 +67,4 @@ function blerc/define-sabbrev-branch {
   ble-sabbrev -m '\branch'=blerc/sabbrev-git-branch
 }
 blehook/eval-after-load complete blerc/define-sabbrev-branch
+

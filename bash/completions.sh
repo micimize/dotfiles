@@ -1,6 +1,10 @@
 # enable bash completion
-[ -f /etc/profile.d/bash-completion ] && source /etc/profile.d/bash-completion
-[ -f /etc/bash_completion ] && source /etc/bash_completion
+function _source_if_present {
+  [ -f $1 ] && source $1
+}
+_source_if_present /etc/profile.d/bash_completion.sh
+_source_if_present /etc/bash_completion
+_source_if_present /usr/share/bash-completion/completions/fzf
 
 # make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(lesspipe)"
@@ -30,5 +34,4 @@ _ssh() {
 
 complete -o bashdefault -o default -o nospace -F _ssh ssh 2>/dev/null \
   || complete -o default -o nospace -F _ssh ssh
-
 

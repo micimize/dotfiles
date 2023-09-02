@@ -5,7 +5,6 @@ $time\
 ${custom.dir}\
 $git_branch\
 $git_status\
-$python\
 $jobs\
 [](fg:black bg:brightblack) \
 """

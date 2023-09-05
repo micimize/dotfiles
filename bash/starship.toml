@@ -77,7 +77,7 @@ detect_extensions = [ ]
 [jobs]
 style = "bg:black fg:blue"
 symbol = "&"
-format = '[$number$symbol ]($style)[](fg:black bg:brightblack) '
+format = '[$number$symbol ]($style)'
 
 [custom.dir]
 when = true

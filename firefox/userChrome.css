@@ -7,17 +7,10 @@
  * - Go to Tools > Developer > Browser Toolbox (not Browser console)
  * Editing browser elements through the debugger seems buggy at times,
  * especially colors
- *
- * had to replace position: fixed with negative margin approach as of FF71
- *
+ * 
  */
 
 /* TODO https://caniuse.com/css-nesting */
-
-/* Hide tab bar because we're using sidebar tabs */
-#main-window:not(#main-window[privatebrowsingmode="temporary"]) #TabsToolbar {
-  visibility: collapse !important;
-}
 
 #sidebar {
   max-width: none !important;
@@ -29,86 +22,93 @@
   visibility: visible !important;
   width: 75px !important;
   height: 0px !important;
+
+  hbox.titlebar-buttonbox-container {
+    position: absolute;
+    margin-top: 10px;
+  }
 }
 
-#toolbar-menubar hbox.titlebar-buttonbox {
-  margin-top: 8px;
-}
 
-/*
- * Use the navbar ordering "<-", "->", "sidebar button", "refresh
- * This css will pull the sidebery button out and over the sidebar button when active,
- * while still surfacing the sidebar button when inactive
- */
-#main-window:not(#main-window[privatebrowsingmode="temporary"]) #nav-bar toolbarspring:first-child {
-  max-width: 75px !important;
-  width: 75px !important;
-  min-width: 75px !important;
-}
 
-/* Hide text and close button from sidebar header */
-#sidebar-header>#sidebar-switcher-target>*:not(:first-child),
-#sidebar-header>#sidebar-close {
-  visibility: collapse !important;
-}
+#main-window:not(#main-window[privatebrowsingmode]) {
+  /* Hide tab bar because we're using sidebar tabs */
+  #TabsToolbar {
+    visibility: collapse!important;
+  }
 
-/*
- * Make the header button the size of the nav bar button,
- * use a fitting color for the background
- * fix color as black because the treetab image is fixed color
- *
- * because sidebar header sizing can't be controlled,
- * we need to pass pointer events to <- -> buttons.
- * thus the pointer-events
- */
-#sidebar-header>#sidebar-switcher-target {
-  background-color: rgb(61, 60, 69);
-  color: black !important;
-  /* width: 32px !important; height: 32px !important; */
-  padding: 7px !important;
   /*
-   * because sidebar header sizing can't be controlled,
-   * we need to pass pointer events to <- -> buttons
-   */
-  pointer-events: all;
-}
+  * Use the navbar ordering "<-", "->", "sidebar button", "refresh
+  * This css will pull the sidebery button out and over the sidebar button when active,
+  * while still surfacing the sidebar button when inactive
+  */
+  #nav-bar toolbarspring:first-child {
+    max-width: 75px !important;
+    width: 75px !important;
+    min-width: 75px !important;
+  }
 
-#sidebar-header>#sidebar-switcher-target image {
-  filter: brightness(180%);
-}
+  /* Move sidebar header button into navbar */
+  #sidebar-header {
+    /* Make the header button the size of the nav bar button and transparent */
+    position: fixed !important;
+    margin-left: 68px !important;
+    margin-top: -36.5px !important;
+    padding-top: 2px !important;
+    background-color: transparent !important;
+    padding-bottom: 0px !important;
+    margin-bottom: 4px !important;
+    width: 29px !important;
+    height: 36px !important;
+    pointer-events: none;
+    border-color: transparent !important;
 
-/* Make the header button the size of the nav bar button and transparent */
-#sidebar-header {
-  position: fixed !important;
-  margin-left: 72px !important;
-  margin-top: -40px !important;
-  padding-top: 2px !important;
-  background-color: transparent !important;
-  padding-bottom: 0px !important;
-  margin-bottom: 4px !important;
-  width: 29px !important;
-  height: 36px !important;
-  pointer-events: none;
-  border-color: transparent !important;
-}
+    /* Hide text and close button from sidebar header */
+    > #sidebar-switcher-target > *:not(:first-child),
+    > #sidebar-close {
+      visibility: collapse !important;
+    }
 
-#main-window[privatebrowsingmode="temporary"] #sidebar-header,
-#main-window[privatebrowsingmode="temporary"] #nav-bar toolbarspring:first-child,
-#main-window[privatebrowsingmode="temporary"] #nav-bar #sidebar-button {
-  display: none !important;
+    /*
+    * Make the header button the size of the nav bar button,
+    * use a fitting color for the background
+    * fix color as black because the treetab image is fixed color
+    *
+    * because sidebar header sizing can't be controlled,
+    * we need to pass pointer events to <- -> buttons.
+    * thus the pointer-events
+    */
+    > #sidebar-switcher-target {
+      background-color: var(--input-bgcolor)!important;
+      /* width: 32px !important; height: 32px !important; */
+      padding: 5px !important;
+      /*
+      * because sidebar header sizing can't be controlled,
+      * we need to pass pointer events to <- -> buttons
+      */
+      pointer-events: all;
+    }
+    > #sidebar-switcher-target:hover {
+      background-color: var(--button-active-bgcolor)!important;
+    }
+
+    > #sidebar-switcher-target image {
+      filter: brightness(180%);
+    }
+
+  }
 }
 
 #sidebar-splitter {
   border-right: 2px solid black !important;
   border-left: 4px solid black !important;
   transition: border-color 0.25s cubic-bezier(0.07, 0.95, 0, 1);
-}
 
-#sidebar-splitter:hover {
-  border-left-color: rgb(31, 31, 31) !important;
+  &:hover {
+    border-left-color: rgb(31, 31, 31) !important;
+  }
 
-}
-
-#sidebar-splitter:active {
-  border-color: rgb(62, 62, 62) !important;
+  &:active {
+    border-color: rgb(62, 62, 62) !important;
+  }
 }

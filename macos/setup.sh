@@ -13,7 +13,10 @@ if [ ! -f "$HOME/.slate.js" ]; then
   ln -s $_DIR/slate.js $HOME/.slate.js
 fi
 
-brew install fzf
+if [ ! `which fzf` ]; then
+  echo "fzf not installed, installing"
+  brew install fzf
+fi
 
 # To install useful key bindings and fuzzy completion:
 # TODO is this setup or recurring?

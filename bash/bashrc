@@ -16,7 +16,7 @@ export XDG_CONFIG_HOME="$HOME/.config"
 export PAGER=less
 export EDITOR=vim
 
-export PATH=$PATH:/home/mjr/.local/bin:/home/mjr/.cargo/bin
+export PATH="$PATH:$HOME/.local/bin:$HOME/.cargo/bin"
 export LESS='-R'
 
 if [ -d /opt/local/bin ]; then

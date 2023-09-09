@@ -6,33 +6,48 @@ set -x
 _DIR=$(dirname -- "$(readlink -f -- "$0")")
 eval $(grep -h "^export" "$_DIR/bash/"*)
 
-if [ "${1:-}" == "--overwrite" ]; then
-  echo "Overwriting existing files"
-  _OVERWRITE="true"
-else
-  _OVERWRITE="false"
-fi
+_OVERWRITE="false"
+JUST_PATHS=()
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --overwrite)
+      echo "Overwriting existing files"
+      _OVERWRITE="true"
+      shift
+      ;;
+    *)
+      echo "Inclusion-only mode: will setup $1"
+      JUST_PATHS+=("$1")
+      shift
+      ;;
+  esac
+done
 
-function setup_block {
+function setup_symlink {
+  if [[ ${#JUST_PATHS[@]} -gt 0 ]]; then
+    if [[ ! " ${JUST_PATHS[@]} " =~ " $1 " ]]; then
+      return
+    fi
+  fi
   source_file=$(realpath "$_DIR/$1")
   target_file="${2/#\~/$HOME}"
   additional="${3:-}"
   mkdir -p "$(dirname "$target_file")"
 
-  if [[ ( -f "$target_file" || -L "$target_file" ) && "_OVERWRITE" == "true" ]]; then
+  if [[ ( -f "$target_file" || -L "$target_file") && "$_OVERWRITE" == "true" ]]; then
     echo "overwriting $target_file"
     rm -f "$target_file"
   fi
 
   if [[ -f "$target_file" || -L "$target_file" ]]; then
     echo -e "\nalready exists: $target_file\n"
-  else
-    echo -e "\n\nInstalling $1 to $target_file\n"
-    ln -s "$source_file" "$target_file"
-    if [ "$additional" != "" ]; then
-      echo -e "\n\nRunning $additional\n"
-      $additional
-    fi
+    return
+  fi
+  echo -e "\n\nInstalling $1 to $target_file\n"
+  ln -s "$source_file" "$target_file"
+  if [ "$additional" != "" ]; then
+    echo -e "\n\nRunning $additional\n"
+    $additional
   fi
 }
 
@@ -42,15 +57,17 @@ case $(uname -s) in
 esac
 cd "$_DIR"
 
-case $(uname -s) in
-  Darwin | FreeBSD) source "$DOTFILES_DIR/macos/setup.sh" ;;
-  Linux) source "$DOTFILES_DIR/blackbox/setup.sh" ;;
-esac
+if [[ ${#JUST_PATHS[@]} == 0 ]]; then
+  case $(uname -s) in
+    Darwin | FreeBSD) source "$DOTFILES_DIR/macos/setup.sh" ;;
+    Linux) source "$DOTFILES_DIR/blackbox/setup.sh" ;;
+  esac
+fi
 
 function _install_bashrc_dependencies {
   cargo install starship --locked
 }
-setup_block bash/bashrc ~/.bashrc _install_bashrc_dependencies 
+setup_symlink bash/bashrc ~/.bashrc _install_bashrc_dependencies 
 
 function _setup_blerc_dir {
   if [ ! -d "$BLESH_DIR" ]; then
@@ -61,9 +78,9 @@ function _setup_blerc_dir {
     popd
   fi
 }
-setup_block bash/blerc ~/.blerc _setup_blerc_dir
+setup_symlink bash/blerc ~/.blerc _setup_blerc_dir
 
-setup_block bash/starship.toml ~/.config/starship.toml
+setup_symlink bash/starship.toml ~/.config/starship.toml
 
 
 function _install_tmux_plugins {
@@ -74,7 +91,7 @@ function _install_tmux_plugins {
     git clone https://github.com/tmux-plugins/tpm "$TPM_DIR"
   fi
 }
-setup_block tmux.conf ~/.tmux.conf _install_tmux_plugins
+setup_symlink tmux.conf ~/.tmux.conf _install_tmux_plugins
 
 function _install_nvim_plugins {
   plug_raw_source=https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
@@ -83,16 +100,9 @@ function _install_nvim_plugins {
   # ~/.local/share/nvim/site/autoload
   nvim --headless +PlugInstall "+qall!"
 }
-setup_block init.vim ~/.config/nvim/init.vim _install_nvim_plugins
+setup_symlink init.vim ~/.config/nvim/init.vim _install_nvim_plugins
 
-
-if [ ! -d "$FIREFOX_PROFILE_DIR" ]; then
-  echo "warning: FIREFOX_PROFILE_DIR $FIREFOX_PROFILE_DIR doesn't exist"
-elif [ -d "$FIREFOX_PROFILE_DIR/chrome" ]; then
-  echo "already configured: firefox"
-else
-  ln -s "$_DIR/firefox" $FIREFOX_PROFILE_DIR/chrome
-fi
+setup_symlink firefox "$FIREFOX_PROFILE_DIR/chrome"
 
 function _install_tridactyl_native {
   tridactyl_installer=https://raw.githubusercontent.com/tridactyl/native_messenger/master/installers/install.sh
@@ -102,21 +112,25 @@ function _install_tridactyl_native {
   sh $temp_file $version
   rm -f $temp_file
 }
-setup_block tridactyl/tridactylrc ~/.config/tridactyl/tridactylrc _install_tridactyl_native
+setup_symlink tridactyl/tridactylrc ~/.config/tridactyl/tridactylrc _install_tridactyl_native
 
 # case $(uname -s) in
 #   Darwin | FreeBSD) _VSCODE_DIR="$HOME/vscode/.config/Code/User/";;
 #   Linux) _VSCODE_DIR="$HOME/vscode/.config/Code/User/";;
 # esac
 
-if [ ! -d "$HOME/vscode" ]; then
-  echo "warning: $HOME/vscode doesn't exist"
-elif [ -f "$HOME/.vscode/shell.sh" ]; then
-  echo "already configured: firefox"
-else
-  ln "$_DIR/vscode/keybindings.jsonc" "$HOME/.config/Code/User/keybindings.json"
-  ln "$_DIR/vscode/settings.jsonc" "$HOME/.config/Code/User/settings.json"
-  ln "$_DIR/shell.sh" "$HOME/.vscode/shell.sh"
+# TODO refactor to symlinks probably
+# TODO does vscode really have platform specific paths for this still?
+if [ false ]; then
+  if [ ! -d "$HOME/vscode" ]; then
+    echo "warning: $HOME/vscode doesn't exist"
+  elif [ -f "$HOME/.vscode/shell.sh" ]; then
+    echo "already configured: firefox"
+  else
+    ln "$_DIR/vscode/keybindings.jsonc" "$HOME/.config/Code/User/keybindings.json"
+    ln "$_DIR/vscode/settings.jsonc" "$HOME/.config/Code/User/settings.json"
+    ln "$_DIR/shell.sh" "$HOME/.vscode/shell.sh"
+  fi
 fi
 
 # globally .gitignore

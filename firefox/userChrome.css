@@ -37,6 +37,10 @@
     visibility: collapse!important;
   }
 
+  #sidebar-button[checked="true"] {
+    visibility: hidden;
+  }
+
   /*
   * Use the navbar ordering "<-", "->", "sidebar button", "refresh
   * This css will pull the sidebery button out and over the sidebar button when active,
@@ -50,12 +54,13 @@
 
   /* Move sidebar header button into navbar */
   #sidebar-header {
+    z-index: 3;
     /* Make the header button the size of the nav bar button and transparent */
     position: fixed !important;
     margin-left: 68px !important;
     margin-top: -36.5px !important;
     padding-top: 2px !important;
-    background-color: transparent !important;
+    background-color: transparent;
     padding-bottom: 0px !important;
     margin-bottom: 4px !important;
     width: 29px !important;
@@ -79,7 +84,8 @@
     * thus the pointer-events
     */
     > #sidebar-switcher-target {
-      background-color: var(--input-bgcolor)!important;
+      opacity: 1;
+      /*! filter: opacity(1); */
       /* width: 32px !important; height: 32px !important; */
       padding: 5px !important;
       /*
@@ -87,9 +93,11 @@
       * we need to pass pointer events to <- -> buttons
       */
       pointer-events: all;
+      background-color: var(--input-bgcolor, var(--toolbar-bgcolor))!important;
+      z-index: 3;
     }
     > #sidebar-switcher-target:hover {
-      background-color: var(--button-active-bgcolor)!important;
+      background-color:  var(--toolbarbutton-hover-background) !important;
     }
 
     > #sidebar-switcher-target image {
@@ -110,5 +118,65 @@
 
   &:active {
     border-color: rgb(62, 62, 62) !important;
+  }
+}
+hbox#urlbar {
+  transition: font-size 0.125s;
+   /*#urlbar-background {
+     transition: background-color 0.1s;
+  }*/
+  box[role="button"] {
+    background-color: var(--toolbar-bgcolor);
+    z-index: 2;
+    > box {
+      align-items: center;
+      width: auto;
+      height: auto;
+    }
+    image {
+      transition: 0.125s;
+      max-width: 16px!important;
+      max-height: 16px!important;
+    }
+  }
+  #urlbar-input {
+    transition: margin-left 0.125s;
+    margin-left: 0px;
+  }
+  &:not(:hover, :active, :focus, :focus-within) {
+    font-size: 12px!important;
+    #urlbar-background {
+      background-color: var(--toolbar-bgcolor)!important;
+    }
+    box[role="button"] {
+      image {
+        opacity: 0.3;
+        max-width: 12px!important;
+        max-height: 12px!important;
+      }
+    }
+  }
+  /* Hide https:// - we already have a lock icon */
+  .urlbar-input-box {
+    overflow: clip;
+  }
+  #urlbar-input { 
+    margin-left: calc(var(--urlbar-scheme-size) * -0.66) !important;
+  } 
+}
+
+toolbar#nav-bar {
+  .urlbar-page-action, .chromeclass-toolbar-additional, #PanelUI-button {
+    transition: 0.125s;
+    opacity: 1.0!important;
+    scale: 1.0;
+  }
+  &:not(:hover, :active, :focus, :focus-within) {
+    .urlbar-page-action,
+    .chromeclass-toolbar-additional:not(#sidebar-button, #back-button, #forward-button),
+    #PanelUI-button {
+      opacity: 0.3!important;
+      scale: 0.8;
+    }
   }
 }

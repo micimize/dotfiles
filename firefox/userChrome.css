@@ -11,7 +11,16 @@
  */
 
 /* TODO https://caniuse.com/css-nesting */
-
+:root {
+  --title-button-space: 75px;
+  --extracted-sidebar-header-offset: 72px;
+  @media (-moz-gtk-csd-available) {
+    --title-button-space: 96px;
+    --extracted-sidebar-header-offset: 90px;
+    --browser-radius: 6px;
+    --browser-border: 1px inset transparent;
+  }
+}
 
 #sidebar {
   max-width: none !important;
@@ -21,16 +30,20 @@
 /* show window controls */
 #toolbar-menubar {
   visibility: visible !important;
-  width: 75px !important;
+  width: var(--title-button-space) !important;
   height: 0px !important;
 
   hbox.titlebar-buttonbox-container {
+    width: 100%;
     position: absolute;
     margin-top: 6px;
     margin-left: -3px;
   }
 }
 
+toolbox#navigator-toolbox {
+  border-bottom: none!important;
+}
 
 
 #main-window:not(#main-window[privatebrowsingmode]) {
@@ -49,9 +62,9 @@
   * while still surfacing the sidebar button when inactive
   */
   #nav-bar toolbarspring:first-child {
-    max-width: 75px !important;
-    width: 75px !important;
-    min-width: 75px !important;
+    max-width: var(--title-button-space) !important;
+    width: var(--title-button-space) !important;
+    min-width: var(--title-button-space) !important;
   }
 
   /* Move sidebar header button into navbar */
@@ -59,7 +72,7 @@
     z-index: 3;
     /* Make the header button the size of the nav bar button and transparent */
     position: fixed !important;
-    margin-left: 72px !important;
+    margin-left: var(--extracted-sidebar-header-offset) !important;
     margin-top: -27px !important;
     padding-top: 2px !important;
     background-color: transparent;
@@ -69,7 +82,11 @@
     height: 24px !important;
     pointer-events: none;
     border-color: transparent !important;
-
+    
+    @media (-moz-gtk-csd-available) {
+      margin-top: -27px !important;
+      padding-top: 1px !important;
+    }
     /* Hide text and close button from sidebar header */
     > #sidebar-switcher-target > *:not(:first-child),
     > #sidebar-close {
@@ -174,6 +191,9 @@ hbox#urlbar {
   }
   #urlbar-input {
     margin-left: calc(var(--urlbar-scheme-size) * -0.66) !important;
+    @media (-moz-gtk-csd-available) {
+      margin-left: calc(var(--urlbar-scheme-size) * -0.76) !important;
+    }
   }
 }
 
@@ -229,11 +249,42 @@ Probably root cause is a snap permissions issue but not worth spending more than
 https://www.reddit.com/r/kde/comments/nm1vub/comment/gzpj9x4/?utm_source=reddit&utm_medium=web2x&context=3
 */
 @media (-moz-gtk-csd-available) {
+  #main-window {
+    toolbox#navigator-toolbox {
+      border: var(--browser-border) !important;
+      border-bottom-width: 0px!important;
+      border-top-left-radius: var(--browser-radius)!important;
+      border-top-right-radius: var(--browser-radius)!important;
+      color: black;
+    }
+    #browser {
+      border: var(--browser-border) !important;
+      border-top-width: 0px!important;
+      border-bottom-left-radius: var(--browser-radius)!important);
+      border-bottom-right-radius: var(--browser-radius)!important;
+    }
+  }
+  #toolbar-menubar hbox.titlebar-buttonbox-container {
+    margin-top: 1px;
+    margin-left: 10px;
+    width: var(--title-button-space);
+  }
   hbox.titlebar-buttonbox-container toolbarbutton.titlebar-button {
+    &:first-child::before {
+      content: url('./linux_assets/firefox_logo.svg');
+      display: flex;
+      width: 16px;
+      height: 20px;
+      margin-right: 1px;
+      flex: 1;
+    }
+    
     /*! -moz-appearance: none !important; */
     background-color: transparent!important;
     width: 26px;
     height: 26px;
+    margin-left: 1px;
+    margin-right: 7px !important;
     /* background-size: 18px 18px;*/
     &.titlebar-min {
       list-style-image: url("./linux_assets/breeze/minimize-normal.svg")!important;
@@ -265,5 +316,6 @@ https://www.reddit.com/r/kde/comments/nm1vub/comment/gzpj9x4/?utm_source=reddit&
         &:active { list-style-image: url("./linux_assets/breeze/close-backdrop-active.svg")!important; }
       }
     }
+    margin-right: -2px;
   }
 }

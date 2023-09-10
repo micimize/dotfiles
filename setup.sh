@@ -121,9 +121,9 @@ setup_symlink tridactyl/tridactylrc ~/.config/tridactyl/tridactylrc _install_tri
 
 # TODO refactor to symlinks probably
 # TODO does vscode really have platform specific paths for this still?
-if [ false ]; then
-  if [ ! -d "$HOME/vscode" ]; then
-    echo "warning: $HOME/vscode doesn't exist"
+if false; then
+  if [ ! -d "$HOME/.vscode" ]; then
+    echo "warning: $HOME/.vscode doesn't exist"
   elif [ -f "$HOME/.vscode/shell.sh" ]; then
     echo "already configured: firefox"
   else

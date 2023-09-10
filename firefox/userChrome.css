@@ -2,12 +2,12 @@
  * Assuming OSX dark theme and compact nav using sidebery
  * Should be readily customizable for whatever setup.
  * To inspect browser elements, you'll want to:
- * - Enable browser chrome and add-on debugging toolboxes in dev tools 
+ * - Enable browser chrome and add-on debugging toolboxes in dev tools
  * - Enable remote debugging
  * - Go to Tools > Developer > Browser Toolbox (not Browser console)
  * Editing browser elements through the debugger seems buggy at times,
  * especially colors
- * 
+ *
  */
 
 /* TODO https://caniuse.com/css-nesting */
@@ -172,9 +172,9 @@ hbox#urlbar {
   .urlbar-input-box {
     overflow: clip;
   }
-  #urlbar-input { 
+  #urlbar-input {
     margin-left: calc(var(--urlbar-scheme-size) * -0.66) !important;
-  } 
+  }
 }
 
 toolbar#nav-bar {
@@ -210,7 +210,7 @@ toolbar#nav-bar {
       }
     }
   }
-  
+
   &:not(:hover, :active, :focus, :focus-within) {
     .urlbar-page-action,
     .chromeclass-toolbar-additional:not(#sidebar-button, #back-button, #forward-button)
@@ -221,5 +221,49 @@ toolbar#nav-bar {
       }
     }
   }
-  #PanelUI-button {}
+}
+
+/*
+Linux-specific. I'm currently using KDE breeze with snapcraft.
+Probably root cause is a snap permissions issue but not worth spending more than 15min.
+https://www.reddit.com/r/kde/comments/nm1vub/comment/gzpj9x4/?utm_source=reddit&utm_medium=web2x&context=3
+*/
+@media (-moz-gtk-csd-available) {
+  hbox.titlebar-buttonbox-container toolbarbutton.titlebar-button {
+    /*! -moz-appearance: none !important; */
+    background-color: transparent!important;
+    width: 26px;
+    height: 26px;
+    /* background-size: 18px 18px;*/
+    &.titlebar-min {
+      list-style-image: url("./linux_assets/breeze/minimize-normal.svg")!important;
+      &:hover { list-style-image: url("./linux_assets/breeze/minimize-hover.svg")!important; }
+      &:active { list-style-image: url("./linux_assets/breeze/minimize-active.svg")!important; }
+      &:-moz-window-inactive {
+        list-style-image: url("./linux_assets/breeze/minimize-backdrop-normal.svg")!important;
+        &:hover { list-style-image: url("./linux_assets/breeze/minimize-backdrop-hover.svg")!important; }
+        &:active { list-style-image: url("./linux_assets/breeze/minimize-backdrop-active.svg")!important; }
+      }
+    }
+    &.titlebar-restore {
+      list-style-image: url("./linux_assets/breeze/maximized-normal.svg")!important;
+      &:hover { list-style-image: url("./linux_assets/breeze/maximized-hover.svg")!important; }
+      &:active { list-style-image: url("./linux_assets/breeze/maximized-active.svg")!important; }
+      &:-moz-window-inactive {
+        list-style-image: url("./linux_assets/breeze/maximized-backdrop-normal.svg")!important;
+        &:hover { list-style-image: url("./linux_assets/breeze/maximized-backdrop-hover.svg")!important; }
+        &:active { list-style-image: url("./linux_assets/breeze/maximized-backdrop-active.svg")!important; }
+      }
+    }
+    &.titlebar-close {
+      list-style-image: url("./linux_assets/breeze/close-normal.svg")!important;
+      &:hover { list-style-image: url("./linux_assets/breeze/close-hover.svg")!important; }
+      &:active { list-style-image: url("./linux_assets/breeze/close-active.svg")!important; }
+      &:-moz-window-inactive {
+        list-style-image: url("./linux_assets/breeze/close-backdrop-normal.svg")!important;
+        &:hover { list-style-image: url("./linux_assets/breeze/close-backdrop-hover.svg")!important; }
+        &:active { list-style-image: url("./linux_assets/breeze/close-backdrop-active.svg")!important; }
+      }
+    }
+  }
 }

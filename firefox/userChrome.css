@@ -85,7 +85,7 @@ toolbox#navigator-toolbox {
     
     @media (-moz-gtk-csd-available) {
       margin-top: -27px !important;
-      padding-top: 1px !important;
+      padding-top: 2px !important;
     }
     /* Hide text and close button from sidebar header */
     > #sidebar-switcher-target > *:not(:first-child),
@@ -264,10 +264,19 @@ https://www.reddit.com/r/kde/comments/nm1vub/comment/gzpj9x4/?utm_source=reddit&
       border-bottom-right-radius: var(--browser-radius)!important;
     }
   }
-  #toolbar-menubar hbox.titlebar-buttonbox-container {
+   #toolbar-menubar hbox.titlebar-buttonbox-container {
     margin-top: 1px;
     margin-left: 10px;
     width: var(--title-button-space);
+  }
+  &[privatebrowsingmode] {
+    #toolbar-menubar {
+      display: none!important;
+    }
+    hbox.titlebar-buttonbox-container {
+      margin-left: 16px;
+      width: auto;
+    }
   }
   hbox.titlebar-buttonbox-container toolbarbutton.titlebar-button {
     &:first-child::before {

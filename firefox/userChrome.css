@@ -249,7 +249,12 @@ Probably root cause is a snap permissions issue but not worth spending more than
 https://www.reddit.com/r/kde/comments/nm1vub/comment/gzpj9x4/?utm_source=reddit&utm_medium=web2x&context=3
 */
 @media (-moz-gtk-csd-available) {
-  #main-window {
+  
+  #main-window[inFullscreen="true"] #toolbar-menubar {
+    display: none!important;
+  }
+  /* this tries to re-add borders but doesn't work very well IMO
+  #main-window:not([sizemode="maximized"]) {
     toolbox#navigator-toolbox {
       border: var(--browser-border) !important;
       border-bottom-width: 0px!important;
@@ -264,6 +269,7 @@ https://www.reddit.com/r/kde/comments/nm1vub/comment/gzpj9x4/?utm_source=reddit&
       border-bottom-right-radius: var(--browser-radius)!important;
     }
   }
+  */
    #toolbar-menubar hbox.titlebar-buttonbox-container {
     margin-top: 1px;
     margin-left: 10px;

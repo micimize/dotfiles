@@ -14,11 +14,14 @@
 :root {
   --title-button-space: 75px;
   --extracted-sidebar-header-offset: 72px;
+  --additional-grab-bar-height: 0px;
+  --navbar-height: 28px;
   @media (-moz-gtk-csd-available) {
     --title-button-space: 96px;
     --extracted-sidebar-header-offset: 90px;
     --browser-radius: 6px;
-    --browser-border: 1px inset transparent;
+    --browser-border: 1px inset #0e0d0f; /* for some reason black doesn't render right */
+    --additional-grab-bar-height: 8px;
   }
 }
 
@@ -36,7 +39,7 @@
   hbox.titlebar-buttonbox-container {
     width: 100%;
     position: absolute;
-    margin-top: 6px;
+    margin-top: calc(6px + var(--additional-grab-bar-height));
     margin-left: -3px;
   }
 }
@@ -112,7 +115,8 @@ toolbox#navigator-toolbox {
       * we need to pass pointer events to <- -> buttons
       */
       pointer-events: all;
-      background-color: var(--input-bgcolor, var(--toolbar-bgcolor))!important;
+      /* initially wanted this to have a "focused" indicator, but changing the button itself seems like enough */
+      /* background-color: var(--input-bgcolor, var(--toolbar-bgcolor))!important; */
       z-index: 3;
     }
     > #sidebar-switcher-target:hover {
@@ -141,11 +145,12 @@ toolbox#navigator-toolbox {
 }
 /* TODO idk where this issue came from but was super annoying */
 #urlbar-container {
-  height: 28px !important;
-  max-height: 28px !important;
-  --urlbar-container-height: 28px !important;
+  height: var(--navbar-height)!important;
+  max-height: var(--navbar-height) !important;
+  --urlbar-container-height: var(--navbar-height) !important;
 }
 hbox#urlbar {
+  --urlbar-toolbar-height: var(--navbar-height)!important;
   transition: font-size 0.125s ease-in-out;
    /*#urlbar-background {
      transition: background-color 0.1s;
@@ -198,7 +203,9 @@ hbox#urlbar {
 }
 
 toolbar#nav-bar {
-  height: 28px;
+  height: calc(var(--navbar-height) + var(--additional-grab-bar-height));
+  border-top: var(--additional-grab-bar-height) solid var(--lwt-accent-color-inactive, var(--lwt-accent-color)) !important;
+  
   --toolbarbutton-inner-padding: 4px;
   .urlbar-page-action,
   .chromeclass-toolbar-additional:not(#sidebar-button, #back-button, #forward-button) {
@@ -253,14 +260,12 @@ https://www.reddit.com/r/kde/comments/nm1vub/comment/gzpj9x4/?utm_source=reddit&
   #main-window[inFullscreen="true"] #toolbar-menubar {
     display: none!important;
   }
-  /* this tries to re-add borders but doesn't work very well IMO
-  #main-window:not([sizemode="maximized"]) {
+  #main-window:not([inFullscreen="true"]) {
     toolbox#navigator-toolbox {
       border: var(--browser-border) !important;
       border-bottom-width: 0px!important;
       border-top-left-radius: var(--browser-radius)!important;
       border-top-right-radius: var(--browser-radius)!important;
-      color: black;
     }
     #browser {
       border: var(--browser-border) !important;
@@ -269,9 +274,9 @@ https://www.reddit.com/r/kde/comments/nm1vub/comment/gzpj9x4/?utm_source=reddit&
       border-bottom-right-radius: var(--browser-radius)!important;
     }
   }
-  */
+  
    #toolbar-menubar hbox.titlebar-buttonbox-container {
-    margin-top: 1px;
+    margin-top: calc(1px + var(--additional-grab-bar-height));
     margin-left: 10px;
     width: var(--title-button-space);
   }
@@ -294,13 +299,11 @@ https://www.reddit.com/r/kde/comments/nm1vub/comment/gzpj9x4/?utm_source=reddit&
       flex: 1;
     }
     
-    /*! -moz-appearance: none !important; */
     background-color: transparent!important;
     width: 26px;
     height: 26px;
     margin-left: 1px;
     margin-right: 7px !important;
-    /* background-size: 18px 18px;*/
     &.titlebar-min {
       list-style-image: url("./linux_assets/breeze/minimize-normal.svg")!important;
       &:hover { list-style-image: url("./linux_assets/breeze/minimize-hover.svg")!important; }

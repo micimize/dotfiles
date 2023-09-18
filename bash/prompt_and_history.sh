@@ -30,6 +30,21 @@ function auto_activate_venv {
 }
 
 
+_short_path_for_prompt() {
+  if [[ $PWD == $HOME ]]; then
+    echo "~"
+  else
+    dir=$(dirname $(echo "$PWD" | sed "s|$HOME|~|g" | sed 's|/\(...\)[^/]*|/\1|g'))
+    echo "$dir/${PWD##*/}"
+  fi
+}
+function _fallback_prompt {
+  _export_color_escape_codes
+  export PS1="\[$_text_cyan\]\D{%m-%d} \A \[$_bold_cyan\]\$(_short_path_for_prompt) $ \[$_text_reset\]"
+}
+_fallback_prompt
+
+
 # I use this for writing to give myself nice padded layout
 function margin_pane {
   bright='brightblack'
@@ -82,5 +97,5 @@ _prompt_func() {
 }
 PROMPT_COMMAND=_prompt_func
 
-eval "$(starship init bash)"
+# eval "$(starship init bash)"
 source "$BLESH_DIR/ble.sh"

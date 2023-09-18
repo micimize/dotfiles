@@ -114,23 +114,14 @@ function _install_tridactyl_native {
 }
 setup_symlink tridactyl/tridactylrc ~/.config/tridactyl/tridactylrc _install_tridactyl_native
 
-# case $(uname -s) in
-#   Darwin | FreeBSD) _VSCODE_DIR="$HOME/vscode/.config/Code/User/";;
-#   Linux) _VSCODE_DIR="$HOME/vscode/.config/Code/User/";;
-# esac
-
-# TODO refactor to symlinks probably
-# TODO does vscode really have platform specific paths for this still?
-if false; then
-  if [ ! -d "$HOME/.vscode" ]; then
-    echo "warning: $HOME/.vscode doesn't exist"
-  elif [ -f "$HOME/.vscode/shell.sh" ]; then
-    echo "already configured: firefox"
-  else
-    ln "$_DIR/vscode/keybindings.jsonc" "$HOME/.config/Code/User/keybindings.json"
-    ln "$_DIR/vscode/settings.jsonc" "$HOME/.config/Code/User/settings.json"
-    ln "$_DIR/shell.sh" "$HOME/.vscode/shell.sh"
-  fi
+if [ ! -d "$HOME/.vscode" ]; then
+  echo "warning: $HOME/.vscode doesn't exist"
+elif [ -f "$HOME/.vscode/shell.sh" ]; then
+  echo "already configured: vscode"
+else
+  setup_symlink vscode/keybindings.jsonc "$VSCODE_CONFIG_DIR/keybindings.json"
+  setup_symlink vscode/settings.jsonc "$VSCODE_CONFIG_DIR/settings.json"
+  setup_symlink vscode/shell.sh ~/.vscode/shell.sh
 fi
 
 # globally .gitignore

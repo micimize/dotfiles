@@ -4,6 +4,7 @@
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/mjr/.mujoco/mujoco210/bin:/usr/lib/nvidia
 
 export FIREFOX_PROFILE_DIR="$HOME/snap/firefox/common/.mozilla/firefox/bsx5dc2h.default"
+export VSCODE_CONFIG_DIR="$HOME/.config/Code/User"
 
 # ALVR and other android libs
 export JAVA_HOME=/usr/lib/jvm/default-java

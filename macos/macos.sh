@@ -4,6 +4,7 @@
 
 alias stat=gstat
 alias vim=nvim
+alias realpath=grealpath
 
 #export PATH="$HOME/.yarn/bin:$PATH"
 
@@ -26,6 +27,7 @@ export PATH=$COCOS_CONSOLE_ROOT:$PATH
 
 # TODO ?
 source /Users/mjr/Library/Preferences/org.dystroy.broot/launcher/bash/br
+
 
 # ruby
 # export PATH="/Users/mjr/.gem/ruby/2.6.0/bin:/usr/local/opt/ruby/bin:$PATH"

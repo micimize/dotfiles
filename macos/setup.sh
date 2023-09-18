@@ -18,6 +18,11 @@ if [ ! `which fzf` ]; then
   brew install fzf
 fi
 
+if [ ! `which grealpath` ]; then
+  echo "grealpath not installed, installing coreutils"
+  brew install coreutils
+fi
+
 # To install useful key bindings and fuzzy completion:
 # TODO is this setup or recurring?
 $(brew --prefix)/opt/fzf/install

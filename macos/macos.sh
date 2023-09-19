@@ -1,6 +1,6 @@
 #/bin/bash
 
-# export PATH="/usr/local/opt/binutils/bin:$PATH"
+export PATH="/usr/local/bin:$PATH"
 
 alias stat=gstat
 alias vim=nvim

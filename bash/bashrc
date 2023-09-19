@@ -3,8 +3,9 @@ if [[ $- != *i* ]]; then
   return
 fi
 
+
 if command -v tmux &>/dev/null && [[ ! "$TERM" =~ screen ]] && [[ ! "$TERM" =~ tmux ]] && [ -z "$TMUX" ]; then
-  tmux
+ tmux
 fi
 
 export DOTFILES_DIR="$HOME/code/personal/dotfiles"
@@ -28,15 +29,16 @@ if [ -d /usr/lib/cw ]; then
 fi
 
 ## shopt & set options
-shopt -s cdspell      # This will correct minor spelling errors in a cd command.
-shopt -s histappend   # Append to history rather than overwrite
-shopt -s checkwinsize # Check window after each command
-shopt -s dotglob      # files beginning with . to be returned in the results of path-name expansion.
-shopt -s extglob      # use extended globbing
-shopt -s direxpand    # prevent dir expansion and $ escaping in tab complete
-shopt -s globstar     # ** matches ./ and subdirs recursively. Cannot be used for files
-set -o noclobber      # prevent overwriting files with cat
-set -o ignoreeof      # stops ctrl+d from logging me out
+shopt -s cdspell                # This will correct minor spelling errors in a cd command.
+shopt -s histappend             # Append to history rather than overwrite
+shopt -s checkwinsize           # Check window after each command
+shopt -s dotglob                # files beginning with . to be returned in the results of path-name expansion.
+shopt -s extglob                # use extended globbing
+set -o noclobber                # prevent overwriting files with cat
+set -o ignoreeof                # stops ctrl+d from logging me out
+# unsupported by macos /bin/bash
+shopt -s direxpand 2> /dev/null # prevent dir expansion and $ escaping in tab complete
+shopt -s globstar  2> /dev/null # ** matches ./ and subdirs recursively. Cannot be used for files
 
 # make the terminal give up control of ctrl-s and ctrl-q
 stty -ixon -ixoff

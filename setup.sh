@@ -121,7 +121,7 @@ elif [ -f "$HOME/.vscode/shell.sh" ]; then
 else
   setup_symlink vscode/keybindings.jsonc "$VSCODE_CONFIG_DIR/keybindings.json"
   setup_symlink vscode/settings.jsonc "$VSCODE_CONFIG_DIR/settings.json"
-  setup_symlink vscode/shell.sh ~/.vscode/shell.sh
+  ln vscode/shell.sh "$HOME/.vscode/shell.sh"
 fi
 
 # globally .gitignore

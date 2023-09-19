@@ -90,9 +90,6 @@
       ]
     }
   },
-  "[handlebars]": {
-    "editor.formatOnSave": false
-  },
   "workbench.list.keyboardNavigation": "simple",
   "workbench.editor.limit.enabled": true,
   "workbench.editor.limit.excludeDirty": true,
@@ -884,20 +881,20 @@
   "terminal.integrated.inheritEnv": true,
   "terminal.integrated.profiles.osx": {
     "tmux": {
-      "path": "~/.vscode/shell.sh",
+      "path": "/Users/mjr/.vscode/shell.sh",
       "overrideName": true,
     },
   },
   "terminal.integrated.profiles.linux": {
-    "vsctmux": {
-      "path": "~/.vscode/shell.sh",
+    "tmux": {
+      "path": "/home/mjr/.vscode/shell.sh",
       "overrideName": true,
     }
   },
   "terminal.integrated.showExitAlert": false,
   "terminal.integrated.tabs.showActiveTerminal": "always",
   "terminal.integrated.defaultProfile.osx": "tmux",
-  "terminal.integrated.defaultProfile.linux": "vsctmux",
+  "terminal.integrated.defaultProfile.linux": "tmux",
   "terminal.integrated.shell.linux": "/home/mjr/.vscode/shell.sh",
   "lifeline.swap": true,
   "lifeline.clock.format": "ddd, MMM HH:mm",
@@ -937,6 +934,9 @@
   },
   "editor.wordWrap": "off",
   "window.zoomLevel": -1,
+  "python.experiments.optInto": [
+    "pythonTerminalEnvVarActivation"
+  ]
   /*
   "editor.wrappingIndent": "indent",
   "editor.wordWrap": "bounded",

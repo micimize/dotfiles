@@ -1,4 +1,5 @@
 #!/bin/bash
+
 # https://medium.com/@joaomoreno/persistent-terminal-sessions-in-vs-code-8fc469ed6b41
 
 # if [[ $- != *i* ]] ; then
@@ -6,12 +7,16 @@
 #  exec /bin/bash
 #fi
 
+if [ -d /usr/local/bin ]; then
+  PATH="/usr/local/bin:$PATH"
+fi
 
 _dir=$(basename $PWD)
 _hash=$(pwd | md5sum)
 _hash=${_hash:0:3}
 
 export VSCODE_SESSION="vscode_${_dir}_${_hash}"
+
 
 sessions=`tmux ls -F '#{session_attached} #{session_name}' | grep "$VSCODE_SESSION*" | sort`
 

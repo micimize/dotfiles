@@ -1,4 +1,4 @@
-export HISTCONTROL=ignoredups
+# export HISTCONTROL=ignoredups
 export HISTSIZE=1000000
 export HISTFILESIZE=1000000
 export HISTIGNORE="&:ls:ll:la:l.:pwd:exit:clear"
@@ -97,5 +97,5 @@ _prompt_func() {
 }
 PROMPT_COMMAND=_prompt_func
 
-eval "$(starship init bash)"
+# eval "$(starship init bash)"
 source "$BLESH_DIR/ble.sh"

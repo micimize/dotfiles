@@ -882,7 +882,6 @@
   "terminal.integrated.profiles.osx": {
     "tmux": {
       "path": "/Users/mjr/.vscode/shell.sh",
-      "overrideName": true,
     },
   },
   "terminal.integrated.profiles.linux": {
@@ -936,7 +935,8 @@
   "window.zoomLevel": -1,
   "python.experiments.optInto": [
     "pythonTerminalEnvVarActivation"
-  ]
+  ],
+  "terminal.integrated.tabs.title": "${sequence}"
   /*
   "editor.wrappingIndent": "indent",
   "editor.wordWrap": "bounded",

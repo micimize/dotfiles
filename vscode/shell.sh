@@ -22,8 +22,7 @@ sessions=`tmux ls -F '#{session_attached} #{session_name}' | grep "$VSCODE_SESSI
 
 if [ -z "$sessions" ]
 then
-  exec tmux new-session -s "${VSCODE_SESSION}_0" \
-    -e VSCODE_SESSION=$VSCODE_SESSION
+  exec tmux new-session -s "${VSCODE_SESSION}_0" -e VSCODE_SESSION="$VSCODE_SESSION"
   exit
 fi
 

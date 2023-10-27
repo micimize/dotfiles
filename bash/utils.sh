@@ -32,9 +32,41 @@ function extract() {
   fi
 }
 
-# TODO not really useful now. Need to replace with something that will work with vscode
+alias current_tmux_session="tmux display-message -p '#S'"
+
+function vscode_session_number {
+  session="$1"
+  name="${session##*/}"
+  number="${session#%%_*}"
+  echo "$number"
+}
+
+function vscode_session_label {
+  session="$1"
+  name="${session##*/}"
+  task="${session#*_}"
+  echo "$task"
+}
+
+function vscode_pack_sessions {
+  num=0
+  sessions=`tmux ls -F '#{session_name}' | grep "$VSCODE_SESSION*" | sort`
+  while read session; do
+    name="${session##*/}"
+    task="${session#*_}"
+    tmux rename-session -t "$session" "${VSCODE_SESSION}/${num}_task" 
+    let "num=num+1"
+  done <<<"$sessions"
+}
+
 function nametab {
-  export PROMPT_COMMAND="echo -ne '\033]0;$@\007'"
+  if [ -n "$TMUX" ] && [[ `tmux display-message -p '#S'` == vscode* ]]; then
+    num=$(vscode_session_number $(current_tmux_session))
+    tabname="${VSCODE_SESSION}/${num}_${1}"
+  else
+    tabname=$1
+  fi
+  tmux set-option set-titles-string $tabname
 }
 alias nt=nametab
 

@@ -943,4 +943,19 @@
   "editor.wordWrapColumn": 140,
   */
   //"isort.importStrategy": "fromEnvironment"
+  "jupyter.runStartupCommands": [
+    "%colors nocolor",
+    "from multiprocessing import spawn",
+    "from multiprocessing.spawn import get_preparation_data as __get_preparation_data",
+    "def __patched_get_preparation_data(name):",
+    "    import sys",
+    "    main_mod = sys.modules['__main__']",
+    "    main_path = getattr(main_mod, '__file__', None)",
+    "    setattr(main_mod, '__file__', None)",
+    "    data = __get_preparation_data(name)",
+    "    setattr(main_mod, '__file__', main_path)",
+    "    return data",
+    "spawn.get_preparation_data = __patched_get_preparation_data",
+    "del spawn",
+  ]
 }

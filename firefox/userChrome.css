@@ -85,7 +85,7 @@ toolbox#navigator-toolbox {
     height: 24px !important;
     pointer-events: none;
     border-color: transparent !important;
-    
+
     @media (-moz-gtk-csd-available) {
       margin-top: -27px !important;
       padding-top: 2px !important;
@@ -132,8 +132,10 @@ toolbox#navigator-toolbox {
 
 #sidebar-splitter {
   border-right: 2px solid black !important;
-  border-left: 4px solid black !important;
+  border-left: 2px solid black !important;
   transition: border-color 0.25s cubic-bezier(0.07, 0.95, 0, 1);
+  /* is -4px on non-linux for some reason */
+  margin-inline-start: 0px!important;
 
   &:hover {
     border-left-color: rgb(31, 31, 31) !important;
@@ -173,6 +175,11 @@ hbox#urlbar {
     }
     align-self: center;
   }
+  #notification-popup-box {
+      align-self: center;
+      width: auto;
+      height: auto;
+  }
   #urlbar-input {
     transition: margin-left 0.125s ease-in-out;
     margin-left: 0px;
@@ -205,8 +212,9 @@ hbox#urlbar {
 toolbar#nav-bar {
   height: calc(var(--navbar-height) + var(--additional-grab-bar-height));
   border-top: var(--additional-grab-bar-height) solid var(--lwt-accent-color-inactive, var(--lwt-accent-color)) !important;
-  
+
   --toolbarbutton-inner-padding: 4px;
+
   .urlbar-page-action,
   .chromeclass-toolbar-additional:not(#sidebar-button, #back-button, #forward-button) {
     transition: 0.125s ease-in-out;
@@ -256,7 +264,6 @@ Probably root cause is a snap permissions issue but not worth spending more than
 https://www.reddit.com/r/kde/comments/nm1vub/comment/gzpj9x4/?utm_source=reddit&utm_medium=web2x&context=3
 */
 @media (-moz-gtk-csd-available) {
-  
   #main-window[inFullscreen="true"] #toolbar-menubar {
     display: none!important;
   }
@@ -274,7 +281,7 @@ https://www.reddit.com/r/kde/comments/nm1vub/comment/gzpj9x4/?utm_source=reddit&
       border-bottom-right-radius: var(--browser-radius)!important;
     }
   }
-  
+
    #toolbar-menubar hbox.titlebar-buttonbox-container {
     margin-top: calc(1px + var(--additional-grab-bar-height));
     margin-left: 10px;
@@ -298,7 +305,7 @@ https://www.reddit.com/r/kde/comments/nm1vub/comment/gzpj9x4/?utm_source=reddit&
       margin-right: 1px;
       flex: 1;
     }
-    
+
     background-color: transparent!important;
     width: 26px;
     height: 26px;

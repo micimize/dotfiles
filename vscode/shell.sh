@@ -15,13 +15,13 @@ _dir=$(basename $PWD)
 _hash=$(pwd | md5sum)
 _hash=${_hash:0:3}
 
-export VSCODE_SESSION="vscode_${_dir}_${_hash}"
+export VSCODE_SESSION_PREFIX="vscode_${_dir}_${_hash}"
 
-sessions=`tmux ls -F '#{session_attached} #{session_name}' | grep "$VSCODE_SESSION*" | sort`
+sessions=`tmux ls -F '#{session_attached} #{session_name}' | grep "$VSCODE_SESSION_PREFIX*" | sort`
 
 if [ -z "$sessions" ]
 then
-  exec tmux new-session -s "${VSCODE_SESSION}/0_tmux" -e VSCODE_SESSION="$VSCODE_SESSION"
+  exec tmux new-session -s "${VSCODE_SESSION_PREFIX}/0_tmux"
   exit
 fi
 
@@ -39,19 +39,7 @@ last_session_num=$(echo "$_last_session" | rev | cut -d"/" -f1 | cut -d"_" -f2  
 
 let "this_session_num=last_session_num+1"
 
-function pack_sessions {
-  num=0
-  sessions=`tmux ls -F '#{session_name}' | grep "$VSCODE_SESSION*" | sort`
-  while read session; do
-    name="${session##*/}"
-    task="${session#*_}"
-    tmux rename-session -t "$session" "${VSCODE_SESSION}/${num}_task"
-    let "num=num+1"
-  done <<<"$sessions"
-}
-pack_sessions
-
-exec tmux new-session -s "${VSCODE_SESSION}/${this_session_num}_tmux" -e VSCODE_SESSION="$VSCODE_SESSION"
+exec tmux new-session -s "${VSCODE_SESSION_PREFIX}/${this_session_num}_tmux"
 
 # TODO: separate command to clean up session names
 # TODO use -L

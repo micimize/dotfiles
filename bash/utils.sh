@@ -32,44 +32,6 @@ function extract() {
   fi
 }
 
-alias current_tmux_session="tmux display-message -p '#S'"
-
-function vscode_session_number {
-  session="$1"
-  name="${session##*/}"
-  number="${session#%%_*}"
-  echo "$number"
-}
-
-function vscode_session_label {
-  session="$1"
-  name="${session##*/}"
-  task="${session#*_}"
-  echo "$task"
-}
-
-function vscode_pack_sessions {
-  num=0
-  sessions=`tmux ls -F '#{session_name}' | grep "$VSCODE_SESSION*" | sort`
-  while read session; do
-    name="${session##*/}"
-    task="${session#*_}"
-    tmux rename-session -t "$session" "${VSCODE_SESSION}/${num}_task" 
-    let "num=num+1"
-  done <<<"$sessions"
-}
-
-function nametab {
-  if [ -n "$TMUX" ] && [[ `tmux display-message -p '#S'` == vscode* ]]; then
-    num=$(vscode_session_number $(current_tmux_session))
-    tabname="${VSCODE_SESSION}/${num}_${1}"
-  else
-    tabname=$1
-  fi
-  tmux set-option set-titles-string $tabname
-}
-alias nt=nametab
-
 function git-track-all {
   git branch -r | grep -v '\->' \
     | sed "s,\x1B\[[0-9;]*[a-zA-Z],,g" \
@@ -100,3 +62,5 @@ function docker-clean {
 
 alias searchjobs="ps -ef | grep -v grep | grep"
 alias numbersum="paste -s -d+ - | bc"
+
+alias current_tmux_session='[ -n "$TMUX" ] && tmux display-message -p "#S" || echo'

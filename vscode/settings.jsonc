@@ -749,7 +749,7 @@
     "editor.formatOnSave": false,
   },
   "editor.wordWrap": "off",
-  "window.zoomLevel": -1, // TODO idk why this is set
+  "window.zoomLevel": -2,
   /*
   "editor.wrappingIndent": "indent",
   "editor.wordWrap": "bounded",

@@ -59,6 +59,16 @@ function docker-clean {
   docker run -v /var/run/docker.sock:/var/run/docker.sock -v /var/lib/docker:/var/lib/docker --rm martin/docker-cleanup-volumes
 }
 
+function tmux-kill-all-sessions {
+  prefix="$1"
+  for session in $(tmux list-sessions | awk 'BEGIN{FS=":"}{print $1}'); do
+    if [[ "$session" == "$prefix"* ]]; then
+      echo "killing $session"
+      tmux kill-session -t "$session"
+    fi
+  done
+}
+
 
 alias searchjobs="ps -ef | grep -v grep | grep"
 alias numbersum="paste -s -d+ - | bc"

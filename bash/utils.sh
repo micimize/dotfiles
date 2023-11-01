@@ -61,8 +61,13 @@ function docker-clean {
 
 function tmux-kill-all-sessions {
   prefix="$1"
+  current=`current_tmux_session`
   for session in $(tmux list-sessions | awk 'BEGIN{FS=":"}{print $1}'); do
-    if [[ "$session" == "$prefix"* ]]; then
+    if [[ "$session" == "$current"*  ]]; then
+      echo "skipping $session: is current session"
+      continue
+    fi
+    if [[ "$session" == "$prefix"* && "$" ]]; then
       echo "killing $session"
       tmux kill-session -t "$session"
     fi

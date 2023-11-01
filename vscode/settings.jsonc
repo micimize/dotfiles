@@ -693,18 +693,17 @@
     "workbench.action.navigateDown",
     "workbench.action.terminal.focusPreviousPane",
     "workbench.action.terminal.focusNextPane",
-    "workbench.action.terminal.focusNextPane",
   ],
   "terminal.integrated.inheritEnv": true,
+  "terminal.integrated.tabs.title": "${sequence}",
   "terminal.integrated.profiles.osx": {
     "tmux": {
-      "path": "/Users/mjr/.vscode/shell.sh",
-    },
+      "path": "/Users/mjr/.vscode/shell.sh"
+    }
   },
   "terminal.integrated.profiles.linux": {
     "tmux": {
-      "path": "/home/mjr/.vscode/shell.sh",
-      "overrideName": true,
+      "path": "/home/mjr/.vscode/shell.sh"
     }
   },
   "terminal.integrated.showExitAlert": false,
@@ -750,6 +749,9 @@
   },
   "editor.wordWrap": "off",
   "window.zoomLevel": -2,
+  "python.experiments.optInto": [
+    "pythonTerminalEnvVarActivation"
+  ],
   /*
   "editor.wrappingIndent": "indent",
   "editor.wordWrap": "bounded",

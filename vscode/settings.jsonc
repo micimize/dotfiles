@@ -15,6 +15,10 @@
   "python.languageServer": "Pylance",
   "python.analysis.autoImportCompletions": true,
   "python.analysis.typeCheckingMode": "basic",
+  "terminal.integrated.tabs.enabled": true,
+  "terminal.integrated.tabs.location": "left",
+  "terminal.integrated.tabs.showActions": "always",
+  "terminal.integrated.tabs.hideCondition": "never",
   "editor.tokenColorCustomizations": {
     "[Solarized Dark]": {
       "textMateRules": [

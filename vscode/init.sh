@@ -27,7 +27,7 @@ function vscode_pack_sessions {
   while read session; do
     name="${session##*/}"
     task="${session#*_}"
-    tmux rename-session -t "$session" "${session_prefix}/${num}_task" 
+    tmux rename-session -t "$session" "${session_prefix}/${num}_${task}"
     let "num=num+1"
   done <<<"$sessions"
 }

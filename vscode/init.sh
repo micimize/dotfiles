@@ -24,7 +24,7 @@ function vscode_pack_sessions {
   session_prefix="${1:-`vscode_session_prefix`}"
   num=0
   for session in `tmux ls -F '#{session_name}' | grep "$session_prefix*" | sort`; do
-    new_session_name="${session_prefix}/${num}_$(vscode_session_label $session)"
+    new_session_name="${session_prefix}/${num}_$(vscode_session_label "$session")"
     tmux rename-session -t "$session" "$new_session_name"
     let "num=num+1"
   done

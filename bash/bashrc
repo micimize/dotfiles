@@ -8,6 +8,8 @@ if command -v tmux &>/dev/null && [[ ! "$TERM" =~ screen ]] && [[ ! "$TERM" =~ t
  tmux
 fi
 
+export LANG="${LANG:-en_US.UTF-8}"
+
 export DOTFILES_DIR="$HOME/code/personal/dotfiles"
 export BASHFILES_DIR="$DOTFILES_DIR/bash"
 export BLESH_DIR="$HOME/.local/share/blesh"

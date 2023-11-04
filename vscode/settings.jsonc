@@ -752,7 +752,7 @@
     "editor.formatOnSave": false,
   },
   "editor.wordWrap": "off",
-  "window.zoomLevel": -2,
+  "window.zoomLevel": -1,
   "python.experiments.optInto": [
     "pythonTerminalEnvVarActivation"
   ],

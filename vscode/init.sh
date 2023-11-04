@@ -23,21 +23,27 @@ function vscode_session_label {
 function vscode_pack_sessions {
   session_prefix="${1:-`vscode_session_prefix`}"
   num=0
-  sessions=`tmux ls -F '#{session_name}' | grep "$session_prefix*" | sort`
-  while read session; do
-    name="${session##*/}"
-    task="${session#*_}"
-    tmux rename-session -t "$session" "${session_prefix}/${num}_${task}"
+  for session in `tmux ls -F '#{session_name}' | grep "$session_prefix*" | sort`; do
+    new_session_name="${session_prefix}/${num}_$(vscode_session_label $session)"
+    tmux rename-session -t "$session" "$new_session_name"
     let "num=num+1"
-  done <<<"$sessions"
+  done
 }
 
 function nametab {
-  tabname=$1
   prefix=`vscode_session_prefix`
-  if [[ "$prefix" == vscode* ]]; then
+  tabname="$1"
+  if [[ "$2" != "" ]]; then
+    num=$1
+    args="-t ${prefix}/${num}_"
+    tabname="$2"
+  else
+    args=""
     num=$(vscode_session_number)
-    tmux rename-session "${prefix}/${num}_${tabname}"
+    tabname="$1"
+  fi
+  if [[ "$prefix" == vscode* ]]; then
+    tmux rename-session $args "${prefix}/${num}_${tabname}"
   else
     tmux set-option set-titles-string "$tabname"
   fi

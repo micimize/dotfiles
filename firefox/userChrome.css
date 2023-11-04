@@ -187,7 +187,11 @@ hbox#urlbar {
   &:not(:active, :focus, :focus-within) {
     font-size: 12px!important;
     #urlbar-background {
-      background-color: var(--toolbar-bgcolor)!important;
+      margin-top: 8px;
+      margin-bottom: 6px;
+      max-height: 20px;
+      opacity: 0.5;
+      background-color: var(--input-bgcolor)!important; /*var(--toolbar-bgcolor)!important;*/
     }
     box[role="button"]:not(:active, :hover, [open="true"]) {
       image {

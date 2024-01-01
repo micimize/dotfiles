@@ -1,0 +1,3 @@
+[submodule "quarantine/qeww_tile/flex_tree"]
+	path = quarantine/qeww_tile/flex_tree
+	url = git@github.com:micimize/qtile-flextree.git

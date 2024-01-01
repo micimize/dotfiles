@@ -11,7 +11,6 @@ export JAVA_HOME=/usr/lib/jvm/default-java
 export ANDROID_HOME=~/AndroidSDK
 export ANDROID_NDK_HOME=~/AndroidSDK/ndk/25.2.9519653/
 
-
 function firefox_hack_recovery {
   # for parsing jsonlv4: https://gist.github.com/Tblue/62ff47bef7f894e92ed5
   backup_dir="$FIREFOX_PROFILE_DIR/sessionstore-backups"

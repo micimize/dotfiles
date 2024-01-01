@@ -585,7 +585,7 @@
     "editor.suggest.snippetsPreventQuickSuggestions": false,
     "editor.suggestSelection": "first",
     "editor.tabCompletion": "onlySnippets",
-    "editor.wordBasedSuggestions": false
+    "editor.wordBasedSuggestions": "off"
   },
   "jupyter.runStartupCommands": [
     "%colors nocolor",
@@ -752,10 +752,12 @@
     "editor.formatOnSave": false,
   },
   "editor.wordWrap": "off",
-  "window.zoomLevel": -2,
   "python.experiments.optInto": [
     "pythonTerminalEnvVarActivation"
   ],
+  "gitlab.aiAssistedCodeSuggestions.enabled": false,
+  "gitlab.duoChat.enabled": false,
+  "window.zoomLevel": -2,
   /*
   "editor.wrappingIndent": "indent",
   "editor.wordWrap": "bounded",

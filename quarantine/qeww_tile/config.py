@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Any, Callable, Final, Iterable, Tuple, cast
 from libqtile import bar, layout, widget
 from libqtile.config import Click, Drag, Group, Key, Match, Screen
@@ -7,8 +8,25 @@ from libqtile import qtile as _qtile
 from libqtile.core.manager import Qtile
 
 from libqtile import hook
-from flex_tree import FlexTree
 from libqtile.backend.base.window import Window
+from libqtile.widget.quick_exit import QuickExit
+from libqtile.widget.clock import Clock
+from libqtile.widget.systray import Systray
+from libqtile.widget.currentlayout import CurrentLayout
+from libqtile.widget.groupbox import GroupBox
+from libqtile.widget.prompt import Prompt
+from libqtile.widget.windowname import WindowName
+from libqtile.widget.chord import Chord
+from libqtile.widget.textbox import TextBox
+from libqtile.widget.bluetooth import Bluetooth
+from libqtile.widget.clipboard import Clipboard
+
+import sys,os.path
+
+
+_flex_tree_path = (Path(os.path.realpath(__file__)).parent / "flex_tree").as_posix()
+sys.path.append(_flex_tree_path)
+from flex_tree import FlexTree
 
 
 qtile: Qtile = _qtile
@@ -25,7 +43,7 @@ RETURN: Final = "Return"
 TAB: Final = "Tab"
 
 
-terminal = "wezterm" #guess_terminal()
+terminal = "konsole" #"wezterm" #guess_terminal()
 assert terminal is not None
 
 
@@ -122,6 +140,7 @@ def move_ahead(client: Window):
 
 @hook.subscribe.startup_once
 def autostart():
+    return
     init_margin_tree()
 
 keys = [
@@ -145,6 +164,7 @@ keys = [
     Key(_mods(CONTROL), "r", lazy.reload_config(), desc="Reload the config"),
     Key(_mods(CONTROL), "q", lazy.shutdown(), desc="Shutdown Qtile"),
     Key(_mods(), "r", lazy.spawncmd(), desc="Spawn a command using a prompt widget"),
+    Key(_mods(), 'm', lazy.layout.toggle_minimize_inline()),
 ]
 
 groups = [Group(i) for i in "123456789"]
@@ -173,6 +193,9 @@ for i in groups:
         ]
     )
 
+groups.append(Group('')) # Must be after `groups` is created
+
+
 layouts = [
     FlexTree(
         border_normal='#333333',
@@ -181,8 +204,8 @@ layouts = [
         border_focus_fixed='#00e8dc',
         border_width=1,
         border_width_single=0,
-        margin=0,
-        margin_single=0
+        margin=8,
+        margin_single=8
     ),
 
     layout.Columns(border_focus_stack=["#d75f5f", "#8f3d3d"], border_width=4),
@@ -210,26 +233,26 @@ extension_defaults = widget_defaults.copy()
 screens = [
     Screen(
         bottom=bar.Bar(
-            [
-                widget.CurrentLayout(),
-                widget.GroupBox(),
-                widget.Prompt(),
-                widget.WindowName(),
-                widget.Chord(
+            widgets=[
+                CurrentLayout(),
+                GroupBox(),
+                Prompt(),
+                WindowName(),
+                Chord(
                     chords_colors={
                         "launch": ("#ff0000", "#ffffff"),
                     },
                     name_transform=lambda name: name.upper(),
                 ),
-                widget.TextBox("default config", name="default"),
-                widget.TextBox("Press &lt;M-r&gt; to spawn", foreground="#d75f5f"),
+                TextBox("default config", name="default"),
+                TextBox("Press &lt;M-r&gt; to spawn", foreground="#d75f5f"),
                 # NB Systray is incompatible with Wayland, consider using StatusNotifier instead
                 # widget.StatusNotifier(),
-                widget.Systray(),
-                widget.Clock(format="%Y-%m-%d %a %I:%M %p"),
-                widget.QuickExit(),
-            ]
-            24,
+                Systray(),
+                Clock(format="%Y-%m-%d %a %I:%M %p"),
+                QuickExit(),
+            ],
+            size=24,
             # border_width=[2, 0, 2, 0],  # Draw top and bottom borders
             # border_color=["ff00ff", "000000", "ff00ff", "000000"]  # Borders are magenta
         ),
@@ -285,3 +308,4 @@ wl_input_rules = None
 # We choose LG3D to maximize irony: it is a 3D non-reparenting WM written in
 # java that happens to be on java's whitelist.
 wmname = "LG3D"
+

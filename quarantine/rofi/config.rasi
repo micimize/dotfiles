@@ -1,0 +1,6 @@
+configuration {
+  modi: "window,drun,filebrowser,windowcd";
+  show-icons: true;
+  drun-display-format: "{icon} {name}";
+
+}

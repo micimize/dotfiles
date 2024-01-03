@@ -76,3 +76,7 @@ meson --buildtype=release . build
 sudo ninja -C build install
 cd ..
 ```
+
+git clone https://github.com/P3rf/rofi-network-manager.git
+cd rofi-network-manager
+bash "./rofi-network-manager.sh"

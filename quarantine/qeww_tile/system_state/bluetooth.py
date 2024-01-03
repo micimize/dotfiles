@@ -13,8 +13,6 @@ RetryCondition = Callable[[T], bool]
 
 
 
-def retr
-
-
-@define
-class 
+class BluetoothState:
+    def __init__(self):
+        BleakScanner.discover

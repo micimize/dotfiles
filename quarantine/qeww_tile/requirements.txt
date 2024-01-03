@@ -104,3 +104,10 @@ xcffib==1.5.0
 xkbcommon==0.8
 bleak
 nmcli
+
+
+plasmashell &
+while ! `pkill kwin_x11`; do
+    echo "Command failed, retrying... `ps -ef | grep kwin`"
+    sleep 1  # Add a delay to avoid excessive looping
+done

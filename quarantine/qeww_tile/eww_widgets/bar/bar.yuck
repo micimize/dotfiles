@@ -5,7 +5,7 @@
   (box :orientation "h"
     :class "launcher"
     :tooltip "Launch apps"
-    (button :class "dispatcher" :onclick "sh ~/.config/bspwm/rofi/bin/launcher" "")
+    (button :class "dispatcher" :onclick "sh ~/.config/rofi/bin/launcher" "")
   )
 )
 
@@ -68,7 +68,7 @@
     :class "powermenu-box"
     (button :class "dispatcher"
       :tooltip "Toggle Power Menu"
-      :onclick "sh ~/.config/bspwm/rofi/bin/powermenu"
+      :onclick "sh ~/.config/rofi/bin/powermenu"
     "⏻")
   )
 )

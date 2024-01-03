@@ -20,6 +20,7 @@ from libqtile.widget.chord import Chord
 from libqtile.widget.textbox import TextBox
 from libqtile.widget.bluetooth import Bluetooth
 from libqtile.widget.clipboard import Clipboard
+from libqtile.widget.net import Net
 
 import sys,os.path
 
@@ -244,11 +245,12 @@ screens = [
                     },
                     name_transform=lambda name: name.upper(),
                 ),
+                Net(),
+                Bluetooth(),
                 TextBox("default config", name="default"),
                 TextBox("Press &lt;M-r&gt; to spawn", foreground="#d75f5f"),
                 # NB Systray is incompatible with Wayland, consider using StatusNotifier instead
                 # widget.StatusNotifier(),
-                Systray(),
                 Clock(format="%Y-%m-%d %a %I:%M %p"),
                 QuickExit(),
             ],
@@ -270,9 +272,15 @@ mouse = [
     Click(_mods(), "Button2", lazy.window.bring_to_front()),
 ]
 
+from libqtile.log_utils import logger
+@hook.subscribe.client_new
+def auto_kill_window(window:Window):
+    if window.name.startswith("Desktop") and window.name.endswith("Plasma"):
+        window.kill()
+
 dgroups_key_binder = None
 dgroups_app_rules = []  # type: list
-follow_mouse_focus = True
+follow_mouse_focus = False
 bring_front_click = False
 floats_kept_above = True
 cursor_warp = False
@@ -284,6 +292,10 @@ floating_layout = layout.Floating(
         Match(wm_class="makebranch"),  # gitk
         Match(wm_class="maketag"),  # gitk
         Match(wm_class="ssh-askpass"),  # ssh-askpass
+        Match(wm_class="plasmashell"),
+        Match(wm_class="spectacle"),
+        Match(wm_class="krunner"),
+        Match(wm_class="ksmserver-logout-greeter"),
         Match(title="branchdialog"),  # gitk
         Match(title="pinentry"),  # GPG key password entry
     ]

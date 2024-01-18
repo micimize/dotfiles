@@ -93,3 +93,5 @@ case $(uname -s) in
   Darwin | FreeBSD) source "$DOTFILES_DIR/macos/macos.sh" ;;
   Linux) source "$DOTFILES_DIR/blackbox/blackbox.sh" ;;
 esac
+
+# source /home/mjr/.config/broot/launcher/bash/br

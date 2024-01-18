@@ -1,3 +1,12 @@
+TODO
+
+This is the wrong way to go about this.
+tiling window managers are too much of a pain and too far from the mainstream
+rather, adapt your old system using hammerspoon to quicksnap to grid to use kde's scripting capabilities.
+
+You should even be able to do relative splits of say, a firefox tab into a new window
+
+
 # qeww_tile
 
 Chimera Qtile setup attempting to fuse eww widgets into the layout.

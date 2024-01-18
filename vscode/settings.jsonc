@@ -92,6 +92,7 @@
   "tslint.enable": true,
   "editor.peekWidgetDefaultFocus": "editor",
   "vim.easymotion": true,
+  "vim.sneak": true,
   "vim.incsearch": true,
   "vim.useSystemClipboard": true,
   "vim.useCtrlKeys": true,
@@ -488,7 +489,109 @@
           "args": []
         }
       ]
-    }
+    },
+    // s and S are synonyms with cl and cc respectively, so I replace with expand and shrink smart selection
+    {
+      "before": [
+        "s",
+      ],
+      "after": [],
+      "commands": [
+        {
+          "command": "editor.action.smartSelect.expand",
+          "args": []
+        }
+      ]
+    },
+    {
+      "before": [
+        "S",
+      ],
+      "after": [],
+      "commands": [
+        {
+          "command": "editor.action.smartSelect.shrink",
+          "args": []
+        }
+      ]
+    },
+    {
+      "before": [
+        "f",
+      ],
+      "after": [
+        "s"
+      ],
+    },
+    {
+      "before": [
+        "F",
+      ],
+      "after": [
+        "S"
+      ],
+    },
+    {
+      "before": [
+        "g", // go
+        "/", // search
+      ],
+      "after": [
+        "<leader>",
+        "<leader>",
+        "/",
+      ],
+    },
+    {
+      "before": [
+        // todo: gf and gF are open file under cursor which could be useful
+        "g", // go
+        "f", // find
+      ],
+      "after": [
+        "<leader>",
+        "<leader>",
+        "2",
+        "f",
+      ],
+    },
+    {
+      "before": [
+        "g", // go
+        "F", // find
+      ],
+      "after": [
+        "<leader>",
+        "<leader>",
+        "2",
+        "F",
+      ],
+    },
+    {
+      "before": [
+        // todo: gf and gF are open file under cursor which could be useful
+        "g", // go
+        "t", // til
+      ],
+      "after": [
+        "<leader>",
+        "<leader>",
+        "2",
+        "t",
+      ],
+    },
+    {
+      "before": [
+        "g", // go
+        "T", // til
+      ],
+      "after": [
+        "<leader>",
+        "<leader>",
+        "2",
+        "T",
+      ],
+    },
   ],
   "vim.visualModeKeyBindingsNonRecursive": [
     // Start indent > < control
@@ -508,7 +611,52 @@
         "editor.action.outdentLines"
       ]
     },
+    // s and S are synonyms with cl and cc respectively, so I replace with expand and shrink smart selection
+    {
+      "before": [
+        "s",
+      ],
+      "after": [],
+      "commands": [
+        {
+          "command": "editor.action.smartSelect.expand",
+          "args": []
+        }
+      ]
+    },
+    {
+      "before": [
+        "z",
+      ],
+      "after": [
+        "S"
+      ],
+    },
+    {
+      "before": [
+        "S",
+      ],
+      "after": [],
+      "commands": [
+        {
+          "command": "editor.action.smartSelect.shrink",
+          "args": []
+        }
+      ]
+    },
+    {
+      "before": [
+        "#",
+      ],
+      "after": [],
+      "commands": [
+        {
+          "command": "editor.action.commentLine",
+        }
+      ],
+    },
   ],
+  "vim.surround": true,
   "workbench.statusBar.feedback.visible": false,
   "terminal.integrated.fontSize": 12,
   "typescript.updateImportsOnFileMove.enabled": "always",
@@ -764,4 +912,14 @@
   "editor.wordWrapColumn": 140,
   */
   //"isort.importStrategy": "fromEnvironment"
+  "anycode.language.features": {
+    "completions": false,
+    "diagnostics": false,
+    "definitions": false,
+    "folding": false,
+    "highlights": false,
+    "outline": false,
+    "references": false,
+    "workspaceSymbols": false
+  },
 }

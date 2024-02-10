@@ -592,6 +592,101 @@
         "T",
       ],
     },
+    /*
+      Drafty tasks
+    */
+    {
+      "before": [
+        "g",
+        "c" // completion
+      ],
+      "after": [],
+      "commands": [
+        {
+          "command": "workbench.action.tasks.runTask",
+          "args": [
+            "drafty.execute"
+          ]
+        }
+      ]
+    },
+    {
+      "before": [
+        "g",
+        "n"
+      ],
+      "after": [],
+      "commands": [
+        "src.remember",
+        {
+          "command": "workbench.action.tasks.runTask",
+          "args": [
+            "drafty.cycle_response_next"
+          ]
+        },
+        {
+          "command": "delayedcommand.run",
+          "args": {
+            "delay": 1000,
+            "command": "src.restore"
+          }
+        }
+      ]
+    },
+    {
+      "before": [
+        "g",
+        "p"
+      ],
+      "after": [],
+      "commands": [
+        "src.remember",
+        {
+          "command": "workbench.action.tasks.runTask",
+          "args": [
+            "drafty.cycle_response_previous"
+          ]
+        },
+        {
+          "command": "delayedcommand.run",
+          "args": {
+            "delay": 1000,
+            "command": "src.restore"
+          }
+        }
+      ]
+    },
+    {
+      "before": [
+        "g",
+        "a"
+      ],
+      "after": [],
+      "commands": [
+        {
+          "command": "workbench.action.tasks.runTask",
+          "args": [
+            "drafty.accept_completion"
+          ]
+        }
+      ]
+    },
+    {
+      "before": [
+        "g",
+        "C" // Chat
+      ],
+      "after": [],
+      "commands": [
+        {
+          "command": "workbench.action.tasks.runTask",
+          "args": [
+            "drafty.open_chat",
+          ]
+        }
+      ]
+    }
+    /* end of Drafty tasks */
   ],
   "vim.visualModeKeyBindingsNonRecursive": [
     // Start indent > < control

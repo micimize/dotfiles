@@ -905,7 +905,6 @@
   ],
   "gitlab.aiAssistedCodeSuggestions.enabled": false,
   "gitlab.duoChat.enabled": false,
-  "window.zoomLevel": -2,
   /*
   "editor.wrappingIndent": "indent",
   "editor.wordWrap": "bounded",
@@ -922,4 +921,9 @@
     "references": false,
     "workspaceSymbols": false
   },
+  "jupyter.widgetScriptSources": [
+    "jsdelivr.com",
+    "unpkg.com"
+  ],
+  "window.zoomLevel": -1,
 }

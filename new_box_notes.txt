@@ -1,0 +1,144 @@
+
+Earlier:
+1. `systemctl start bluetooth.service`
+
+
+Things to do:
+1. Install and log in to firefox.
+2. Authenticate 1pass
+2. Copy over ssh keys
+3. Install and login to Cursor
+
+
+Applications
+- Spotify
+- Obsidian
+- 
+
+
+What I did
+0. `systemctl start bluetooth.service`, setup mouse and keyboard
+1. Install and log in to firefox.
+2. Authenticate 1pass, manually copying secret key from macbook 
+3. Log in to gmail, slack, notion. NOTE: dark modes unused?
+4. Manually reverse scroll direction
+5. Manually set keyboard repeat to 200ms delay, 45 repeats/sec
+6. `sudo pacman -Syu`
+7. `sudo pacman -S flatpak`
+
+
+-- restart: NOTE: firefox did NOT preserve state, maybe due to upgrade
+
+8. 1password setup to move to 1password for ssh key management
+   https://support.1password.com/install-linux/
+   tabled: main window insta-crashes on open
+
+9. Manual key transfer of `~/.ssh/id_rsa`, `~/.ssh/id_rsa.pub`, `private.pgp` for imbue
+`gpg --import ~/Downloads/private.pgp; rm ~/Downloads/private.pgp`
+`chmod 600 ~/.ssh/id_rsa`
+
+ git clone https://aur.archlinux.org/1password.git
+
+10.  pacman -S ack
+
+11. dotfiles: 
+
+from readme:
+
+4:DOTFILE_DIR="~/code/personal/dotfiles"
+5:mkdir -p "$DOTFILE_DIR"
+6:cd "$DOTFILE_DIR"
+
+... clone and configure git clone git@github.com:micimize/dotfiles.git
+
+yeesh
+
+
+get cursor appimage from https://www.trycursor.com/
+
+app image issue: fuse
+ 
+sudo chmod u+s "$(which fusermount3)
+dlopen(): error loading libfuse.so.2
+sudo pacman -S fuse
+
+started putting dependencies in arch_setup.sh
+
+git complains: Please tell me who you are
+
+enabled slack notifications
+
+NOTE: tmux yank not working out of the box
+NOTE: tmux background is light grey in konsole
+
+NOTE: ENV vars for dotfiles repo not really streamlined
+
+NOTE: overrode  VSCODE_CONFIG_DIR=~/.config/Cursor/User for now
+this seemed to work for settings setup
+
+
+cloning git@gitlab.com:generally-intelligent/generally_intelligent.git worked
+
+
+had to chsh -s /usr/bin/bash
+then `pkill -KILL -u mjr` to get bash
+
+
+cachy browser not retaining sessions.
+Fix:
+```
+defaultPref("privacy.clearOnShutdown.history", false);
+defaultPref("privacy.clearOnShutdown.downloads", false);
+```
+
+Need to route firefox config to cachy-browser (if I want to keep using it):
+/home/mjr/.cachy/n9j1ed1p.default-release/
+
+firefox dir about:profiles
+/home/mjr/.mozilla/firefox/b6q5k1a8.default-release/
+
+need to make the linux script blackbox agnostic
+
+set default search to ddg
+
+toolkit.legacyUserProfileCustomizations.stylesheets has to be set to true
+
+moved app images into /usr/local/bin
+then /opt
+FUCKING WHERE DO YOU PUT APPLICATIONS TO GET THEM PICKED UP BY KRUNNER WTF
+
+
+installed AM
+https://github.com/ivan-hc/AM#installation
+
+am -i obsidian cursor
+good enough, installs in /opt/obisidian
+
+1password just crashes all the time
+
+
+---
+A new day:
+- weird font issue in cursor terminal
+- got nvim plugins installed
+- set konsole profile to solarized, which helps with color issue.
+
+need to:
+- get tmux yank working
+- ensure github is set up to push
+- pull text and ensure obsidian is working
+
+would like to to:
+- firefox userchrome is kinda fucked up
+- 1password: uninstalled aur, which let me use browser login
+
+---
+got tmux-yank working by:
+- manually installing: ~/.tmux/plugins/tpm/scripts/install_plugins.sh
+- pacman -S xclip xsel
+
+- pacman -S wl_clipboard
+
+
+
+

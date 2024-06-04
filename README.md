@@ -25,3 +25,7 @@ TODO:
 * nvim PlugInstall hangs with this init.vim on macos but works ok when pasted into another vim file
 * vscode dir is wrong
 * blesh fancy prompt, margin_pane sysem: https://github.com/akinomyoga/ble.sh/discussions/282#discussioncomment-5058432
+
+
+* learn fzf integration for blesh
+* Ensure copy and paste aliases work

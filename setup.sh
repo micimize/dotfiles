@@ -114,6 +114,8 @@ function _install_tridactyl_native {
 }
 setup_symlink tridactyl/tridactylrc ~/.config/tridactyl/tridactylrc _install_tridactyl_native
 
+VSCODE_CONFIG_DIR=~/.config/Cursor
+
 if [ ! -d "$HOME/.vscode" ]; then
   echo "warning: $HOME/.vscode doesn't exist"
 elif [ -f "$HOME/.vscode/shell.sh" ]; then

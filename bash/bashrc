@@ -79,6 +79,8 @@ function _set_user_friendly_aliases {
 _set_user_friendly_aliases
 
 alias manage_memory="sudo ncdu -e $@"
+alias vim=nvim
+
 
 #shopt -s extdebug; trap "tput sgr0" DEBUG
 

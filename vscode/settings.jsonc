@@ -71,7 +71,6 @@
   "workbench.editor.limit.excludeDirty": true,
   "workbench.editor.limit.perEditorGroup": true,
   "workbench.editor.limit.value": 5,
-  "vim.statusBarColorControl": false,
   "editor.quickSuggestionsDelay": 100,
   "editor.quickSuggestions": {
     "comments": "on",
@@ -91,6 +90,7 @@
   "tslint.autoFixOnSave": true,
   "tslint.enable": true,
   "editor.peekWidgetDefaultFocus": "editor",
+  "vim.statusBarColorControl": false,
   "vim.easymotion": true,
   "vim.sneak": true,
   "vim.incsearch": true,
@@ -515,22 +515,22 @@
         }
       ]
     },
-    {
-      "before": [
-        "f",
-      ],
-      "after": [
-        "s"
-      ],
-    },
-    {
-      "before": [
-        "F",
-      ],
-      "after": [
-        "S"
-      ],
-    },
+    //{
+    //  "before": [
+    //    "f",
+    //  ],
+    //  "after": [
+    //    "s"
+    //  ],
+    //},
+    //{
+    //  "before": [
+    //    "F",
+    //  ],
+    //  "after": [
+    //    "S"
+    //  ],
+    //},
     {
       "before": [
         "g", // go
@@ -926,4 +926,7 @@
     "unpkg.com"
   ],
   "window.zoomLevel": -1,
+  "github.copilot.editor.enableAutoCompletions": true,
+  "accessibility.voice.keywordActivation": "inlineChat",
+  "interactiveWindow.executeWithShiftEnter": true,
 }

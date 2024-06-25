@@ -415,6 +415,16 @@
     "key": "ctrl+b",
     "command": "-workbench.action.toggleSidebarVisibility"
   },
+  {
+    "key": "browserback",
+    "command": "workbench.action.chat.startVoiceChat",
+    "when": "!voiceChatInProgress"
+  },
+  {
+    "key": "browserback",
+    "command": "workbench.action.chat.stopListeningAndSubmit",
+    "when": "voiceChatInProgress"
+  },
   //{
   //  "key": "shift+enter",
   //  "command": "-interactive.execute",

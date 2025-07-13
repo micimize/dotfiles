@@ -417,13 +417,12 @@
   },
   {
     "key": "browserback",
-    "command": "workbench.action.chat.startVoiceChat",
-    "when": "!voiceChatInProgress"
-  },
-  {
-    "key": "browserback",
     "command": "workbench.action.chat.stopListeningAndSubmit",
     "when": "voiceChatInProgress"
+  },
+  {
+    "key": "cmd+i",
+    "command": "composerMode.agent"
   },
   //{
   //  "key": "shift+enter",

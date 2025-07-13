@@ -78,6 +78,7 @@
     "other": "on"
   }, // setting to false helps typing performance
   "editor.fontSize": 12,
+  "editor.lineHeight": 1.5,
   "editor.formatOnSave": true,
   "telemetry.telemetryLevel": "off",
   "workbench.editor.enablePreview": false,
@@ -92,7 +93,7 @@
   "editor.peekWidgetDefaultFocus": "editor",
   "vim.statusBarColorControl": false,
   "vim.easymotion": true,
-  "vim.sneak": true,
+  //"vim.sneak": true,
   "vim.incsearch": true,
   "vim.useSystemClipboard": true,
   "vim.useCtrlKeys": true,
@@ -998,7 +999,7 @@
   "python.experiments.optInto": [
     "pythonTerminalEnvVarActivation"
   ],
-  "gitlab.aiAssistedCodeSuggestions.enabled": false,
+  "gitlab.aiAssistedCodeSuggestions.enabled": true,
   "gitlab.duoChat.enabled": false,
   /*
   "editor.wrappingIndent": "indent",
@@ -1024,5 +1025,6 @@
   "github.copilot.editor.enableAutoCompletions": true,
   "accessibility.voice.keywordActivation": "inlineChat",
   "interactiveWindow.executeWithShiftEnter": true,
-  "window.titleBarStyle": "custom"
+  "window.titleBarStyle": "custom",
+  "cursorless.commandHistory": true,
 }

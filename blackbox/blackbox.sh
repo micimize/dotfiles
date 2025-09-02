@@ -1,10 +1,12 @@
 #!/bin/bash
 
 # blech
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/mjr/.mujoco/mujoco210/bin:/usr/lib/nvidia
-
-export FIREFOX_PROFILE_DIR="$HOME/snap/firefox/common/.mozilla/firefox/bsx5dc2h.default"
+# export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/mjr/.mujoco/mujoco210/bin:/usr/lib/nvidia
+export FIREFOX_PROFILE_DIR="$HOME/.mozilla/firefox/h4hh8m1f.default-release/"
+# export FIREFOX_PROFILE_DIR="$HOME/.var/app/org.mozilla.firefox/.mozilla/firefox/sip7urf0.default-release"
 export VSCODE_CONFIG_DIR="$HOME/.config/Code/User"
+
+export PATH="/home/linuxbrew/.linuxbrew/opt/coreutils/libexec/gnubin:$PATH"
 
 # ALVR and other android libs
 export JAVA_HOME=/usr/lib/jvm/default-java
@@ -65,7 +67,8 @@ function display_tv_time {
 }
 export -f display_tv_time
 
-alias copy='xclip -sel clip'
+alias pbcopy='wl-copy'
+
 
 function refresh_gpu {
   sudo rmmod nvidia_uvm

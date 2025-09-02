@@ -29,3 +29,5 @@ TODO:
 
 * learn fzf integration for blesh
 * Ensure copy and paste aliases work
+
+Replace custom scripts with chezmoi if it really is so great

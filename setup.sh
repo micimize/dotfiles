@@ -100,7 +100,7 @@ function _install_nvim_plugins {
   # ~/.local/share/nvim/site/autoload
   nvim --headless +PlugInstall "+qall!"
 }
-setup_symlink init.vim ~/.config/nvim/init.vim _install_nvim_plugins
+# setup_symlink init.vim ~/.config/nvim/init.vim _install_nvim_plugins
 
 setup_symlink firefox "$FIREFOX_PROFILE_DIR/chrome"
 
@@ -114,7 +114,7 @@ function _install_tridactyl_native {
 }
 setup_symlink tridactyl/tridactylrc ~/.config/tridactyl/tridactylrc _install_tridactyl_native
 
-VSCODE_CONFIG_DIR=~/.config/Cursor
+# VSCODE_CONFIG_DIR=~/.config/Code/User
 
 if [ ! -d "$HOME/.vscode" ]; then
   echo "warning: $HOME/.vscode doesn't exist"

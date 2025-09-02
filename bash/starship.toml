@@ -87,12 +87,17 @@ short_path() {
   if [[ $PWD == $HOME ]]; then
     echo "~"
   else
+    # Replace the home directory part
     _dir=$(echo "$PWD" | sed "s|$HOME|~|g")
+    
+    # Define a regex to match directory names with more than three characters
     more_than_three_chars='/\([^/][^/][^/]\)[^/]\+'
-    purple='\\e[1;35m'
-    magenta_black_bg='\\e[0;35m\\e[40m'
-    dir=$(dirname $(echo "$_dir" | sed "s|$more_than_three_chars|/$purple\1$magenta_black_bg|g"))
-    echo "$dir/${PWD##*/}"
+    
+    # Use sed to replace the long names with their three-character short versions
+    dir=$(echo "$_dir" | sed "s|$more_than_three_chars|/\1|g")
+    
+    # Print the final, plain-text path
+    echo "$dir"
   fi
 };
 short_path

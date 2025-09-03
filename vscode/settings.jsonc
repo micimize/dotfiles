@@ -929,4 +929,5 @@
   "github.copilot.editor.enableAutoCompletions": true,
   "accessibility.voice.keywordActivation": "inlineChat",
   "interactiveWindow.executeWithShiftEnter": true,
+  "window.titleBarStyle": "custom"
 }

@@ -16,11 +16,13 @@
   --extracted-sidebar-header-offset: 72px;
   --additional-grab-bar-height: 0px;
   --navbar-height: 28px;
+
   @media (-moz-gtk-csd-available) {
     --title-button-space: 96px;
     --extracted-sidebar-header-offset: 90px;
     --browser-radius: 6px;
-    --browser-border: 1px inset #0e0d0f; /* for some reason black doesn't render right */
+    --browser-border: 1px inset #0e0d0f;
+    /* for some reason black doesn't render right */
     --additional-grab-bar-height: 8px;
   }
 }
@@ -35,24 +37,29 @@
   visibility: visible !important;
   width: var(--title-button-space) !important;
   height: 0px !important;
+  z-index: 1;
 
   hbox.titlebar-buttonbox-container {
     width: 100%;
     position: absolute;
     margin-top: calc(6px + var(--additional-grab-bar-height));
     margin-left: -3px;
+    z-index: 3;
+    /*! right: 1px; */
+    /*! align-self: flex-start; */
   }
 }
 
 toolbox#navigator-toolbox {
-  border-bottom: none!important;
+  border-bottom: none !important;
 }
 
 
 #main-window:not(#main-window[privatebrowsingmode]) {
+
   /* Hide tab bar because we're using sidebar tabs */
   #TabsToolbar {
-    visibility: collapse!important;
+    visibility: collapse !important;
   }
 
   #sidebar-button[checked="true"] {
@@ -68,6 +75,7 @@ toolbox#navigator-toolbox {
     max-width: var(--title-button-space) !important;
     width: var(--title-button-space) !important;
     min-width: var(--title-button-space) !important;
+    z-index: 3;
   }
 
   /* Move sidebar header button into navbar */
@@ -90,9 +98,10 @@ toolbox#navigator-toolbox {
       margin-top: -27px !important;
       padding-top: 2px !important;
     }
+
     /* Hide text and close button from sidebar header */
-    > #sidebar-switcher-target > *:not(:first-child),
-    > #sidebar-close {
+    >#sidebar-switcher-target>*:not(:first-child),
+    >#sidebar-close {
       visibility: collapse !important;
     }
 
@@ -105,7 +114,7 @@ toolbox#navigator-toolbox {
     * we need to pass pointer events to <- -> buttons.
     * thus the pointer-events
     */
-    > #sidebar-switcher-target {
+    >#sidebar-switcher-target {
       opacity: 1;
       /*! filter: opacity(1); */
       /* width: 32px !important; height: 32px !important; */
@@ -117,13 +126,14 @@ toolbox#navigator-toolbox {
       pointer-events: all;
       /* initially wanted this to have a "focused" indicator, but changing the button itself seems like enough */
       /* background-color: var(--input-bgcolor, var(--toolbar-bgcolor))!important; */
-      z-index: 3;
-    }
-    > #sidebar-switcher-target:hover {
-      background-color:  var(--toolbarbutton-hover-background) !important;
+      z-index: 2;
     }
 
-    > #sidebar-switcher-target image {
+    >#sidebar-switcher-target:hover {
+      background-color: var(--toolbarbutton-hover-background) !important;
+    }
+
+    >#sidebar-switcher-target image {
       filter: brightness(180%);
     }
 
@@ -135,7 +145,7 @@ toolbox#navigator-toolbox {
   border-left: 2px solid black !important;
   transition: border-color 0.25s cubic-bezier(0.07, 0.95, 0, 1);
   /* is -4px on non-linux for some reason */
-  margin-inline-start: 0px!important;
+  margin-inline-start: 0px !important;
 
   &:hover {
     border-left-color: rgb(31, 31, 31) !important;
@@ -145,68 +155,91 @@ toolbox#navigator-toolbox {
     border-color: rgb(62, 62, 62) !important;
   }
 }
+
 /* TODO idk where this issue came from but was super annoying */
 #urlbar-container {
-  height: var(--navbar-height)!important;
+  height: var(--navbar-height) !important;
   max-height: var(--navbar-height) !important;
   --urlbar-container-height: var(--navbar-height) !important;
 }
-hbox#urlbar {
-  --urlbar-toolbar-height: var(--navbar-height)!important;
+
+#urlbar {
+  --urlbar-height: var(--navbar-height) !important;
+  /*! max-height: var(--navbar-height) !important; */
   transition: font-size 0.125s ease-in-out;
-   /*#urlbar-background {
+  /*#urlbar-background {
      transition: background-color 0.1s;
   }*/
   align-items: center;
+
+  /*
+  > .urlbar-input-container {
+    max-height: var(--navbar-height) !important;
+  }*/
+
+  /*! height: var(--navbar-height) !important; */
   box[role="button"] {
     /*background-color: var(--toolbar-bgcolor);*/
     z-index: 2;
     min-width: 22px;
     min-height: 24px;
-    > box {
+
+    >box {
       align-items: center;
       width: auto;
       height: auto;
     }
+
     image {
       transition: 0.125s;
-      max-width: 16px!important;
-      max-height: 16px!important;
+      max-width: 16px !important;
+      max-height: 16px !important;
     }
+
     align-self: center;
   }
+
   #notification-popup-box {
-      align-self: center;
-      width: auto;
-      height: auto;
+    align-self: center;
+    width: auto;
+    height: auto;
   }
+
   #urlbar-input {
     transition: margin-left 0.125s ease-in-out;
     margin-left: 0px;
   }
+
   &:not(:active, :focus, :focus-within) {
-    font-size: 12px!important;
+    font-size: 12px !important;
+
     #urlbar-background {
-      margin-top: 8px;
+      margin-top: 6px;
       margin-bottom: 6px;
-      max-height: 20px;
+      max-height: 22px;
       opacity: 0.5;
-      background-color: var(--input-bgcolor)!important; /*var(--toolbar-bgcolor)!important;*/
+      background-color: var(--input-bgcolor, pink) !important;
+      /*var(--toolbar-bgcolor)!important;*/
     }
+
     box[role="button"]:not(:active, :hover, [open="true"]) {
       image {
         opacity: 0.3;
-        max-width: 12px!important;
-        max-height: 12px!important;
+        max-width: 12px !important;
+        max-height: 12px !important;
       }
     }
   }
+
   /* Hide https:// - we already have a lock icon */
   .urlbar-input-box {
     overflow: clip;
+    max-height: 100%;
   }
+
   #urlbar-input {
     margin-left: calc(var(--urlbar-scheme-size) * -0.66) !important;
+
     @media (-moz-gtk-csd-available) {
       margin-left: calc(var(--urlbar-scheme-size) * -0.76) !important;
     }
@@ -215,156 +248,299 @@ hbox#urlbar {
 
 toolbar#nav-bar {
   height: calc(var(--navbar-height) + var(--additional-grab-bar-height));
-  border-top: var(--additional-grab-bar-height) solid var(--lwt-accent-color-inactive, var(--lwt-accent-color)) !important;
+  /* Supposed to inherit system accents, fallback to something noticable in case broken (or layout will break) */
+  border-top: var(--additional-grab-bar-height) solid var(--lwt-accent-color-inactive, var(--lwt-accent-color, pink)) !important;
 
   --toolbarbutton-inner-padding: 4px;
 
   .urlbar-page-action,
-  .chromeclass-toolbar-additional:not(#sidebar-button, #back-button, #forward-button) {
+  .chromeclass-toolbar-additional:not(#sidebar-button, #back-button, #forward-button),
+  #tracking-protection-icon-container,
+  #identity-icon-box {
     transition: 0.125s ease-in-out;
+
     &:not(.urlbar-page-action) {
-      margin-top: -3px!important;
-      image { max-height: 22px; }
+      margin-top: -3px !important;
+
+      image {
+        max-height: 22px;
+      }
     }
+
+    &#tracking-protection-icon-container,
+    &#identity-icon-box {
+      margin-top: -1px !important;
+    }
+
     image {
       transition: 0.125s ease-in-out;
       scale: 1.1;
     }
-    opacity: 1.0!important;
-    height: 34px; /* this + scale focus on image prevents weird nested menu wiggling */
+
+    opacity: 1.0 !important;
+    height: 34px;
+    /* this + scale focus on image prevents weird nested menu wiggling */
     max-width: 24px !important;
+
     .toolbarbutton-badge {
-      opacity: 1!important;
-      background-color: transparent!important;
-      border: none!important;
-      box-shadow: none!important;
+      opacity: 1 !important;
+      background-color: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
       position: relative;
       top: 2px;
     }
 
     &:not(:hover, :active, :focus, :focus-within, [open="true"]) {
-      > image, > :not(toolbarbutton) image, toolbarbutton:not([open="true"]) image {
+
+      >image,
+      > :not(toolbarbutton) image,
+      toolbarbutton:not([open="true"]) image {
         scale: 0.75;
         /*! transform-origin: bottom; */
       }
-    }
-  }
 
-  &:not(:hover, :active, :focus, :focus-within) {
-    .urlbar-page-action,
-    .chromeclass-toolbar-additional:not(#sidebar-button, #back-button, #forward-button)
-     {
-      opacity: 0.4!important;
-      .toolbarbutton-badge {
-        opacity: 0!important;
+      /* reload icon too small for some reason */
+      #reload-button image {
+        scale: 0.85;
       }
     }
   }
-  /* todo unify with other urlbar styles */
-  #forward-button {
-     /* todo fragile, maybe hist buttons should be centered */
-     margin-right: auto!important;
+
+  &:not(:focus-within, [open="true"]) #urlbar-container {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 600px;
   }
-  #urlbar-container {
-    transition: max-width 0.1s ease-in-out;
-    max-width: 900px;
-    &:not(:active, :focus, :focus-within) {
-      margin-left: auto;
-      margin-right: auto;
-      max-width: 600px;
-    }
-    & + * {
-      margin-left: auto!important;
+
+  &:not(:active, :hover, :focus, :focus-within, [open="true"]) {
+
+    .urlbar-page-action,
+    .chromeclass-toolbar-additional:not(#sidebar-button, #back-button, #forward-button),
+    #tracking-protection-icon-container,
+    #identity-icon-box {
+      opacity: 0.4 !important;
+
+      .toolbarbutton-badge {
+        opacity: 0 !important;
+      }
     }
   }
 
-  
+
+  /* todo unify with other urlbar styles */
+  #forward-button {
+    /* todo fragile, maybe hist buttons should be centered */
+    margin-right: auto !important;
+  }
+
+  #urlbar-container {
+    transition: max-width 0.1s ease-in-out;
+    max-width: 900px;
+
+    &+* {
+      margin-left: auto !important;
+    }
+  }
+
+
   /*#urlbar { pointer-events: none; }*/
 }
 
 /*
-Linux-specific. I'm currently using KDE breeze with snapcraft.
-Probably root cause is a snap permissions issue but not worth spending more than 15min.
-https://www.reddit.com/r/kde/comments/nm1vub/comment/gzpj9x4/?utm_source=reddit&utm_medium=web2x&context=3
+Linux-specific. I'm currently using KDE breeze with flatpak.
+Trying not to worry about this too much as want to get rid of titlebars eventually
 */
 @media (-moz-gtk-csd-available) {
   #main-window[inFullscreen="true"] #toolbar-menubar {
-    display: none!important;
+    display: none !important;
   }
+
   #main-window:not([inFullscreen="true"]) {
     toolbox#navigator-toolbox {
       border: var(--browser-border) !important;
-      border-bottom-width: 0px!important;
-      border-top-left-radius: var(--browser-radius)!important;
-      border-top-right-radius: var(--browser-radius)!important;
+      border-bottom-width: 0px !important;
+      border-top-left-radius: var(--browser-radius) !important;
+      border-top-right-radius: var(--browser-radius) !important;
     }
+
     #browser {
       border: var(--browser-border) !important;
-      border-top-width: 0px!important;
-      border-bottom-left-radius: var(--browser-radius)!important);
-      border-bottom-right-radius: var(--browser-radius)!important;
+      border-top-width: 0px !important;
+      border-bottom-left-radius: var(--browser-radius) !important);
+      border-bottom-right-radius: var(--browser-radius) !important;
     }
   }
 
-   #toolbar-menubar hbox.titlebar-buttonbox-container {
+  #toolbar-menubar hbox.titlebar-buttonbox-container {
     margin-top: calc(1px + var(--additional-grab-bar-height));
-    margin-left: 10px;
+    margin-right: 10px;
     width: var(--title-button-space);
   }
+
   &[privatebrowsingmode] {
     #toolbar-menubar {
-      display: none!important;
+      display: none !important;
     }
+
     hbox.titlebar-buttonbox-container {
       margin-left: 16px;
       width: auto;
     }
   }
-  hbox.titlebar-buttonbox-container toolbarbutton.titlebar-button {
-    &:first-child::before {
-      content: url('./linux_assets/firefox_logo.svg');
-      display: flex;
-      width: 16px;
-      height: 20px;
-      margin-right: 1px;
-      flex: 1;
+
+  #navigator-toolbox {
+    z-index: unset !important;
+  }
+
+  /* necessary for hacked kde menu to overlay z-indexed sidebar button */
+  #toolbar-menubar {
+    --ff-icon-size: 16px;
+    position: fixed;
+    left: 0px;
+    top: var(--additional-grab-bar-height);
+    height: var(--navbar-height);
+    /*overflow: hidden;*/
+    /*! width: 100%!important; */
+    z-index: 4;
+    display: flex;
+    padding-left: calc(var(--ff-icon-size) + 2 * var(--toolbar-start-end-padding)) !important;
+
+    &::before {
+      content: ' ';
+      background-image: url('./linux_assets/firefox_logo.svg');
+      background-size: var(--ff-icon-size);
+      flex-shrink: 0;
+      background-repeat: no-repeat;
+      background-position: center;
+      width: var(--ff-icon-size) !important;
+      height: var(--ff-icon-size) !important;
+      margin-top: 5px;
+      margin-left: var(--toolbar-start-end-padding);
+      align-content: center;
+      align-self: flex-start;
+      position: absolute;
+      left: 2px;
+      top: 2px;
+      cursor: pointer;
     }
 
-    background-color: transparent!important;
-    width: 26px;
+    >spacer {
+      display: none;
+    }
+
+    /* show menubar menus on hover */
+    #menubar-items,
+    hbox.titlebar-buttonbox-container {
+      height: var(--navbar-height);
+      /*! padding-left: calc(var(--ff-icon-size) + 2 * var(--toolbar-start-end-padding)); */
+      transition: max-width 0.125s ease-in-out, opacity 0.125s ease-out;
+      opacity: 1;
+      background: black !important;
+      height: var(--navbar-height);
+      max-width: 450px;
+
+      /*! order: unset !important; */
+    }
+
+    &:not(:hover, :active, :focus, :focus-within, [open="true"]) {
+
+      #menubar-items,
+      hbox.titlebar-buttonbox-container {
+        opacity: 0;
+        pointer-events: none;
+        max-width: 0px;
+      }
+    }
+
+    hbox.titlebar-buttonbox-container {
+      margin-top: unset;
+      margin-left: unset;
+      position: relative;
+      /*! right: 1px; */
+    }
+  }
+
+  hbox.titlebar-buttonbox-container toolbarbutton.titlebar-button {
+    background-color: transparent !important;
+    /*width: 26px;
     height: 26px;
     margin-left: 1px;
-    margin-right: 7px !important;
+    margin-right: 7px !important;*/
+    --titlebar-button-size: 16px;
+
     &.titlebar-min {
-      list-style-image: url("./linux_assets/breeze/minimize-normal.svg")!important;
-      &:hover { list-style-image: url("./linux_assets/breeze/minimize-hover.svg")!important; }
-      &:active { list-style-image: url("./linux_assets/breeze/minimize-active.svg")!important; }
+      list-style-image: url("./linux_assets/breeze/minimize-normal.svg") !important;
+
+      &:hover {
+        list-style-image: url("./linux_assets/breeze/minimize-hover.svg") !important;
+      }
+
+      &:active {
+        list-style-image: url("./linux_assets/breeze/minimize-active.svg") !important;
+      }
+
       &:-moz-window-inactive {
-        list-style-image: url("./linux_assets/breeze/minimize-backdrop-normal.svg")!important;
-        &:hover { list-style-image: url("./linux_assets/breeze/minimize-backdrop-hover.svg")!important; }
-        &:active { list-style-image: url("./linux_assets/breeze/minimize-backdrop-active.svg")!important; }
+        list-style-image: url("./linux_assets/breeze/minimize-backdrop-normal.svg") !important;
+
+        &:hover {
+          list-style-image: url("./linux_assets/breeze/minimize-backdrop-hover.svg") !important;
+        }
+
+        &:active {
+          list-style-image: url("./linux_assets/breeze/minimize-backdrop-active.svg") !important;
+        }
       }
     }
-    &.titlebar-restore {
-      list-style-image: url("./linux_assets/breeze/maximized-normal.svg")!important;
-      &:hover { list-style-image: url("./linux_assets/breeze/maximized-hover.svg")!important; }
-      &:active { list-style-image: url("./linux_assets/breeze/maximized-active.svg")!important; }
+
+    &.titlebar-max {
+      list-style-image: url("./linux_assets/breeze/maximize-normal.svg") !important;
+
+      &:hover {
+        list-style-image: url("./linux_assets/breeze/maximize-hover.svg") !important;
+      }
+
+      &:active {
+        list-style-image: url("./linux_assets/breeze/maximize-active.svg") !important;
+      }
+
       &:-moz-window-inactive {
-        list-style-image: url("./linux_assets/breeze/maximized-backdrop-normal.svg")!important;
-        &:hover { list-style-image: url("./linux_assets/breeze/maximized-backdrop-hover.svg")!important; }
-        &:active { list-style-image: url("./linux_assets/breeze/maximized-backdrop-active.svg")!important; }
+        list-style-image: url("./linux_assets/breeze/maximize-backdrop-normal.svg") !important;
+
+        &:hover {
+          list-style-image: url("./linux_assets/breeze/maximize-backdrop-hover.svg") !important;
+        }
+
+        &:active {
+          list-style-image: url("./linux_assets/breeze/maximize-backdrop-active.svg") !important;
+        }
       }
     }
+
     &.titlebar-close {
-      list-style-image: url("./linux_assets/breeze/close-normal.svg")!important;
-      &:hover { list-style-image: url("./linux_assets/breeze/close-hover.svg")!important; }
-      &:active { list-style-image: url("./linux_assets/breeze/close-active.svg")!important; }
+      list-style-image: url("./linux_assets/breeze/close-normal.svg") !important;
+
+      &:hover {
+        list-style-image: url("./linux_assets/breeze/close-hover.svg") !important;
+      }
+
+      &:active {
+        list-style-image: url("./linux_assets/breeze/close-active.svg") !important;
+      }
+
       &:-moz-window-inactive {
-        list-style-image: url("./linux_assets/breeze/close-backdrop-normal.svg")!important;
-        &:hover { list-style-image: url("./linux_assets/breeze/close-backdrop-hover.svg")!important; }
-        &:active { list-style-image: url("./linux_assets/breeze/close-backdrop-active.svg")!important; }
+        list-style-image: url("./linux_assets/breeze/close-backdrop-normal.svg") !important;
+
+        &:hover {
+          list-style-image: url("./linux_assets/breeze/close-backdrop-hover.svg") !important;
+        }
+
+        &:active {
+          list-style-image: url("./linux_assets/breeze/close-backdrop-active.svg") !important;
+        }
       }
     }
+
     margin-right: -2px;
   }
 }

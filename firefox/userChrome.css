@@ -16,14 +16,17 @@
   --extracted-sidebar-header-offset: 72px;
   --additional-grab-bar-height: 0px;
   --navbar-height: 28px;
+  --fallback-bg: #462b46;
 
   @media (-moz-gtk-csd-available) {
-    --title-button-space: 96px;
-    --extracted-sidebar-header-offset: 90px;
     --browser-radius: 6px;
     --browser-border: 1px inset #0e0d0f;
     /* for some reason black doesn't render right */
     --additional-grab-bar-height: 8px;
+    --ff-icon-size: 16px;
+    --title-button-space: calc(var(--ff-icon-size) + 2 * var(--toolbar-start-end-padding));
+    /* idk why this is different */
+    --extracted-sidebar-header-offset: calc(var(--ff-icon-size) + 1.25 * var(--toolbar-start-end-padding));
   }
 }
 
@@ -67,7 +70,7 @@ toolbox#navigator-toolbox {
   }
 
   /*
-  * Use the navbar ordering "<-", "->", "sidebar button", "refresh
+  * Use the navbar ordering "sidebar button", "<-", "->", "refresh
   * This css will pull the sidebery button out and over the sidebar button when active,
   * while still surfacing the sidebar button when inactive
   */
@@ -172,22 +175,22 @@ toolbox#navigator-toolbox {
   }*/
   align-items: center;
 
-  /*
-  > .urlbar-input-container {
-    max-height: var(--navbar-height) !important;
-  }*/
 
-  /*! height: var(--navbar-height) !important; */
+  >.urlbar-input-container {
+    overflow-x: visible !important;
+  }
+
   box[role="button"] {
     /*background-color: var(--toolbar-bgcolor);*/
     z-index: 2;
     min-width: 22px;
     min-height: 24px;
 
+    /*! display: b; */
     >box {
       align-items: center;
-      width: auto;
-      height: auto;
+      min-width: 16px;
+      min-height: 18px;
     }
 
     image {
@@ -210,6 +213,31 @@ toolbox#navigator-toolbox {
     margin-left: 0px;
   }
 
+  #urlbar-searchmode-switcher {
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+
+    margin-left: -2px !important;
+    max-height: 14px;
+    align-self: center;
+    box-sizing: content-box;
+    position: relative;
+    top: 1px;
+  }
+
+  #searchmode-switcher-chicklet {
+    max-height: 20px;
+    align-self: center;
+    position: relative;
+    top: 0px;
+  }
+
+  &:not([focused]) #urlbar-searchmode-switcher,
+  &:not([focused]) #searchmode-switcher-chicklet {
+    border-top-right-radius: 0px !important;
+    border-bottom-right-radius: 0px !important;
+  }
+
   &:not(:active, :focus, :focus-within) {
     font-size: 12px !important;
 
@@ -218,15 +246,15 @@ toolbox#navigator-toolbox {
       margin-bottom: 6px;
       max-height: 22px;
       opacity: 0.5;
-      background-color: var(--input-bgcolor, pink) !important;
+      background-color: var(--input-bgcolor, var(--fallback-bg)) !important;
       /*var(--toolbar-bgcolor)!important;*/
     }
 
     box[role="button"]:not(:active, :hover, [open="true"]) {
       image {
         opacity: 0.3;
-        max-width: 12px !important;
-        max-height: 12px !important;
+        /*! max-width: 12px !important; */
+        /*! max-height: 12px !important; */
       }
     }
   }
@@ -249,7 +277,7 @@ toolbox#navigator-toolbox {
 toolbar#nav-bar {
   height: calc(var(--navbar-height) + var(--additional-grab-bar-height));
   /* Supposed to inherit system accents, fallback to something noticable in case broken (or layout will break) */
-  border-top: var(--additional-grab-bar-height) solid var(--lwt-accent-color-inactive, var(--lwt-accent-color, pink)) !important;
+  border-top: var(--additional-grab-bar-height) solid var(--lwt-accent-color-inactive, var(--lwt-accent-color, var(--fallback-bg))) !important;
 
   --toolbarbutton-inner-padding: 4px;
 
@@ -262,6 +290,8 @@ toolbar#nav-bar {
     &:not(.urlbar-page-action) {
       margin-top: -3px !important;
 
+      /*! padding-bottom: 5px !important; */
+      /*! background-color: unset !important; */
       image {
         max-height: 22px;
       }
@@ -270,6 +300,8 @@ toolbar#nav-bar {
     &#tracking-protection-icon-container,
     &#identity-icon-box {
       margin-top: -1px !important;
+      /*! border: solid transparent; */
+      background-color: unset !important;
     }
 
     image {
@@ -284,11 +316,8 @@ toolbar#nav-bar {
 
     .toolbarbutton-badge {
       opacity: 1 !important;
-      background-color: transparent !important;
-      border: none !important;
-      box-shadow: none !important;
-      position: relative;
-      top: 2px;
+      /*! height: 34px; */
+      /*! max-width: 24px !important; */
     }
 
     &:not(:hover, :active, :focus, :focus-within, [open="true"]) {
@@ -297,7 +326,14 @@ toolbar#nav-bar {
       > :not(toolbarbutton) image,
       toolbarbutton:not([open="true"]) image {
         scale: 0.75;
-        /*! transform-origin: bottom; */
+
+        &:first-of-type:not(:last-of-type) {
+          transform-origin: right;
+        }
+
+        &:last-of-type:not(:first-of-type) {
+          transform-origin: left;
+        }
       }
 
       /* reload icon too small for some reason */
@@ -318,7 +354,8 @@ toolbar#nav-bar {
     .urlbar-page-action,
     .chromeclass-toolbar-additional:not(#sidebar-button, #back-button, #forward-button),
     #tracking-protection-icon-container,
-    #identity-icon-box {
+    #identity-icon-box,
+    #searchmode-switcher-chicklet {
       opacity: 0.4 !important;
 
       .toolbarbutton-badge {
@@ -326,6 +363,7 @@ toolbar#nav-bar {
       }
     }
   }
+
 
 
   /* todo unify with other urlbar styles */
@@ -379,6 +417,8 @@ Trying not to worry about this too much as want to get rid of titlebars eventual
   }
 
   &[privatebrowsingmode] {
+    --additional-grab-bar-height: 0px;
+
     #toolbar-menubar {
       display: none !important;
     }
@@ -395,16 +435,23 @@ Trying not to worry about this too much as want to get rid of titlebars eventual
 
   /* necessary for hacked kde menu to overlay z-indexed sidebar button */
   #toolbar-menubar {
-    --ff-icon-size: 16px;
+    &[customizing] {
+      display: none;
+    }
+
+    --show-animation: max-width 0.125s ease-out,
+    opacity 0.125s ease-out;
     position: fixed;
     left: 0px;
     top: var(--additional-grab-bar-height);
-    height: var(--navbar-height);
+    height: var(--navbar-height) !important;
     /*overflow: hidden;*/
     /*! width: 100%!important; */
     z-index: 4;
     display: flex;
     padding-left: calc(var(--ff-icon-size) + 2 * var(--toolbar-start-end-padding)) !important;
+    max-width: 450px;
+    transition: var(--show-animation);
 
     &::before {
       content: ' ';
@@ -423,6 +470,10 @@ Trying not to worry about this too much as want to get rid of titlebars eventual
       left: 2px;
       top: 2px;
       cursor: pointer;
+      z-index: 2;
+      overflow: hidden;
+      /*! width: fit-content; */
+      /*! padding-left: 0px !important; */
     }
 
     >spacer {
@@ -433,31 +484,30 @@ Trying not to worry about this too much as want to get rid of titlebars eventual
     #menubar-items,
     hbox.titlebar-buttonbox-container {
       height: var(--navbar-height);
-      /*! padding-left: calc(var(--ff-icon-size) + 2 * var(--toolbar-start-end-padding)); */
-      transition: max-width 0.125s ease-in-out, opacity 0.125s ease-out;
       opacity: 1;
       background: black !important;
       height: var(--navbar-height);
       max-width: 450px;
+      margin-top: unset;
+      margin-left: unset;
+      position: relative;
 
-      /*! order: unset !important; */
+      /*! padding-left: calc(var(--ff-icon-size) + 2 * var(--toolbar-start-end-padding)); */
+      /* note: :hover delay is finicky / unreliable */
+      transition: var(--show-animation);
+      /*! top: -16px; */
     }
 
     &:not(:hover, :active, :focus, :focus-within, [open="true"]) {
+      max-width: var(--ff-icon-size);
 
       #menubar-items,
       hbox.titlebar-buttonbox-container {
         opacity: 0;
         pointer-events: none;
         max-width: 0px;
+        margin-right: 0px;
       }
-    }
-
-    hbox.titlebar-buttonbox-container {
-      margin-top: unset;
-      margin-left: unset;
-      position: relative;
-      /*! right: 1px; */
     }
   }
 

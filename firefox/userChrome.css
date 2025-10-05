@@ -168,13 +168,16 @@ toolbox#navigator-toolbox {
 
 #urlbar {
   --urlbar-height: var(--navbar-height) !important;
-  /*! max-height: var(--navbar-height) !important; */
+  max-height: var(--navbar-height) !important;
+  min-height: var(--navbar-height) !important;
   transition: font-size 0.125s ease-in-out .1s;
   /*#urlbar-background {
      transition: background-color 0.1s;
   }*/
   align-items: center;
 
+
+  min-height: var(--navbar-height) !important;
 
   >.urlbar-input-container {
     overflow-x: visible !important;
@@ -342,6 +345,7 @@ toolbar#nav-bar {
       }
     }
   }
+
   /* partial motivation originally was this arc-ish popout but moving the icons is just worse really
   &:not(:focus-within, [open="true"]) #urlbar-container {
     margin-left: auto;
@@ -376,6 +380,7 @@ toolbar#nav-bar {
     transition: max-width 0.1s ease-in-out;
     max-width: 900px;
 
+    /*! max-height: 100%!imp; */
     &+* {
       margin-left: auto !important;
     }

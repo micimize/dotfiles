@@ -17,6 +17,7 @@
   --additional-grab-bar-height: 0px;
   --navbar-height: 28px;
   --fallback-bg: #462b46;
+  --toolbar-field-color: var(--toolbar-field-color, pink);
 
   @media (-moz-gtk-csd-available) {
     --browser-radius: 6px;
@@ -168,19 +169,24 @@ toolbox#navigator-toolbox {
 
 #urlbar {
   --urlbar-height: var(--navbar-height) !important;
-  max-height: var(--navbar-height) !important;
+  /* max-height: var(--navbar-height) !important; */
   min-height: var(--navbar-height) !important;
-  transition: font-size 0.125s ease-in-out .1s;
-  /*#urlbar-background {
-     transition: background-color 0.1s;
-  }*/
+  .urlbar-input-container {
+    transition: font-size 0.05s ease-in-out .05s;
+  }
+  .urlbarView > * {
+    transition: opacity 0.025s ease-in-out .075s;
+    opacity: 1
+  }
+  .urlbar-background {
+     transition: background-color 0.025s ease-in-out .025s, border-color 0.025s ease-in-out .075s;
+    
+  }
   align-items: center;
-
-
-  min-height: var(--navbar-height) !important;
 
   >.urlbar-input-container {
     overflow-x: visible !important;
+    border:unset!important;
   }
 
   box[role="button"] {
@@ -220,30 +226,41 @@ toolbox#navigator-toolbox {
     padding-left: 6px !important;
     padding-right: 6px !important;
 
-    margin-left: -2px !important;
+    margin-left: -1px !important;
     max-height: 14px;
     align-self: center;
     box-sizing: content-box;
     position: relative;
     top: 1px;
+    /*! min-height: 27px !important; */
   }
 
-  #searchmode-switcher-chicklet {
+  .searchmode-switcher-chicklet {
     max-height: 20px;
     align-self: center;
     position: relative;
     top: 0px;
+    min-height: 20px;
   }
-
-  &:not([focused]) #urlbar-searchmode-switcher,
-  &:not([focused]) #searchmode-switcher-chicklet {
-    border-top-right-radius: 0px !important;
-    border-bottom-right-radius: 0px !important;
+  
+  &:not([focused]) {
+    --urlbar-unfocused-height: calc(var(--navbar-height) - 2 * var(--urlbar-padding-block));
+    min-height: var(--urlbar-unfocused-height) !important;
+    max-height: var(--urlbar-unfocused-height) !important;
+    #urlbar-searchmode-switcher,
+    #searchmode-switcher-chicklet {
+      border-top-right-radius: 0px !important;
+      border-bottom-right-radius: 0px !important;
+    }
   }
 
   &:not(:active, :focus, :focus-within) {
+    .urlbar-input-container {
     font-size: 12px !important;
-
+    }
+      .urlbarView > * {
+    opacity: 0
+  }
     #urlbar-background {
       margin-top: 6px;
       margin-bottom: 6px;
@@ -308,7 +325,8 @@ toolbar#nav-bar {
     }
 
     image {
-      transition: 0.125s ease-in-out;
+      transition: scale 0.05s ease-in-out 0.05s;
+      transform-origin: center;
       scale: 1.1;
     }
 
@@ -345,7 +363,6 @@ toolbar#nav-bar {
       }
     }
   }
-
   /* partial motivation originally was this arc-ish popout but moving the icons is just worse really
   &:not(:focus-within, [open="true"]) #urlbar-container {
     margin-left: auto;
@@ -359,7 +376,7 @@ toolbar#nav-bar {
     .chromeclass-toolbar-additional:not(#sidebar-button, #back-button, #forward-button),
     #tracking-protection-icon-container,
     #identity-icon-box,
-    #searchmode-switcher-chicklet {
+    .searchmode-switcher-chicklet {
       opacity: 0.4 !important;
 
       .toolbarbutton-badge {
@@ -380,11 +397,10 @@ toolbar#nav-bar {
     transition: max-width 0.1s ease-in-out;
     max-width: 900px;
 
-    /*! max-height: 100%!imp; */
-    &+* {
+      &+* {
       margin-left: auto !important;
     }
-  }
+}
 
 
   /*#urlbar { pointer-events: none; }*/

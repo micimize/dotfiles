@@ -19,20 +19,43 @@ export XDG_CONFIG_HOME="$HOME/.config"
 export PAGER=less
 export EDITOR=vim
 
-export PATH="$PATH:$HOME/.local/bin:$HOME/.cargo/bin"
 export LESS='-R'
 
 # temporary
 alias wezterm=k:ome/mjr/code/libraries/wezterm/wezterm-20230712-072601-f4abf8fd/target/release/wezterm
 
+__prefix_paths=(
+  "/opt/local/bin"
+  "/usr/lib/cw" # think this is an arch thing
+)
+for entry in "${__prefix_paths[@]}"; do
+  # if not present and dir exists
+  if [[ "${PATH#*$entry:}" == "$PATH" ]] && [ -d "$entry" ]; then
+    PATH="$entry:$PATH"
+  fi
+done
 
-if [ -d /opt/local/bin ]; then
-  PATH="/opt/local/bin:$PATH"
-fi
+__postfix_paths=(
+  "/home/linuxbrew/.linuxbrew/opt/coreutils/libexec/gnubin"
+  "/var/lib/snapd/snap/bin"
+  "/home/linuxbrew/.linuxbrew/bin"
+  "$HOME/.local/bin"
+  "$HOME/.cargo/bin"
+)
+for entry in "${__postfix_paths[@]}"; do
+  # if not present and dir exists
+  if [[ "${PATH#*:$entry}" == "$PATH" ]] && [ -d "$entry" ]; then
+    PATH="$PATH:$entry"
+  fi
+done
 
-if [ -d /usr/lib/cw ]; then
-  PATH="/usr/lib/cw:$PATH"
-fi
+function _load_homebrew_nvm {
+  export NVM_DIR="$HOME/.nvm"
+  mkdir -p $NVM_DIR
+  [ -s "/home/linuxbrew/.linuxbrew/opt/nvm/nvm.sh" ] && \. "/home/linuxbrew/.linuxbrew/opt/nvm/nvm.sh"  # This loads nvm
+  [ -s "/home/linuxbrew/.linuxbrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/home/linuxbrew/.linuxbrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
+}
+_load_homebrew_nvm
 
 ## shopt & set options
 shopt -s cdspell                # This will correct minor spelling errors in a cd command.
@@ -95,5 +118,7 @@ case $(uname -s) in
   Darwin | FreeBSD) source "$DOTFILES_DIR/macos/macos.sh" ;;
   Linux) source "$DOTFILES_DIR/blackbox/blackbox.sh" ;;
 esac
+
+
 
 # source /home/mjr/.config/broot/launcher/bash/br

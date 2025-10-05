@@ -6,8 +6,6 @@ export FIREFOX_PROFILE_DIR="$HOME/.mozilla/firefox/h4hh8m1f.default-release/"
 # export FIREFOX_PROFILE_DIR="$HOME/.var/app/org.mozilla.firefox/.mozilla/firefox/sip7urf0.default-release"
 export VSCODE_CONFIG_DIR="$HOME/.config/Code/User"
 
-export PATH="/home/linuxbrew/.linuxbrew/opt/coreutils/libexec/gnubin:$PATH"
-
 # ALVR and other android libs
 export JAVA_HOME=/usr/lib/jvm/default-java
 export ANDROID_HOME=~/AndroidSDK

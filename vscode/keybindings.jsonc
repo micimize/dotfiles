@@ -424,6 +424,34 @@
     "key": "cmd+i",
     "command": "composerMode.agent"
   },
+  {
+    "key": "cmd+e",
+    "command": "composerMode.background"
+  },
+  {
+    "key": "cmd+e",
+    "command": "composerMode.background"
+  },
+  {
+    "key": "cmd+e",
+    "command": "composerMode.background"
+  },
+  {
+    "key": "cmd+e",
+    "command": "composerMode.background"
+  },
+  {
+    "key": "cmd+e",
+    "command": "composerMode.background"
+  },
+  {
+    "key": "cmd+i",
+    "command": "composerMode.agent"
+  },
+  {
+    "key": "cmd+i",
+    "command": "composerMode.agent"
+  },
   //{
   //  "key": "shift+enter",
   //  "command": "-interactive.execute",

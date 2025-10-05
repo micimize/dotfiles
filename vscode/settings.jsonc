@@ -999,7 +999,6 @@
   "python.experiments.optInto": [
     "pythonTerminalEnvVarActivation"
   ],
-  "gitlab.aiAssistedCodeSuggestions.enabled": true,
   "gitlab.duoChat.enabled": false,
   /*
   "editor.wrappingIndent": "indent",
@@ -1027,4 +1026,6 @@
   "interactiveWindow.executeWithShiftEnter": true,
   "window.titleBarStyle": "custom",
   "cursorless.commandHistory": true,
+  "github.copilot.nextEditSuggestions.enabled": true,
+  "gitlab.duoCodeSuggestions.enabled": true,
 }

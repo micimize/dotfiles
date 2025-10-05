@@ -1,6 +1,7 @@
 #/bin/bash
 
-export PATH="/usr/local/bin:$PATH"
+eval "$(/opt/homebrew/bin/brew shellenv)"
+export PATH="$HOMEBREW_PREFIX/opt/python@3.11/libexec/bin:$HOMEBREW_PREFIX/bin:/usr/local/bin:$PATH"
 
 alias stat=gstat
 alias vim=nvim
@@ -14,8 +15,8 @@ export VSCODE_CONFIG_DIR="$HOME/Library/Application Support/Code/User"
 
 
 export NVM_DIR="$HOME/.nvm"
-[ -s "/usr/local/opt/nvm/nvm.sh" ] && \. "/usr/local/opt/nvm/nvm.sh"  # This loads nvm
-[ -s "/usr/local/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/usr/local/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
+[ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
+[ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
 
 alias fixaudio="sudo killall coreaudiod"
 function fixbluetooth {

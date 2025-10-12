@@ -1,10 +1,7 @@
 # A Terraform configuration to provision the AWS infrastructure for a Btrfs backup target.
 # This single file defines a complete and reproducible environment.
 
-# Define the AWS provider and set the region.
 provider "aws" {
-  # The region is set to us-west-1 (Northern California) for optimal performance
-  # for users in the San Francisco Bay Area.
   region = var.aws_region
 }
 
@@ -14,7 +11,7 @@ provider "aws" {
 variable "aws_region" {
   description = "The AWS region to deploy resources to."
   type        = string
-  default     = "us-west-1"
+  default     = "us-west-1" # close to sf
 }
 
 variable "ssh_public_key" {

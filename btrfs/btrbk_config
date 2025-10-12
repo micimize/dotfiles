@@ -11,17 +11,21 @@ timestamp_format          YYYY-MM-DD-HHMM
 # This should be your private key.
 ssh_identity              ~/.ssh/id_rsa_btrbk
 
-# Define the global retention policy for both local and remote snapshots.
-# This example keeps 7 daily, 4 weekly, and 6 monthly snapshots.
+# Global retention policy for both local and remote snapshots.
 # Adjust to your needs. 'all' means all snapshots.
-retention_policy          7d 4w 6m
+retention_policy          90d 52w 120m
 
 # --- Subvolume Backups ---
+
+# I want:
+# - all of /home/mjr
+# minus .env, .venv, *secret*, node_modules, /.var, /.cache, /.local, 
+# - all of Documents and Downloads
 
 # Backup the main /home subvolume
 # This will create a snapshot of @home and send it to the AWS server.
 # The remote path will be /backup_volume/backups/home.
-subvolume /home
+subvolume /home/mjr/code
   snapshot_dir           .snapshots
   target                 ssh://user@your-aws-ec2.compute.amazonaws.com/backup_volume/backups/
   target_preserve_path   true

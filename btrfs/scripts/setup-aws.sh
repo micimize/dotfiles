@@ -1,0 +1,425 @@
+#!/usr/bin/env bash
+# AWS Infrastructure Setup Script for Btrfs Backup System
+#
+# This script automates the deployment of AWS infrastructure for btrbk backups.
+# It wraps OpenTofu/Terraform commands with proper error handling and generates
+# configuration files for local backup setup.
+#
+# Usage: ./scripts/setup-aws.sh
+
+set -euo pipefail
+
+# Script directory (for finding other scripts)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+# Detect whether to use tofu or terraform
+if command -v tofu &> /dev/null; then
+    TF_CMD="tofu"
+elif command -v terraform &> /dev/null; then
+    TF_CMD="terraform"
+else
+    echo "ERROR: Neither tofu nor terraform found. Please install one of them."
+    exit 1
+fi
+
+# Color codes for output
+readonly RED='\033[0;31m'
+readonly GREEN='\033[0;32m'
+readonly YELLOW='\033[1;33m'
+readonly BLUE='\033[0;34m'
+readonly NC='\033[0m' # No Color
+
+# Log functions
+log_info() {
+    echo -e "${BLUE}INFO:${NC} $*"
+}
+
+log_success() {
+    echo -e "${GREEN}SUCCESS:${NC} $*"
+}
+
+log_warning() {
+    echo -e "${YELLOW}WARNING:${NC} $*"
+}
+
+log_error() {
+    echo -e "${RED}ERROR:${NC} $*" >&2
+}
+
+# Error handler
+error_exit() {
+    log_error "$1"
+    log_error "Setup failed. Review the error above."
+    exit 1
+}
+
+# Print banner
+print_banner() {
+    echo ""
+    echo "╔════════════════════════════════════════════════════════════╗"
+    echo "║   Btrfs Backup System - AWS Infrastructure Setup          ║"
+    echo "╚════════════════════════════════════════════════════════════╝"
+    echo ""
+}
+
+# Cleanup function
+cleanup() {
+    local exit_code=$?
+    if [[ $exit_code -ne 0 ]]; then
+        log_error "Setup failed with exit code $exit_code"
+    fi
+}
+
+trap cleanup EXIT
+
+# Check prerequisites using separate script
+check_prerequisites() {
+    log_info "Checking prerequisites..."
+
+    if [[ ! -x "$SCRIPT_DIR/check-prerequisites.sh" ]]; then
+        error_exit "Prerequisites script not found or not executable: $SCRIPT_DIR/check-prerequisites.sh"
+    fi
+
+    if ! "$SCRIPT_DIR/check-prerequisites.sh"; then
+        error_exit "Prerequisites check failed. Install missing tools and try again."
+    fi
+
+    log_success "All prerequisites met"
+}
+
+# Validate terraform.tfvars exists
+validate_tfvars() {
+    log_info "Validating Terraform variables..."
+
+    local tfvars_file="$PROJECT_DIR/terraform.tfvars"
+    local tfvars_example="$PROJECT_DIR/terraform.tfvars.example"
+
+    if [[ ! -f "$tfvars_file" ]]; then
+        log_error "terraform.tfvars not found"
+        log_info "Please create it from the example:"
+        log_info "  cp $tfvars_example $tfvars_file"
+        log_info "  \$EDITOR $tfvars_file"
+        error_exit "Missing configuration file"
+    fi
+
+    # Check for placeholder values
+    if grep -q "AAAAC3NzaC1lZDI1NTE5AAAAIExampleKeyDataHere" "$tfvars_file"; then
+        log_error "terraform.tfvars contains example placeholder values"
+        log_info "Please edit $tfvars_file with your actual SSH public key"
+        error_exit "Invalid configuration"
+    fi
+
+    # Validate SSH public key format (basic check)
+    local ssh_key
+    ssh_key=$(grep '^ssh_public_key' "$tfvars_file" | cut -d'"' -f2 || echo "")
+
+    if [[ -z "$ssh_key" ]]; then
+        error_exit "ssh_public_key not set in terraform.tfvars"
+    fi
+
+    if [[ ! "$ssh_key" =~ ^ssh-(rsa|ed25519|ecdsa) ]]; then
+        log_warning "ssh_public_key doesn't look like a valid SSH public key"
+        log_warning "Expected format: ssh-ed25519 AAAA... comment"
+    fi
+
+    log_success "Terraform variables validated"
+}
+
+# Initialize Terraform
+init_terraform() {
+    log_info "Initializing $TF_CMD..."
+
+    cd "$PROJECT_DIR"
+
+    if ! $TF_CMD init; then
+        error_exit "$TF_CMD initialization failed"
+    fi
+
+    log_success "$TF_CMD initialized"
+}
+
+# Run terraform plan
+plan_infrastructure() {
+    log_info "Planning infrastructure changes..."
+
+    cd "$PROJECT_DIR"
+
+    if ! $TF_CMD plan -out=tfplan; then
+        error_exit "$TF_CMD plan failed"
+    fi
+
+    log_success "Plan generated successfully"
+}
+
+# Apply terraform plan
+apply_infrastructure() {
+    log_info "Deploying AWS infrastructure..."
+    log_warning "This will create resources in your AWS account and incur costs."
+    log_info "Estimated monthly cost: ~\$11-12 (t3a.nano + 100GB EBS in us-west-1)"
+    echo ""
+
+    read -p "Continue with deployment? (yes/no): " -r
+    echo ""
+
+    if [[ ! $REPLY =~ ^[Yy][Ee][Ss]$ ]]; then
+        log_info "Deployment cancelled by user"
+        exit 0
+    fi
+
+    cd "$PROJECT_DIR"
+
+    log_info "Deploying... (this may take 2-3 minutes)"
+
+    if ! $TF_CMD apply tfplan; then
+        error_exit "$TF_CMD apply failed"
+    fi
+
+    # Remove plan file after successful apply
+    rm -f tfplan
+
+    log_success "Infrastructure deployed successfully"
+}
+
+# Wait for instance to be ready
+wait_for_instance() {
+    log_info "Waiting for instance to complete initialization..."
+    log_info "This includes running user_data script to set up btrfs and btrbk"
+
+    cd "$PROJECT_DIR"
+
+    local instance_ip
+    instance_ip=$($TF_CMD output -raw instance_public_ip)
+
+    # Try to detect SSH key path from terraform.tfvars
+    local ssh_key_path
+    if [[ -f ~/.ssh/btrbk_backup ]]; then
+        ssh_key_path=~/.ssh/btrbk_backup
+    elif [[ -f ~/.ssh/btrbk_backup_test ]]; then
+        ssh_key_path=~/.ssh/btrbk_backup_test
+    else
+        log_warning "Could not find SSH key, using default paths for connection test"
+        ssh_key_path=""
+    fi
+
+    local max_attempts=60
+    local attempt=0
+
+    while [[ $attempt -lt $max_attempts ]]; do
+        local ssh_cmd="ssh"
+        if [[ -n "$ssh_key_path" ]]; then
+            ssh_cmd="ssh -i $ssh_key_path"
+        fi
+
+        if $ssh_cmd -o ConnectTimeout=5 \
+               -o StrictHostKeyChecking=no \
+               -o UserKnownHostsFile=/dev/null \
+               -q \
+               "btrbk@$instance_ip" "exit" 2>/dev/null; then
+            echo ""
+            log_success "Instance is ready and SSH is accessible"
+            return 0
+        fi
+
+        ((attempt++))
+        echo -n "."
+        sleep 5
+    done
+
+    echo ""
+    log_warning "Instance did not become ready within expected time (5 minutes)"
+    log_info "You can check status later with: ./scripts/troubleshoot.sh check-ssh"
+}
+
+# Run basic smoke tests on deployed infrastructure
+smoke_test() {
+    log_info "Running smoke tests..."
+
+    cd "$PROJECT_DIR"
+
+    local instance_ip
+    instance_ip=$($TF_CMD output -raw instance_public_ip)
+
+    # Determine SSH key path
+    local ssh_key_path=""
+    if [[ -f ~/.ssh/btrbk_backup ]]; then
+        ssh_key_path="~/.ssh/btrbk_backup"
+    elif [[ -f ~/.ssh/btrbk_backup_test ]]; then
+        ssh_key_path="~/.ssh/btrbk_backup_test"
+    fi
+
+    if [[ -z "$ssh_key_path" ]]; then
+        log_warning "Could not find SSH key, skipping smoke tests"
+        log_info "Run './scripts/troubleshoot.sh check-all' manually after setting up SSH key"
+        return 0
+    fi
+
+    local ssh_opts="-i $ssh_key_path -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -q"
+
+    # Test 1: SSH connection
+    log_info "Test 1: SSH connection..."
+    if ssh $ssh_opts "btrbk@$instance_ip" "exit" 2>/dev/null; then
+        log_success "SSH connection: PASS"
+    else
+        log_error "SSH connection: FAIL"
+        log_warning "Cannot connect to instance. Check security group and SSH key."
+        return 1
+    fi
+
+    # Test 2: Backup volume mounted
+    log_info "Test 2: Backup volume mounted..."
+    if ssh $ssh_opts "btrbk@$instance_ip" "mountpoint -q /backup_volume" 2>/dev/null; then
+        log_success "Backup volume: MOUNTED"
+    else
+        log_error "Backup volume: NOT MOUNTED"
+        log_warning "Check user_data script logs: ssh $ssh_opts btrbk@$instance_ip 'sudo cat /var/log/cloud-init-output.log'"
+        return 1
+    fi
+
+    # Test 3: Btrfs filesystem
+    log_info "Test 3: Btrfs filesystem..."
+    if ssh $ssh_opts "btrbk@$instance_ip" "sudo btrfs filesystem show /backup_volume" &>/dev/null; then
+        log_success "Btrfs filesystem: READY"
+    else
+        log_error "Btrfs filesystem: NOT FOUND"
+        return 1
+    fi
+
+    # Test 4: Btrbk installed
+    log_info "Test 4: Btrbk installation..."
+    if ssh $ssh_opts "btrbk@$instance_ip" "btrbk --version" &>/dev/null; then
+        local btrbk_version
+        btrbk_version=$(ssh $ssh_opts "btrbk@$instance_ip" "btrbk --version" 2>&1 | head -n1)
+        log_success "Btrbk: INSTALLED ($btrbk_version)"
+    else
+        log_error "Btrbk: NOT INSTALLED"
+        return 1
+    fi
+
+    # Test 5: Restricted SSH commands (should fail)
+    log_info "Test 5: SSH command restrictions..."
+    if ssh $ssh_opts "btrbk@$instance_ip" "ls /" &>/dev/null; then
+        log_error "SSH restrictions: NOT ENFORCED (security issue!)"
+        log_warning "btrbk user can run arbitrary commands"
+        return 1
+    else
+        log_success "SSH restrictions: ENFORCED"
+    fi
+
+    # Test 6: Allowed commands (should succeed)
+    log_info "Test 6: Btrbk commands allowed..."
+    if ssh $ssh_opts "btrbk@$instance_ip" "btrfs --version" &>/dev/null; then
+        log_success "Btrbk commands: ALLOWED"
+    else
+        log_error "Btrbk commands: BLOCKED (check btrbk-ssh wrapper)"
+        return 1
+    fi
+
+    log_success "All smoke tests passed!"
+    return 0
+}
+
+# Generate .env file for local configuration
+generate_config() {
+    log_info "Generating configuration for local setup..."
+
+    cd "$PROJECT_DIR"
+
+    local env_file="$PROJECT_DIR/aws_connection.env"
+    local instance_ip
+    local instance_id
+    local volume_id
+    local btrbk_target
+    local aws_region
+
+    # Extract outputs from terraform
+    instance_ip=$($TF_CMD output -raw instance_public_ip)
+    instance_id=$($TF_CMD output -raw instance_id)
+    volume_id=$($TF_CMD output -raw volume_id)
+    btrbk_target=$($TF_CMD output -raw btrbk_target)
+    aws_region=$(grep '^aws_region' terraform.tfvars | cut -d'"' -f2 || echo "us-west-1")
+
+    # Generate .env file
+    cat > "$env_file" << EOF
+# AWS Backup Server Connection Details
+# Generated by setup-aws.sh on $(date)
+#
+# Source this file in local setup: source aws_connection.env
+# Or use these values to configure btrbk on your local machine
+
+# SSH connection
+BTRBK_AWS_HOST=$instance_ip
+BTRBK_AWS_USER=btrbk
+BTRBK_AWS_SSH_KEY=~/.ssh/btrbk_backup  # UPDATE THIS with your actual key path
+
+# Backup configuration
+BTRBK_AWS_TARGET=$btrbk_target
+BTRBK_AWS_PATH=/backup_volume/backups
+
+# AWS resource IDs (for troubleshooting)
+BTRBK_AWS_INSTANCE_ID=$instance_id
+BTRBK_AWS_VOLUME_ID=$volume_id
+BTRBK_AWS_REGION=$aws_region
+
+# Example btrbk target configuration:
+# target ssh://\${BTRBK_AWS_USER}@\${BTRBK_AWS_HOST}\${BTRBK_AWS_PATH}/
+EOF
+
+    log_success "Configuration written to $env_file"
+
+    return 0
+}
+
+# Display next steps to user
+display_next_steps() {
+    local env_file="$PROJECT_DIR/aws_connection.env"
+
+    cd "$PROJECT_DIR"
+
+    echo ""
+    echo "╔════════════════════════════════════════════════════════════╗"
+    echo "║   Setup Complete!                                          ║"
+    echo "╚════════════════════════════════════════════════════════════╝"
+    echo ""
+    log_success "AWS infrastructure is ready for backups"
+    echo ""
+    echo "Connection details saved to: $env_file"
+    echo ""
+    echo "Next steps:"
+    echo "  1. Test SSH connection:"
+    echo "     ssh -i ~/.ssh/btrbk_backup btrbk@$($TF_CMD output -raw instance_public_ip)"
+    echo ""
+    echo "  2. Configure local btrbk (future task - not yet implemented)"
+    echo ""
+    echo "  3. Run troubleshooting if needed:"
+    echo "     ./scripts/troubleshoot.sh check-all"
+    echo ""
+    echo "To destroy this infrastructure later:"
+    echo "  cd $PROJECT_DIR && $TF_CMD destroy"
+    echo ""
+}
+
+# Main function
+main() {
+    print_banner
+
+    check_prerequisites
+    validate_tfvars
+    init_terraform
+    plan_infrastructure
+    apply_infrastructure
+    wait_for_instance
+
+    # Run smoke tests but don't fail setup if they fail
+    # (infrastructure is deployed, tests might have transient failures)
+    if ! smoke_test; then
+        log_warning "Some smoke tests failed. Infrastructure is deployed but may need troubleshooting."
+        log_info "Run: ./scripts/troubleshoot.sh check-all"
+    fi
+
+    generate_config
+    display_next_steps
+}
+
+# Run main function
+main "$@"

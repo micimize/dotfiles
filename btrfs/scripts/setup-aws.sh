@@ -191,27 +191,26 @@ wait_for_instance() {
     local instance_ip
     instance_ip=$($TF_CMD output -raw instance_public_ip)
 
-    # Try to detect SSH key path from terraform.tfvars
-    local ssh_key_path
+    # Try to detect SSH key path or use SSH agent
+    local ssh_key_path=""
+    local ssh_opts=""
+
     if [[ -f ~/.ssh/btrbk_backup ]]; then
         ssh_key_path=~/.ssh/btrbk_backup
+        ssh_opts="-i $ssh_key_path"
     elif [[ -f ~/.ssh/btrbk_backup_test ]]; then
         ssh_key_path=~/.ssh/btrbk_backup_test
+        ssh_opts="-i $ssh_key_path"
     else
-        log_warning "Could not find SSH key, using default paths for connection test"
-        ssh_key_path=""
+        log_info "No SSH key file found, will try SSH agent (e.g., 1Password)"
+        ssh_opts=""
     fi
 
     local max_attempts=60
     local attempt=0
 
     while [[ $attempt -lt $max_attempts ]]; do
-        local ssh_cmd="ssh"
-        if [[ -n "$ssh_key_path" ]]; then
-            ssh_cmd="ssh -i $ssh_key_path"
-        fi
-
-        if $ssh_cmd -o ConnectTimeout=5 \
+        if ssh $ssh_opts -o ConnectTimeout=5 \
                -o StrictHostKeyChecking=no \
                -o UserKnownHostsFile=/dev/null \
                -q \
@@ -240,21 +239,29 @@ smoke_test() {
     local instance_ip
     instance_ip=$($TF_CMD output -raw instance_public_ip)
 
-    # Determine SSH key path
+    # Determine SSH key path and options
     local ssh_key_path=""
+    local ssh_opts=""
+
     if [[ -f ~/.ssh/btrbk_backup ]]; then
         ssh_key_path="~/.ssh/btrbk_backup"
+        ssh_opts="-i $ssh_key_path -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -q"
     elif [[ -f ~/.ssh/btrbk_backup_test ]]; then
         ssh_key_path="~/.ssh/btrbk_backup_test"
-    fi
+        ssh_opts="-i $ssh_key_path -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -q"
+    else
+        # No key file found, try SSH agent (e.g., 1Password SSH agent)
+        log_info "No SSH key file found, attempting to use SSH agent (e.g., 1Password)"
+        ssh_opts="-o ConnectTimeout=10 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -q"
 
-    if [[ -z "$ssh_key_path" ]]; then
-        log_warning "Could not find SSH key, skipping smoke tests"
-        log_info "Run './scripts/troubleshoot.sh check-all' manually after setting up SSH key"
-        return 0
+        # Quick test if SSH agent works
+        if ! ssh $ssh_opts "btrbk@$instance_ip" "exit" 2>/dev/null; then
+            log_warning "Could not connect via SSH agent either, skipping smoke tests"
+            log_info "Run './scripts/troubleshoot.sh check-all' manually after configuring SSH"
+            return 0
+        fi
+        log_success "SSH agent authentication working"
     fi
-
-    local ssh_opts="-i $ssh_key_path -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -q"
 
     # Test 1: SSH connection
     log_info "Test 1: SSH connection..."
@@ -350,7 +357,7 @@ generate_config() {
 # SSH connection
 BTRBK_AWS_HOST=$instance_ip
 BTRBK_AWS_USER=btrbk
-BTRBK_AWS_SSH_KEY=~/.ssh/btrbk_backup  # UPDATE THIS with your actual key path
+BTRBK_AWS_SSH_KEY=~/.ssh/btrbk_backup  # UPDATE THIS with your actual key path, or leave empty for SSH agent (e.g., 1Password)
 
 # Backup configuration
 BTRBK_AWS_TARGET=$btrbk_target

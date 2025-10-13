@@ -51,7 +51,14 @@ load_config() {
 # Get SSH connection command
 get_ssh_cmd() {
     local ssh_key="${BTRBK_AWS_SSH_KEY:-~/.ssh/btrbk_backup}"
-    echo "ssh -i $ssh_key -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${BTRBK_AWS_USER}@${BTRBK_AWS_HOST}"
+
+    # If SSH key is specified and exists, use it; otherwise try SSH agent
+    if [[ -n "$ssh_key" && -f "$ssh_key" ]]; then
+        echo "ssh -i $ssh_key -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${BTRBK_AWS_USER}@${BTRBK_AWS_HOST}"
+    else
+        # No key file, use SSH agent (e.g., 1Password)
+        echo "ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${BTRBK_AWS_USER}@${BTRBK_AWS_HOST}"
+    fi
 }
 
 # Show help

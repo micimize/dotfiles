@@ -1,47 +1,62 @@
 # Testing Guide for Btrfs Backup System
 
-This guide will help you test the AWS infrastructure deployment.
+This guide will help you test the AWS infrastructure deployment using 1Password SSH agent.
 
 ## Prerequisites
 
 Before testing, make sure you have:
 - ✅ AWS account with credentials configured (`aws configure`)
 - ✅ OpenTofu or Terraform installed
-- ✅ SSH client
-- ✅ An SSH keypair for the backup system
+- ✅ 1Password with SSH agent enabled
+- ✅ SSH key generated in 1Password for btrfs-sync
 
-## Quick Start Test
+## Setup 1Password SSH Agent
 
-### 1. Generate SSH Key (if you don't have one)
+### 1. Enable 1Password SSH Agent
 
+1. Open 1Password Settings → Developer
+2. Enable "Use the SSH agent"
+3. Enable "Integrate with 1Password CLI" (optional, but recommended)
+
+### 2. Create SSH Key in 1Password
+
+1. In 1Password, create a new item of type "SSH Key"
+2. Give it a name: `btrfs-sync`
+3. Click "Generate a New Key" → Choose ED25519
+4. Save the item
+
+### 3. Get Your Public Key
+
+From 1Password app:
+- Open the `btrfs-sync` item
+- Copy the public key (starts with `ssh-ed25519`)
+
+Or via CLI:
 ```bash
-ssh-keygen -t ed25519 -f ~/.ssh/btrfs_sync -C "btrfs-sync" -N ""
+op item get "btrfs-sync" --fields "public key"
 ```
 
-This creates:
-- Private key: `~/.ssh/btrfs_sync`
-- Public key: `~/.ssh/btrfs_sync.pub`
+---
 
-### 2. Create Configuration File
+## Deployment Test
+
+**All commands should be run from the repository root (`/code`).**
+
+### 1. Create Configuration File
 
 ```bash
-cd /code/btrfs
-cp terraform.tfvars.example terraform.tfvars
+cp btrfs/terraform.tfvars.example btrfs/terraform.tfvars
 ```
 
-Edit `terraform.tfvars` and:
+Edit `btrfs/terraform.tfvars`:
 1. Set `aws_region` to your preferred region (or keep default: `us-west-1`)
-2. Replace the `ssh_public_key` value with your actual public key:
-   ```bash
-   cat ~/.ssh/btrfs_sync.pub
-   ```
-   Copy the entire output and paste it in `terraform.tfvars`
+2. Replace the `ssh_public_key` value with your public key from 1Password
+   - Paste the entire line starting with `ssh-ed25519`
 
-### 3. Run Prerequisites Check
+### 2. Run Prerequisites Check
 
 ```bash
-cd /code/btrfs
-./scripts/check-prerequisites.sh
+./btrfs/scripts/check-prerequisites.sh
 ```
 
 **Expected output:**
@@ -53,11 +68,10 @@ cd /code/btrfs
 
 **If any required items fail**, install them before proceeding.
 
-### 4. Deploy Infrastructure
+### 3. Deploy Infrastructure
 
 ```bash
-cd /code/btrfs
-./scripts/setup-aws.sh
+./btrfs/scripts/setup-aws.sh
 ```
 
 **What this does:**
@@ -68,12 +82,12 @@ cd /code/btrfs
 5. **Prompts for confirmation** - Type `yes` to deploy
 6. Creates AWS resources (~2-3 minutes)
 7. Waits for instance to be ready (~5 minutes for user_data script)
-8. Runs smoke tests
-9. Generates `aws_connection.env` with connection details
+8. Runs smoke tests using 1Password SSH agent
+9. Generates `btrfs/aws_connection.env` with connection details
 
 **Expected duration:** 7-10 minutes total
 
-### 5. Verify Deployment
+### 4. Verify Deployment
 
 After setup completes, you should see:
 ```
@@ -86,68 +100,33 @@ SUCCESS: AWS infrastructure is ready for backups
 Connection details saved to: /code/btrfs/aws_connection.env
 ```
 
-### 6. Test SSH Connection
+### 5. Test SSH Connection
 
 ```bash
-ssh -i ~/.ssh/btrfs_sync btrbk@$(cd /code/btrfs && tofu output -raw instance_public_ip)
+ssh btrbk@<IP_ADDRESS>
 ```
 
 **Expected:**
-- You should connect but see: `Access denied: Command not permitted.`
-- This is CORRECT! It means SSH restrictions are working.
+- Connection succeeds
+- See: `Access denied: Command not permitted.`
+- This is CORRECT! SSH restrictions are working
+- 1Password prompts for authentication (Touch ID/etc)
 
-### 7. Test Allowed Commands
-
-```bash
-ssh -i ~/.ssh/btrfs_sync btrbk@$(cd /code/btrfs && tofu output -raw instance_public_ip) "btrfs --version"
-```
-
-**Expected output:**
-```
-btrfs-progs v5.16.2
-```
-
-### 8. Run Troubleshooting Checks
+### 6. Test Allowed Commands
 
 ```bash
-cd /code/btrfs
-./scripts/troubleshoot.sh check-all
+ssh btrbk@<IP_ADDRESS> "btrfs --version"
 ```
 
-**Expected:** All checks should pass (green checkmarks)
+**Expected:** `btrfs-progs v5.16.2`
 
----
+### 7. Run Full Diagnostics
 
-## What to Report Back
+```bash
+./btrfs/scripts/troubleshoot.sh check-all
+```
 
-Please share:
-
-1. **Prerequisites check output:**
-   ```bash
-   ./scripts/check-prerequisites.sh
-   ```
-
-2. **Setup output (full log):**
-   ```bash
-   ./scripts/setup-aws.sh 2>&1 | tee setup.log
-   ```
-   Then share `setup.log`
-
-3. **Smoke test results:**
-   - Did all 6 smoke tests pass?
-   - If any failed, which ones?
-
-4. **SSH test results:**
-   - Can you connect with SSH?
-   - Are commands properly restricted?
-   - Can you run `btrfs --version`?
-
-5. **Troubleshooting output:**
-   ```bash
-   ./scripts/troubleshoot.sh check-all
-   ```
-
-6. **Any errors or unexpected behavior**
+**Expected:** All checks pass (green ✓)
 
 ---
 
@@ -155,110 +134,45 @@ Please share:
 
 ### Issue: "terraform.tfvars contains example placeholder values"
 
-**Solution:** Edit `terraform.tfvars` and replace the SSH public key with your actual key from `~/.ssh/btrfs_sync.pub`
+**Solution:** Edit `btrfs/terraform.tfvars` and replace with your actual 1Password public key
 
-### Issue: "SSH connection: FAIL" in smoke tests
+### Issue: 1Password not prompting
 
-**Possible causes:**
-1. Instance is still initializing (wait 2-3 more minutes)
-2. Security group not allowing SSH from your IP
-3. SSH key mismatch
+**Solutions:**
+1. Verify SSH agent enabled (1Password Settings → Developer)
+2. Test it works: `ssh-add -L` (should list your keys)
+3. Check key exists: `op item list --categories "SSH Key"`
+
+### Issue: "SSH connection: FAIL"
 
 **Debug:**
 ```bash
-# Check if instance is running
-aws ec2 describe-instances --instance-ids $(cd /code/btrfs && tofu output -raw instance_id)
+# Check instance is running
+cd btrfs && aws ec2 describe-instances --instance-ids $(tofu output -raw instance_id)
 
-# Try manual SSH connection
-ssh -v -i ~/.ssh/btrfs_sync btrbk@$(cd /code/btrfs && tofu output -raw instance_public_ip)
-```
+# Test 1Password SSH agent
+ssh-add -L
 
-### Issue: "Volume not mounted" in smoke tests
-
-**Solution:** Check cloud-init logs:
-```bash
-./scripts/troubleshoot.sh check-logs
-```
-
-Look for errors in the user_data script execution.
-
-### Issue: Smoke tests fail but I want to continue
-
-The setup script will still generate `aws_connection.env` even if smoke tests fail. You can proceed with manual troubleshooting using:
-```bash
-./scripts/troubleshoot.sh check-all
+# Verbose SSH connection
+ssh -v btrbk@$(cd btrfs && tofu output -raw instance_public_ip)
 ```
 
 ---
 
 ## Cleaning Up
 
-When you're done testing and want to destroy the infrastructure:
-
 ```bash
-cd /code/btrfs
-tofu destroy
-# or
-terraform destroy
+cd btrfs && tofu destroy
 ```
 
-Type `yes` when prompted.
-
-**Note:** This will permanently delete the EC2 instance and EBS volume.
+**Cost:** ~$11-12/month while running
 
 ---
 
-## Cost Information
+## Key Benefits of 1Password SSH
 
-While the infrastructure is running:
-- **EC2 t3a.nano:** ~$0.0047/hour = ~$3.43/month
-- **EBS 100GB gp3:** ~$8/month
-- **Total:** ~$11-12/month
-
-To minimize costs during testing:
-1. Test everything you need
-2. Run `tofu destroy` when done
-3. Can always redeploy later with `./scripts/setup-aws.sh`
-
----
-
-## Files Created
-
-After successful deployment, you should have:
-
-```
-btrfs/
-├── .gitignore                    # Ignores sensitive files
-├── terraform.tfvars              # Your config (NOT in git)
-├── terraform.tfvars.example      # Template
-├── aws_connection.env            # Generated connection details (NOT in git)
-├── .terraform/                   # Terraform state (NOT in git)
-├── terraform.tfstate             # Terraform state (NOT in git)
-├── btrbk_aws.tf                  # Infrastructure definition
-├── scripts/
-│   ├── check-prerequisites.sh    # Prerequisites checker
-│   ├── setup-aws.sh              # Main setup script
-│   └── troubleshoot.sh           # Diagnostic tool
-└── TESTING_GUIDE.md              # This file
-```
-
----
-
-## Next Steps After Successful Test
-
-Once everything works:
-1. Report results back
-2. We can add more features:
-   - End-to-end backup test script
-   - Detailed troubleshooting documentation
-   - Local btrbk configuration (Phase 2)
-   - More robust error handling
-
----
-
-## Questions?
-
-If you encounter anything not covered here, please report:
-- What command you ran
-- Full error output
-- Output of `./scripts/troubleshoot.sh check-all`
+- ✅ No SSH key files on disk
+- ✅ Biometric authentication
+- ✅ Keys available on all devices
+- ✅ Secure encrypted storage
+- ✅ Easy rotation

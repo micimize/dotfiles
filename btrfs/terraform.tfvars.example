@@ -3,9 +3,11 @@
 aws_region = "us-west-1"
 
 # SSH Public Key
-# This key will be used for authentication to the backup server
-# Generate with: ssh-keygen -t ed25519 -f ~/.ssh/btrfs_sync -C "btrfs-sync"
-# Then copy the contents of ~/.ssh/btrfs_sync.pub here
+# This key will be used for authentication to the backup server via SSH agent (e.g., 1Password)
+#
+# To get your public key from 1Password:
+#   op item get "btrfs-sync" --fields "public key"
+# Or generate a new key in 1Password and paste the public key here
 ssh_public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIExampleKeyDataHere btrfs-sync"
 
 # AWS Key Pair Name (optional - defaults to "btrfs-sync-ssh-key")

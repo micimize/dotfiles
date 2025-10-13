@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Troubleshooting script for btrfs backup system
 #
-# Usage: ./scripts/troubleshoot.sh <command>
+# Usage (from repo root): ./btrfs/scripts/troubleshoot.sh <command>
 #
 # Commands:
 #   check-ssh          Test SSH connectivity to backup server
@@ -13,8 +13,9 @@
 
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+# Determine repo root and btrfs directory
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+BTRFS_DIR="$REPO_ROOT/btrfs"
 
 # Color codes
 readonly RED='\033[0;31m'
@@ -30,11 +31,11 @@ log_error() { echo -e "${RED}ERROR:${NC} $*" >&2; }
 
 # Load connection details
 load_config() {
-    local env_file="$PROJECT_DIR/aws_connection.env"
+    local env_file="$BTRFS_DIR/aws_connection.env"
 
     if [[ ! -f "$env_file" ]]; then
         log_error "Configuration file not found: $env_file"
-        log_info "Run ./scripts/setup-aws.sh first to deploy infrastructure"
+        log_info "Run ./btrfs/scripts/setup-aws.sh first to deploy infrastructure"
         exit 1
     fi
 
@@ -48,17 +49,9 @@ load_config() {
     fi
 }
 
-# Get SSH connection command
+# Get SSH connection command (uses SSH agent, e.g., 1Password)
 get_ssh_cmd() {
-    local ssh_key="${BTRBK_AWS_SSH_KEY:-~/.ssh/btrfs_sync}"
-
-    # If SSH key is specified and exists, use it; otherwise try SSH agent
-    if [[ -n "$ssh_key" && -f "$ssh_key" ]]; then
-        echo "ssh -i $ssh_key -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${BTRBK_AWS_USER}@${BTRBK_AWS_HOST}"
-    else
-        # No key file, use SSH agent (e.g., 1Password)
-        echo "ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${BTRBK_AWS_USER}@${BTRBK_AWS_HOST}"
-    fi
+    echo "ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${BTRBK_AWS_USER}@${BTRBK_AWS_HOST}"
 }
 
 # Show help

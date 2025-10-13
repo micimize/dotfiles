@@ -5,13 +5,14 @@
 # It wraps OpenTofu/Terraform commands with proper error handling and generates
 # configuration files for local backup setup.
 #
-# Usage: ./scripts/setup-aws.sh
+# Usage (from repo root): ./btrfs/scripts/setup-aws.sh
 
 set -euo pipefail
 
-# Script directory (for finding other scripts)
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+# Determine repo root and btrfs directory
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+BTRFS_DIR="$REPO_ROOT/btrfs"
+SCRIPTS_DIR="$BTRFS_DIR/scripts"
 
 # Detect whether to use tofu or terraform
 if command -v tofu &> /dev/null; then
@@ -77,11 +78,11 @@ trap cleanup EXIT
 check_prerequisites() {
     log_info "Checking prerequisites..."
 
-    if [[ ! -x "$SCRIPT_DIR/check-prerequisites.sh" ]]; then
-        error_exit "Prerequisites script not found or not executable: $SCRIPT_DIR/check-prerequisites.sh"
+    if [[ ! -x "$SCRIPTS_DIR/check-prerequisites.sh" ]]; then
+        error_exit "Prerequisites script not found or not executable: $SCRIPTS_DIR/check-prerequisites.sh"
     fi
 
-    if ! "$SCRIPT_DIR/check-prerequisites.sh"; then
+    if ! "$SCRIPTS_DIR/check-prerequisites.sh"; then
         error_exit "Prerequisites check failed. Install missing tools and try again."
     fi
 
@@ -92,8 +93,8 @@ check_prerequisites() {
 validate_tfvars() {
     log_info "Validating Terraform variables..."
 
-    local tfvars_file="$PROJECT_DIR/terraform.tfvars"
-    local tfvars_example="$PROJECT_DIR/terraform.tfvars.example"
+    local tfvars_file="$BTRFS_DIR/terraform.tfvars"
+    local tfvars_example="$BTRFS_DIR/terraform.tfvars.example"
 
     if [[ ! -f "$tfvars_file" ]]; then
         log_error "terraform.tfvars not found"
@@ -130,7 +131,7 @@ validate_tfvars() {
 init_terraform() {
     log_info "Initializing $TF_CMD..."
 
-    cd "$PROJECT_DIR"
+    cd "$BTRFS_DIR"
 
     if ! $TF_CMD init; then
         error_exit "$TF_CMD initialization failed"
@@ -143,7 +144,7 @@ init_terraform() {
 plan_infrastructure() {
     log_info "Planning infrastructure changes..."
 
-    cd "$PROJECT_DIR"
+    cd "$BTRFS_DIR"
 
     if ! $TF_CMD plan -out=tfplan; then
         error_exit "$TF_CMD plan failed"
@@ -167,7 +168,7 @@ apply_infrastructure() {
         exit 0
     fi
 
-    cd "$PROJECT_DIR"
+    cd "$BTRFS_DIR"
 
     log_info "Deploying... (this may take 2-3 minutes)"
 
@@ -186,35 +187,19 @@ wait_for_instance() {
     log_info "Waiting for instance to complete initialization..."
     log_info "This includes running user_data script to set up btrfs and btrbk"
 
-    cd "$PROJECT_DIR"
+    cd "$BTRFS_DIR"
 
     local instance_ip
     instance_ip=$($TF_CMD output -raw instance_public_ip)
 
-    # Try to detect SSH key path or use SSH agent
-    local ssh_key_path=""
-    local ssh_opts=""
-
-    if [[ -f ~/.ssh/btrfs_sync ]]; then
-        ssh_key_path=~/.ssh/btrfs_sync
-        ssh_opts="-i $ssh_key_path"
-    elif [[ -f ~/.ssh/btrfs_sync_test ]]; then
-        ssh_key_path=~/.ssh/btrfs_sync_test
-        ssh_opts="-i $ssh_key_path"
-    else
-        log_info "No SSH key file found, will try SSH agent (e.g., 1Password)"
-        ssh_opts=""
-    fi
+    # Use SSH agent (e.g., 1Password) for authentication
+    local ssh_opts="-o ConnectTimeout=5 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -q"
 
     local max_attempts=60
     local attempt=0
 
     while [[ $attempt -lt $max_attempts ]]; do
-        if ssh $ssh_opts -o ConnectTimeout=5 \
-               -o StrictHostKeyChecking=no \
-               -o UserKnownHostsFile=/dev/null \
-               -q \
-               "btrbk@$instance_ip" "exit" 2>/dev/null; then
+        if ssh $ssh_opts "btrbk@$instance_ip" "exit" 2>/dev/null; then
             echo ""
             log_success "Instance is ready and SSH is accessible"
             return 0
@@ -240,43 +225,31 @@ wait_for_instance() {
 smoke_test() {
     log_info "Running smoke tests..."
 
-    cd "$PROJECT_DIR"
+    cd "$BTRFS_DIR"
 
     local instance_ip
     instance_ip=$($TF_CMD output -raw instance_public_ip)
 
-    # Determine SSH key path and options
-    local ssh_key_path=""
-    local ssh_opts=""
+    # Use SSH agent (e.g., 1Password) for authentication
+    log_info "Using SSH agent for authentication (e.g., 1Password)"
+    local ssh_opts="-o ConnectTimeout=10 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -q"
 
-    if [[ -f ~/.ssh/btrfs_sync ]]; then
-        ssh_key_path="~/.ssh/btrfs_sync"
-        ssh_opts="-i $ssh_key_path -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -q"
-    elif [[ -f ~/.ssh/btrfs_sync_test ]]; then
-        ssh_key_path="~/.ssh/btrfs_sync_test"
-        ssh_opts="-i $ssh_key_path -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -q"
-    else
-        # No key file found, try SSH agent (e.g., 1Password SSH agent)
-        log_info "No SSH key file found, attempting to use SSH agent (e.g., 1Password)"
-        ssh_opts="-o ConnectTimeout=10 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -q"
-
-        # Quick test if SSH agent works
-        if ! ssh $ssh_opts "btrbk@$instance_ip" "exit" 2>/dev/null; then
-            log_warning "Could not connect via SSH agent, skipping smoke tests"
-            echo ""
-            log_info "Possible causes:"
-            log_info "  - SSH agent (e.g., 1Password) not running or configured"
-            log_info "  - SSH key not added to agent"
-            log_info "  - Instance still initializing (wait a few minutes)"
-            echo ""
-            log_info "After configuring SSH, verify with:"
-            log_info "  ssh btrbk@$instance_ip"
-            log_info "  ./scripts/troubleshoot.sh check-all"
-            echo ""
-            return 0
-        fi
-        log_success "SSH agent authentication working"
+    # Quick test if SSH agent works
+    if ! ssh $ssh_opts "btrbk@$instance_ip" "exit" 2>/dev/null; then
+        log_warning "Could not connect via SSH agent, skipping smoke tests"
+        echo ""
+        log_info "Possible causes:"
+        log_info "  - SSH agent (e.g., 1Password) not running or configured"
+        log_info "  - SSH key not added to agent"
+        log_info "  - Instance still initializing (wait a few minutes)"
+        echo ""
+        log_info "After configuring SSH, verify with:"
+        log_info "  ssh btrbk@$instance_ip"
+        log_info "  ./btrfs/scripts/troubleshoot.sh check-all"
+        echo ""
+        return 0
     fi
+    log_success "SSH agent authentication working"
 
     # Test 1: SSH connection
     log_info "Test 1: SSH connection..."
@@ -345,9 +318,9 @@ smoke_test() {
 generate_config() {
     log_info "Generating configuration for local setup..."
 
-    cd "$PROJECT_DIR"
+    cd "$BTRFS_DIR"
 
-    local env_file="$PROJECT_DIR/aws_connection.env"
+    local env_file="$BTRFS_DIR/aws_connection.env"
     local instance_ip
     local instance_id
     local volume_id
@@ -369,10 +342,9 @@ generate_config() {
 # Source this file in local setup: source aws_connection.env
 # Or use these values to configure btrbk on your local machine
 
-# SSH connection
+# SSH connection (uses SSH agent, e.g., 1Password)
 BTRBK_AWS_HOST=$instance_ip
 BTRBK_AWS_USER=btrbk
-BTRBK_AWS_SSH_KEY=~/.ssh/btrfs_sync  # UPDATE THIS with your actual key path, or leave empty for SSH agent (e.g., 1Password)
 
 # Backup configuration
 BTRBK_AWS_TARGET=$btrbk_target
@@ -394,9 +366,9 @@ EOF
 
 # Display next steps to user
 display_next_steps() {
-    local env_file="$PROJECT_DIR/aws_connection.env"
+    local env_file="$BTRFS_DIR/aws_connection.env"
 
-    cd "$PROJECT_DIR"
+    cd "$BTRFS_DIR"
 
     echo ""
     echo "╔════════════════════════════════════════════════════════════╗"
@@ -408,16 +380,16 @@ display_next_steps() {
     echo "Connection details saved to: $env_file"
     echo ""
     echo "Next steps:"
-    echo "  1. Test SSH connection:"
-    echo "     ssh -i ~/.ssh/btrfs_sync btrbk@$($TF_CMD output -raw instance_public_ip)"
+    echo "  1. Test SSH connection (via 1Password SSH agent):"
+    echo "     ssh btrbk@$($TF_CMD output -raw instance_public_ip)"
     echo ""
-    echo "  2. Configure local btrbk (future task - not yet implemented)"
+    echo "  2. Run troubleshooting if needed:"
+    echo "     ./btrfs/scripts/troubleshoot.sh check-all"
     echo ""
-    echo "  3. Run troubleshooting if needed:"
-    echo "     ./scripts/troubleshoot.sh check-all"
+    echo "  3. Configure local btrbk (future task - not yet implemented)"
     echo ""
     echo "To destroy this infrastructure later:"
-    echo "  cd $PROJECT_DIR && $TF_CMD destroy"
+    echo "  cd $BTRFS_DIR && $TF_CMD destroy"
     echo ""
 }
 

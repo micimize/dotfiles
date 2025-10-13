@@ -133,7 +133,7 @@ resource "aws_instance" "btrbk_backup_target" {
               # Add the public key with the command restriction to the authorized_keys file.
               # This ensures the 'btrbk' user can only run the `btrbk-ssh` command,
               # preventing arbitrary shell access.
-              echo 'command="/usr/local/bin/btrbk-ssh" '${var.ssh_public_key} >> /home/btrbk/.ssh/authorized_keys
+              echo "command=\"/usr/local/bin/btrbk-ssh\" ${var.ssh_public_key}" >> /home/btrbk/.ssh/authorized_keys
               
               # Ensure the authorized_keys file is owned by the btrbk user.
               chown btrbk:btrbk /home/btrbk/.ssh/authorized_keys

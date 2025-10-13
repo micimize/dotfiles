@@ -72,54 +72,16 @@ echo "UUID=$UUID /backup_volume btrfs defaults 0 0" >> /etc/fstab
 
 log "Step 6: Creating backup directory structure..."
 mkdir -p /backup_volume/backups
-chmod 755 /backup_volume/backups
 
-log "Step 7: Creating btrbk user..."
-useradd -m -s /bin/bash btrbk
-
-log "Step 8: Setting up SSH for btrbk user..."
-mkdir -p /home/btrbk/.ssh
-touch /home/btrbk/.ssh/authorized_keys
-chown -R btrbk:btrbk /home/btrbk
-chmod 700 /home/btrbk/.ssh
-chmod 600 /home/btrbk/.ssh/authorized_keys
-
-log "Step 9: Adding SSH public key with command restriction..."
-# The public key will be added by Terraform via template substitution
-cat << 'SSH_KEY_MARKER' >> /home/btrbk/.ssh/authorized_keys
-${ssh_authorized_keys_entry}
-SSH_KEY_MARKER
-
-log "Step 10: Creating btrbk-ssh wrapper script..."
-cat << 'WRAPPER_SCRIPT' > /usr/local/bin/btrbk-ssh
-#!/bin/bash
-# SSH command wrapper that restricts what commands can be executed
-# Only allows btrfs and btrbk commands needed for backup operations
-
-case "$SSH_ORIGINAL_COMMAND" in
-    btrfs\ send*|btrfs\ receive*|btrfs\ subvolume\ *)
-        eval "$SSH_ORIGINAL_COMMAND"
-        ;;
-    btrbk\ *)
-        eval "$SSH_ORIGINAL_COMMAND"
-        ;;
-    *)
-        echo "Access denied: Command not permitted." >&2
-        exit 1
-        ;;
-esac
-WRAPPER_SCRIPT
-
-chmod +x /usr/local/bin/btrbk-ssh
-
-log "Step 11: Giving btrbk user permissions on backup volume..."
-chown -R btrbk:btrbk /backup_volume/backups
+log "Step 7: Giving ubuntu user ownership of backup volume..."
+chown -R ubuntu:ubuntu /backup_volume/backups
 
 log "=== Setup completed successfully at $$(date) ==="
 log "Device: $DEVICE"
 log "UUID: $UUID"
 log "Mount point: /backup_volume"
 log "Backup directory: /backup_volume/backups"
+log "Owner: ubuntu:ubuntu"
 
 # Write completion marker
 touch /var/lib/cloud/instance/user-data-finished

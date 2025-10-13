@@ -199,7 +199,7 @@ wait_for_instance() {
     local attempt=0
 
     while [[ $attempt -lt $max_attempts ]]; do
-        if ssh $ssh_opts "btrbk@$instance_ip" "exit" 2>/dev/null; then
+        if ssh $ssh_opts "ubuntu@$instance_ip" "exit" 2>/dev/null; then
             echo ""
             log_success "Instance is ready and SSH is accessible"
             return 0
@@ -235,7 +235,7 @@ smoke_test() {
     local ssh_opts="-o ConnectTimeout=10 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -q"
 
     # Quick test if SSH agent works
-    if ! ssh $ssh_opts "btrbk@$instance_ip" "exit" 2>/dev/null; then
+    if ! ssh $ssh_opts "ubuntu@$instance_ip" "exit" 2>/dev/null; then
         log_warning "Could not connect via SSH agent, skipping smoke tests"
         echo ""
         log_info "Possible causes:"
@@ -244,7 +244,7 @@ smoke_test() {
         log_info "  - Instance still initializing (wait a few minutes)"
         echo ""
         log_info "After configuring SSH, verify with:"
-        log_info "  ssh btrbk@$instance_ip"
+        log_info "  ssh ubuntu@$instance_ip"
         log_info "  ./btrfs/scripts/troubleshoot.sh check-all"
         echo ""
         return 0
@@ -253,7 +253,7 @@ smoke_test() {
 
     # Test 1: SSH connection
     log_info "Test 1: SSH connection..."
-    if ssh $ssh_opts "btrbk@$instance_ip" "exit" 2>/dev/null; then
+    if ssh $ssh_opts "ubuntu@$instance_ip" "exit" 2>/dev/null; then
         log_success "SSH connection: PASS"
     else
         log_error "SSH connection: FAIL"
@@ -263,17 +263,17 @@ smoke_test() {
 
     # Test 2: Backup volume mounted
     log_info "Test 2: Backup volume mounted..."
-    if ssh $ssh_opts "btrbk@$instance_ip" "mountpoint -q /backup_volume" 2>/dev/null; then
+    if ssh $ssh_opts "ubuntu@$instance_ip" "mountpoint -q /backup_volume" 2>/dev/null; then
         log_success "Backup volume: MOUNTED"
     else
         log_error "Backup volume: NOT MOUNTED"
-        log_warning "Check user_data script logs: ssh $ssh_opts btrbk@$instance_ip 'sudo cat /var/log/cloud-init-output.log'"
+        log_warning "Check user_data script logs: ssh $ssh_opts ubuntu@$instance_ip 'sudo cat /var/log/cloud-init-output.log'"
         return 1
     fi
 
     # Test 3: Btrfs filesystem
     log_info "Test 3: Btrfs filesystem..."
-    if ssh $ssh_opts "btrbk@$instance_ip" "sudo btrfs filesystem show /backup_volume" &>/dev/null; then
+    if ssh $ssh_opts "ubuntu@$instance_ip" "sudo btrfs filesystem show /backup_volume" &>/dev/null; then
         log_success "Btrfs filesystem: READY"
     else
         log_error "Btrfs filesystem: NOT FOUND"
@@ -282,9 +282,9 @@ smoke_test() {
 
     # Test 4: Btrbk installed
     log_info "Test 4: Btrbk installation..."
-    if ssh $ssh_opts "btrbk@$instance_ip" "btrbk --version" &>/dev/null; then
+    if ssh $ssh_opts "ubuntu@$instance_ip" "btrbk --version" &>/dev/null; then
         local btrbk_version
-        btrbk_version=$(ssh $ssh_opts "btrbk@$instance_ip" "btrbk --version" 2>&1 | head -n1)
+        btrbk_version=$(ssh $ssh_opts "ubuntu@$instance_ip" "btrbk --version" 2>&1 | head -n1)
         log_success "Btrbk: INSTALLED ($btrbk_version)"
     else
         log_error "Btrbk: NOT INSTALLED"
@@ -293,7 +293,7 @@ smoke_test() {
 
     # Test 5: Restricted SSH commands (should fail)
     log_info "Test 5: SSH command restrictions..."
-    if ssh $ssh_opts "btrbk@$instance_ip" "ls /" &>/dev/null; then
+    if ssh $ssh_opts "ubuntu@$instance_ip" "ls /" &>/dev/null; then
         log_error "SSH restrictions: NOT ENFORCED (security issue!)"
         log_warning "btrbk user can run arbitrary commands"
         return 1
@@ -303,7 +303,7 @@ smoke_test() {
 
     # Test 6: Allowed commands (should succeed)
     log_info "Test 6: Btrbk commands allowed..."
-    if ssh $ssh_opts "btrbk@$instance_ip" "btrfs --version" &>/dev/null; then
+    if ssh $ssh_opts "ubuntu@$instance_ip" "btrfs --version" &>/dev/null; then
         log_success "Btrbk commands: ALLOWED"
     else
         log_error "Btrbk commands: BLOCKED (check btrbk-ssh wrapper)"
@@ -344,7 +344,7 @@ generate_config() {
 
 # SSH connection (uses SSH agent, e.g., 1Password)
 BTRBK_AWS_HOST=$instance_ip
-BTRBK_AWS_USER=btrbk
+BTRBK_AWS_USER=ubuntu
 
 # Backup configuration
 BTRBK_AWS_TARGET=$btrbk_target
@@ -381,7 +381,7 @@ display_next_steps() {
     echo ""
     echo "Next steps:"
     echo "  1. Test SSH connection (via 1Password SSH agent):"
-    echo "     ssh btrbk@$($TF_CMD output -raw instance_public_ip)"
+    echo "     ssh ubuntu@$($TF_CMD output -raw instance_public_ip)"
     echo ""
     echo "  2. Run troubleshooting if needed:"
     echo "     ./btrfs/scripts/troubleshoot.sh check-all"

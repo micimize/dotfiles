@@ -96,12 +96,9 @@ resource "aws_instance" "btrbk_backup_target" {
   vpc_security_group_ids = [aws_security_group.btrbk_sg.id]
 
   # Use user_data from external file for better maintainability and debugging.
-  # The file contains setup logic for btrfs, btrbk user, and SSH configuration.
-  # NOTE: The key_name above also adds the SSH key to the default ubuntu user,
-  # which is useful for debugging if the btrbk user setup fails.
-  user_data = templatefile("${path.module}/user-data.sh", {
-    ssh_authorized_keys_entry = "command=\"/usr/local/bin/btrbk-ssh\" ${var.ssh_public_key}"
-  })
+  # The file contains setup logic for btrfs volume mounting.
+  # SSH access uses the default ubuntu user (key_name above).
+  user_data = file("${path.module}/user-data.sh")
 
   tags = {
     Name = "btrbk_backup_target"
@@ -138,8 +135,8 @@ output "instance_public_ip" {
 
 # Output the SSH connection string for easy access
 output "ssh_connection_string" {
-  description = "SSH connection string for the btrbk user"
-  value       = "btrbk@${aws_instance.btrbk_backup_target.public_ip}"
+  description = "SSH connection string for the ubuntu user"
+  value       = "ubuntu@${aws_instance.btrbk_backup_target.public_ip}"
 }
 
 # Output the backup target path for btrbk configuration
@@ -151,7 +148,7 @@ output "backup_target_path" {
 # Output the full btrbk target string
 output "btrbk_target" {
   description = "Full target string for btrbk configuration"
-  value       = "ssh://btrbk@${aws_instance.btrbk_backup_target.public_ip}/backup_volume/backups/"
+  value       = "ssh://ubuntu@${aws_instance.btrbk_backup_target.public_ip}/backup_volume/backups/"
 }
 
 # Output instance ID for troubleshooting

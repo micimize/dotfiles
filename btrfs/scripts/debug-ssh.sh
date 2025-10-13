@@ -84,14 +84,14 @@ echo "5. Testing SSH connection..."
 if [[ -f btrfs/terraform.tfstate ]]; then
     instance_ip=$(cd btrfs && tofu output -raw instance_public_ip 2>/dev/null || terraform output -raw instance_public_ip 2>/dev/null || echo "")
     if [[ -n "$instance_ip" ]]; then
-        echo "   Testing connection to: btrbk@$instance_ip"
-        if ssh -o ConnectTimeout=5 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "btrbk@$instance_ip" "echo 'SSH works!'" 2>/dev/null; then
+        echo "   Testing connection to: ubuntu@$instance_ip"
+        if ssh -o ConnectTimeout=5 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "ubuntu@$instance_ip" "echo 'SSH works!'" 2>/dev/null; then
             echo "   ✓ SSH connection successful!"
         else
             echo "   ✗ SSH connection failed"
             echo ""
             echo "   Trying verbose connection to see details..."
-            ssh -v -o ConnectTimeout=5 -o StrictHostKeyChecking=no "btrbk@$instance_ip" "echo test" 2>&1 | grep -E "Offering|Authentications|key_load_public|debug1: send_pubkey_test"
+            ssh -v -o ConnectTimeout=5 -o StrictHostKeyChecking=no "ubuntu@$instance_ip" "echo test" 2>&1 | grep -E "Offering|Authentications|key_load_public|debug1: send_pubkey_test"
         fi
     else
         echo "   ⚠ Could not get instance IP (infrastructure may not be deployed)"

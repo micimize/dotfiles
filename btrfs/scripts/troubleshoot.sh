@@ -103,23 +103,15 @@ cmd_check_ssh() {
         return 1
     fi
 
-    # Test btrbk user
+    # Test ubuntu user
     local remote_user
     remote_user=$($ssh_cmd "whoami" 2>/dev/null || echo "unknown")
 
-    if [[ "$remote_user" == "btrbk" ]]; then
-        log_success "Connected as btrbk user: OK"
+    if [[ "$remote_user" == "ubuntu" ]]; then
+        log_success "Connected as ubuntu user: OK"
     else
         log_error "Connected as unexpected user: $remote_user"
         return 1
-    fi
-
-    # Test command restrictions
-    if $ssh_cmd "ls /" &>/dev/null; then
-        log_warning "SSH command restrictions: NOT ENFORCED"
-        log_warning "btrbk user can run unrestricted commands (security issue)"
-    else
-        log_success "SSH command restrictions: ENFORCED"
     fi
 
     # Test allowed commands

@@ -227,7 +227,13 @@ wait_for_instance() {
 
     echo ""
     log_warning "Instance did not become ready within expected time (5 minutes)"
-    log_info "You can check status later with: ./scripts/troubleshoot.sh check-ssh"
+    log_info "This is often due to slow user_data script execution on first boot"
+    log_info "Infrastructure is deployed. You can check status later with:"
+    log_info "  ./scripts/troubleshoot.sh check-ssh"
+
+    # Return 0 because infrastructure IS deployed, we just can't verify SSH yet
+    # Smoke tests will be skipped but that's acceptable
+    return 0
 }
 
 # Run basic smoke tests on deployed infrastructure
@@ -256,8 +262,17 @@ smoke_test() {
 
         # Quick test if SSH agent works
         if ! ssh $ssh_opts "btrbk@$instance_ip" "exit" 2>/dev/null; then
-            log_warning "Could not connect via SSH agent either, skipping smoke tests"
-            log_info "Run './scripts/troubleshoot.sh check-all' manually after configuring SSH"
+            log_warning "Could not connect via SSH agent, skipping smoke tests"
+            echo ""
+            log_info "Possible causes:"
+            log_info "  - SSH agent (e.g., 1Password) not running or configured"
+            log_info "  - SSH key not added to agent"
+            log_info "  - Instance still initializing (wait a few minutes)"
+            echo ""
+            log_info "After configuring SSH, verify with:"
+            log_info "  ssh btrbk@$instance_ip"
+            log_info "  ./scripts/troubleshoot.sh check-all"
+            echo ""
             return 0
         fi
         log_success "SSH agent authentication working"

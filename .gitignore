@@ -3,3 +3,31 @@
 .*.sw[a-p]
 
 zsh/plugins.sh
+
+# btrfs backup system
+#####################
+# Terraform/OpenTofu files
+btrfs/*.tfstate
+btrfs/*.tfstate.*
+btrfs/.terraform/
+btrfs/.terraform.lock.hcl
+btrfs/terraform.tfvars
+btrfs/crash.log
+btrfs/tfplan
+
+# Environment files
+btrfs/.env
+btrfs/*.env
+!btrfs/*.env.example
+
+# SSH keys (just in case)
+btrfs/*.pem
+btrfs/id_*
+!btrfs/*.pub
+
+# Logs
+btrfs/*.log
+
+# Test artifacts
+btrfs/tmp/
+btrfs/test_*

@@ -25,6 +25,12 @@ variable "key_pair_name" {
   default     = "btrbk-backup-key"
 }
 
+variable "ebs_volume_size" {
+  description = "Size of the backup EBS volume in GiB"
+  type        = number
+  default     = 100
+}
+
 # --- Data Sources ---
 # Use a data source to automatically fetch the most recent Ubuntu 22.04 LTS AMI.
 data "aws_ami" "ubuntu" {
@@ -97,9 +103,9 @@ resource "aws_instance" "btrbk_backup_target" {
               # Wait for the volume to be attached and available (dev/sdh is a common device name for the first attached EBS volume)
               while [ ! -e "/dev/sdh" ]; do sleep 1; done
               
-              # Install Btrfs tools to manage the filesystem
+              # Install Btrfs tools and btrbk to manage the filesystem
               apt update
-              apt install -y btrfs-progs
+              apt install -y btrfs-progs btrbk
               
               # Format the attached EBS volume with a Btrfs filesystem
               mkfs.btrfs /dev/sdh
@@ -114,8 +120,8 @@ resource "aws_instance" "btrbk_backup_target" {
               echo "/dev/sdh /backup_volume btrfs defaults 0 0" >> /etc/fstab
 
               # --- Btrbk User Configuration for enhanced security ---
-              # Create a dedicated system user for btrbk without a home directory or password
-              useradd -r btrbk -s /bin/false
+              # Create a dedicated user for btrbk with a home directory and bash shell
+              useradd -m -s /bin/bash btrbk
 
               # Create .ssh directory and authorized_keys file for the new user
               mkdir -p /home/btrbk/.ssh
@@ -127,7 +133,7 @@ resource "aws_instance" "btrbk_backup_target" {
               # Add the public key with the command restriction to the authorized_keys file.
               # This ensures the 'btrbk' user can only run the `btrbk-ssh` command,
               # preventing arbitrary shell access.
-              echo 'command="btrbk-ssh" ${var.ssh_public_key}' >> /home/btrbk/.ssh/authorized_keys
+              echo 'command="/usr/local/bin/btrbk-ssh" '${var.ssh_public_key} >> /home/btrbk/.ssh/authorized_keys
               
               # Ensure the authorized_keys file is owned by the btrbk user.
               chown btrbk:btrbk /home/btrbk/.ssh/authorized_keys
@@ -139,12 +145,12 @@ resource "aws_instance" "btrbk_backup_target" {
               #!/bin/bash
               
               case "$SSH_ORIGINAL_COMMAND" in
-                # Allow only btrfs send/receive commands.
-                # Adjust this if you need other btrbk commands.
-                'btrfs send'*)
+                # Allow btrfs send/receive and subvolume commands for bidirectional sync
+                btrfs\ send*|btrfs\ receive*|btrfs\ subvolume\ *)
                   eval "$SSH_ORIGINAL_COMMAND"
                   ;;
-                'btrbk receive'*)
+                # Allow btrbk commands for backup operations
+                btrbk\ *)
                   eval "$SSH_ORIGINAL_COMMAND"
                   ;;
                 *)
@@ -159,9 +165,6 @@ resource "aws_instance" "btrbk_backup_target" {
               chmod +x /usr/local/bin/btrbk-ssh
 
               EOF
-  
-  # Ensure the instance and the EBS volume are in the same availability zone for attachment.
-  availability_zone = aws_security_group.btrbk_sg.availability_zone
 
   tags = {
     Name = "btrbk_backup_target"
@@ -170,7 +173,7 @@ resource "aws_instance" "btrbk_backup_target" {
 
 # 4. Create an encrypted EBS volume to store the backups.
 resource "aws_ebs_volume" "btrbk_volume" {
-  size              = 100 # Adjust size as needed (in GiB)
+  size              = var.ebs_volume_size
   encrypted         = true
   # The availability zone must match the EC2 instance's zone.
   availability_zone = aws_instance.btrbk_backup_target.availability_zone
@@ -194,4 +197,34 @@ resource "aws_volume_attachment" "btrbk_attach" {
 output "instance_public_ip" {
   description = "The public IP address of the btrbk backup target."
   value       = aws_instance.btrbk_backup_target.public_ip
+}
+
+# Output the SSH connection string for easy access
+output "ssh_connection_string" {
+  description = "SSH connection string for the btrbk user"
+  value       = "btrbk@${aws_instance.btrbk_backup_target.public_ip}"
+}
+
+# Output the backup target path for btrbk configuration
+output "backup_target_path" {
+  description = "Path on remote server for backups"
+  value       = "/backup_volume/backups"
+}
+
+# Output the full btrbk target string
+output "btrbk_target" {
+  description = "Full target string for btrbk configuration"
+  value       = "ssh://btrbk@${aws_instance.btrbk_backup_target.public_ip}/backup_volume/backups/"
+}
+
+# Output instance ID for troubleshooting
+output "instance_id" {
+  description = "EC2 instance ID for AWS console access"
+  value       = aws_instance.btrbk_backup_target.id
+}
+
+# Output volume ID for troubleshooting
+output "volume_id" {
+  description = "EBS volume ID for AWS console access"
+  value       = aws_ebs_volume.btrbk_volume.id
 }

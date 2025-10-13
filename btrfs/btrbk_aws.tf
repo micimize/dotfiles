@@ -94,77 +94,14 @@ resource "aws_instance" "btrbk_backup_target" {
   instance_type = "t3a.nano" # A minimal, cost-effective instance type for a backup target.
   key_name      = aws_key_pair.btrbk_key.key_name
   vpc_security_group_ids = [aws_security_group.btrbk_sg.id]
-  
-  # Use user_data to automatically configure the instance on first boot.
-  # This script installs Btrfs tools, formats the volume, creates a dedicated user,
-  # and mounts the volume persistently.
-  user_data = <<-EOF
-              #!/bin/bash
-              # Wait for the volume to be attached and available (dev/sdh is a common device name for the first attached EBS volume)
-              while [ ! -e "/dev/sdh" ]; do sleep 1; done
-              
-              # Install Btrfs tools and btrbk to manage the filesystem
-              apt update
-              apt install -y btrfs-progs btrbk
-              
-              # Format the attached EBS volume with a Btrfs filesystem
-              mkfs.btrfs /dev/sdh
-              
-              # Create a mount point for the volume
-              mkdir -p /backup_volume
-              
-              # Mount the newly formatted volume
-              mount /dev/sdh /backup_volume
-              
-              # Add the volume to /etc/fstab to ensure it is mounted automatically on every reboot
-              echo "/dev/sdh /backup_volume btrfs defaults 0 0" >> /etc/fstab
 
-              # --- Btrbk User Configuration for enhanced security ---
-              # Create a dedicated user for btrbk with a home directory and bash shell
-              useradd -m -s /bin/bash btrbk
-
-              # Create .ssh directory and authorized_keys file for the new user
-              mkdir -p /home/btrbk/.ssh
-              touch /home/btrbk/.ssh/authorized_keys
-              chown -R btrbk:btrbk /home/btrbk
-              chmod 700 /home/btrbk/.ssh
-              chmod 600 /home/btrbk/.ssh/authorized_keys
-
-              # Add the public key with the command restriction to the authorized_keys file.
-              # This ensures the 'btrbk' user can only run the `btrbk-ssh` command,
-              # preventing arbitrary shell access.
-              echo "command=\"/usr/local/bin/btrbk-ssh\" ${var.ssh_public_key}" >> /home/btrbk/.ssh/authorized_keys
-              
-              # Ensure the authorized_keys file is owned by the btrbk user.
-              chown btrbk:btrbk /home/btrbk/.ssh/authorized_keys
-
-              # --- Implement the btrbk-ssh wrapper script ---
-              # This script limits what commands the SSH user can run.
-              
-              cat << 'EOT' > /usr/local/bin/btrbk-ssh
-              #!/bin/bash
-              
-              case "$SSH_ORIGINAL_COMMAND" in
-                # Allow btrfs send/receive and subvolume commands for bidirectional sync
-                btrfs\ send*|btrfs\ receive*|btrfs\ subvolume\ *)
-                  eval "$SSH_ORIGINAL_COMMAND"
-                  ;;
-                # Allow btrbk commands for backup operations
-                btrbk\ *)
-                  eval "$SSH_ORIGINAL_COMMAND"
-                  ;;
-                *)
-                  # Forbid any other commands.
-                  echo "Access denied: Command not permitted." >&2
-                  exit 1
-                  ;;
-              esac
-              EOT
-              
-              # Make the script executable
-              chmod +x /usr/local/bin/btrbk-ssh
-
-              EOF
+  # Use user_data from external file for better maintainability and debugging.
+  # The file contains setup logic for btrfs, btrbk user, and SSH configuration.
+  # NOTE: The key_name above also adds the SSH key to the default ubuntu user,
+  # which is useful for debugging if the btrbk user setup fails.
+  user_data = templatefile("${path.module}/user-data.sh", {
+    ssh_authorized_keys_entry = "command=\"/usr/local/bin/btrbk-ssh\" ${var.ssh_public_key}"
+  })
 
   tags = {
     Name = "btrbk_backup_target"

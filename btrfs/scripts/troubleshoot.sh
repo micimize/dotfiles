@@ -8,6 +8,7 @@
 #   check-volume       Check backup volume status and space
 #   check-aws          Verify AWS resources are running
 #   check-logs         View remote system logs
+#   check-setup        View detailed user-data setup log
 #   check-all          Run all checks
 #   help               Show this help message
 
@@ -66,6 +67,7 @@ Commands:
   check-volume       Check backup volume status and space
   check-aws          Verify AWS resources are running
   check-logs         View remote system logs
+  check-setup        View detailed user-data setup log
   check-all          Run all checks
   help               Show this help message
 
@@ -281,6 +283,39 @@ cmd_check_logs() {
     return 0
 }
 
+# Check detailed user-data setup log
+cmd_check_setup() {
+    log_info "Fetching detailed user-data setup log..."
+
+    local ssh_cmd
+    ssh_cmd=$(get_ssh_cmd)
+
+    # Try to connect to ubuntu user first (btrbk user might not be set up yet)
+    local ubuntu_ssh="ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@${BTRBK_AWS_HOST}"
+
+    log_info "User-data setup log:"
+    echo "========================================"
+    if $ubuntu_ssh "sudo cat /var/log/user-data.log" 2>/dev/null; then
+        echo "========================================"
+        log_success "Setup log retrieved successfully"
+    else
+        log_warning "Could not fetch user-data.log (may not exist yet or SSH as ubuntu failed)"
+        log_info "Trying cloud-init-output.log instead..."
+        echo "========================================"
+        $ssh_cmd "sudo cat /var/log/cloud-init-output.log" 2>/dev/null || log_error "Could not fetch any logs"
+        echo "========================================"
+    fi
+
+    # Check if setup completed
+    if $ubuntu_ssh "test -f /var/lib/cloud/instance/user-data-finished" 2>/dev/null; then
+        log_success "User-data script completed successfully"
+    else
+        log_warning "User-data script may still be running or failed"
+    fi
+
+    return 0
+}
+
 # Run all checks
 cmd_check_all() {
     log_info "Running all checks..."
@@ -314,6 +349,10 @@ main() {
         check-ssh)
             load_config
             cmd_check_ssh
+            ;;
+        check-setup)
+            load_config
+            cmd_check_setup
             ;;
         check-volume)
             load_config

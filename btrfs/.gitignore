@@ -1,0 +1,25 @@
+# Terraform/OpenTofu files
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+terraform.tfvars
+crash.log
+tfplan
+
+# Environment files
+.env
+*.env
+!*.env.example
+
+# SSH keys (just in case)
+*.pem
+id_*
+!*.pub
+
+# Logs
+*.log
+
+# Test artifacts
+/tmp/
+test_*

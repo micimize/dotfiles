@@ -6,11 +6,11 @@ set -e  # Exit on error
 exec > >(tee -a /var/log/user-data.log)
 exec 2>&1
 
-echo "=== Starting btrbk backup target setup at $$(date) ==="
+echo "=== Starting btrbk backup target setup at $(date) ==="
 
 # Function to log with timestamp
 log() {
-    echo "[$$(date '+%Y-%m-%d %H:%M:%S')] $*"
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*"
 }
 
 log "Step 1: Waiting for EBS volume to be attached..."
@@ -44,11 +44,11 @@ while [ $ELAPSED -lt $MAX_WAIT ]; do
     fi
 
     sleep 2
-    ELAPSED=$$((ELAPSED + 2))
+    ELAPSED=$((ELAPSED + 2))
 done
 
 if [ -z "$DEVICE" ]; then
-    log "ERROR: EBS volume not found after $${MAX_WAIT}s. Available block devices:"
+    log "ERROR: EBS volume not found after ${MAX_WAIT}s. Available block devices:"
     lsblk
     exit 1
 fi
@@ -67,7 +67,7 @@ mount "$DEVICE" /backup_volume
 
 log "Step 5: Adding volume to /etc/fstab for persistent mounting..."
 # Get the UUID of the device for more reliable mounting
-UUID=$$(blkid -s UUID -o value "$DEVICE")
+UUID=$(blkid -s UUID -o value "$DEVICE")
 echo "UUID=$UUID /backup_volume btrfs defaults 0 0" >> /etc/fstab
 
 log "Step 6: Creating backup directory structure..."
@@ -76,7 +76,7 @@ mkdir -p /backup_volume/backups
 log "Step 7: Giving ubuntu user ownership of backup volume..."
 chown -R ubuntu:ubuntu /backup_volume/backups
 
-log "=== Setup completed successfully at $$(date) ==="
+log "=== Setup completed successfully at $(date) ==="
 log "Device: $DEVICE"
 log "UUID: $UUID"
 log "Mount point: /backup_volume"

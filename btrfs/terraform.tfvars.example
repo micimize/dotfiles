@@ -4,12 +4,12 @@ aws_region = "us-west-1"
 
 # SSH Public Key
 # This key will be used for authentication to the backup server
-# Generate with: ssh-keygen -t ed25519 -f ~/.ssh/btrbk_backup -C "btrbk-backup"
-# Then copy the contents of ~/.ssh/btrbk_backup.pub here
-ssh_public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIExampleKeyDataHere btrbk-backup"
+# Generate with: ssh-keygen -t ed25519 -f ~/.ssh/btrfs_sync -C "btrfs-sync"
+# Then copy the contents of ~/.ssh/btrfs_sync.pub here
+ssh_public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIExampleKeyDataHere btrfs-sync"
 
-# AWS Key Pair Name (optional - defaults to "btrbk-backup-key")
-# key_pair_name = "btrbk-backup-key"
+# AWS Key Pair Name (optional - defaults to "btrfs-sync-ssh-key")
+# key_pair_name = "btrfs-sync-ssh-key"
 
 # EBS Volume Size in GiB (optional - defaults to 100)
 # Estimate: Calculate total size of data you want to back up, multiply by 2-3x

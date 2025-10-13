@@ -15,12 +15,12 @@ Before testing, make sure you have:
 ### 1. Generate SSH Key (if you don't have one)
 
 ```bash
-ssh-keygen -t ed25519 -f ~/.ssh/btrbk_backup -C "btrbk-backup" -N ""
+ssh-keygen -t ed25519 -f ~/.ssh/btrfs_sync -C "btrfs-sync" -N ""
 ```
 
 This creates:
-- Private key: `~/.ssh/btrbk_backup`
-- Public key: `~/.ssh/btrbk_backup.pub`
+- Private key: `~/.ssh/btrfs_sync`
+- Public key: `~/.ssh/btrfs_sync.pub`
 
 ### 2. Create Configuration File
 
@@ -33,7 +33,7 @@ Edit `terraform.tfvars` and:
 1. Set `aws_region` to your preferred region (or keep default: `us-west-1`)
 2. Replace the `ssh_public_key` value with your actual public key:
    ```bash
-   cat ~/.ssh/btrbk_backup.pub
+   cat ~/.ssh/btrfs_sync.pub
    ```
    Copy the entire output and paste it in `terraform.tfvars`
 
@@ -89,7 +89,7 @@ Connection details saved to: /code/btrfs/aws_connection.env
 ### 6. Test SSH Connection
 
 ```bash
-ssh -i ~/.ssh/btrbk_backup btrbk@$(cd /code/btrfs && tofu output -raw instance_public_ip)
+ssh -i ~/.ssh/btrfs_sync btrbk@$(cd /code/btrfs && tofu output -raw instance_public_ip)
 ```
 
 **Expected:**
@@ -99,7 +99,7 @@ ssh -i ~/.ssh/btrbk_backup btrbk@$(cd /code/btrfs && tofu output -raw instance_p
 ### 7. Test Allowed Commands
 
 ```bash
-ssh -i ~/.ssh/btrbk_backup btrbk@$(cd /code/btrfs && tofu output -raw instance_public_ip) "btrfs --version"
+ssh -i ~/.ssh/btrfs_sync btrbk@$(cd /code/btrfs && tofu output -raw instance_public_ip) "btrfs --version"
 ```
 
 **Expected output:**
@@ -155,7 +155,7 @@ Please share:
 
 ### Issue: "terraform.tfvars contains example placeholder values"
 
-**Solution:** Edit `terraform.tfvars` and replace the SSH public key with your actual key from `~/.ssh/btrbk_backup.pub`
+**Solution:** Edit `terraform.tfvars` and replace the SSH public key with your actual key from `~/.ssh/btrfs_sync.pub`
 
 ### Issue: "SSH connection: FAIL" in smoke tests
 
@@ -170,7 +170,7 @@ Please share:
 aws ec2 describe-instances --instance-ids $(cd /code/btrfs && tofu output -raw instance_id)
 
 # Try manual SSH connection
-ssh -v -i ~/.ssh/btrbk_backup btrbk@$(cd /code/btrfs && tofu output -raw instance_public_ip)
+ssh -v -i ~/.ssh/btrfs_sync btrbk@$(cd /code/btrfs && tofu output -raw instance_public_ip)
 ```
 
 ### Issue: "Volume not mounted" in smoke tests

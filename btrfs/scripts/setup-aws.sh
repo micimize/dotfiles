@@ -195,11 +195,11 @@ wait_for_instance() {
     local ssh_key_path=""
     local ssh_opts=""
 
-    if [[ -f ~/.ssh/btrbk_backup ]]; then
-        ssh_key_path=~/.ssh/btrbk_backup
+    if [[ -f ~/.ssh/btrfs_sync ]]; then
+        ssh_key_path=~/.ssh/btrfs_sync
         ssh_opts="-i $ssh_key_path"
-    elif [[ -f ~/.ssh/btrbk_backup_test ]]; then
-        ssh_key_path=~/.ssh/btrbk_backup_test
+    elif [[ -f ~/.ssh/btrfs_sync_test ]]; then
+        ssh_key_path=~/.ssh/btrfs_sync_test
         ssh_opts="-i $ssh_key_path"
     else
         log_info "No SSH key file found, will try SSH agent (e.g., 1Password)"
@@ -249,11 +249,11 @@ smoke_test() {
     local ssh_key_path=""
     local ssh_opts=""
 
-    if [[ -f ~/.ssh/btrbk_backup ]]; then
-        ssh_key_path="~/.ssh/btrbk_backup"
+    if [[ -f ~/.ssh/btrfs_sync ]]; then
+        ssh_key_path="~/.ssh/btrfs_sync"
         ssh_opts="-i $ssh_key_path -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -q"
-    elif [[ -f ~/.ssh/btrbk_backup_test ]]; then
-        ssh_key_path="~/.ssh/btrbk_backup_test"
+    elif [[ -f ~/.ssh/btrfs_sync_test ]]; then
+        ssh_key_path="~/.ssh/btrfs_sync_test"
         ssh_opts="-i $ssh_key_path -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -q"
     else
         # No key file found, try SSH agent (e.g., 1Password SSH agent)
@@ -372,7 +372,7 @@ generate_config() {
 # SSH connection
 BTRBK_AWS_HOST=$instance_ip
 BTRBK_AWS_USER=btrbk
-BTRBK_AWS_SSH_KEY=~/.ssh/btrbk_backup  # UPDATE THIS with your actual key path, or leave empty for SSH agent (e.g., 1Password)
+BTRBK_AWS_SSH_KEY=~/.ssh/btrfs_sync  # UPDATE THIS with your actual key path, or leave empty for SSH agent (e.g., 1Password)
 
 # Backup configuration
 BTRBK_AWS_TARGET=$btrbk_target
@@ -409,7 +409,7 @@ display_next_steps() {
     echo ""
     echo "Next steps:"
     echo "  1. Test SSH connection:"
-    echo "     ssh -i ~/.ssh/btrbk_backup btrbk@$($TF_CMD output -raw instance_public_ip)"
+    echo "     ssh -i ~/.ssh/btrfs_sync btrbk@$($TF_CMD output -raw instance_public_ip)"
     echo ""
     echo "  2. Configure local btrbk (future task - not yet implemented)"
     echo ""

@@ -50,7 +50,7 @@ load_config() {
 
 # Get SSH connection command
 get_ssh_cmd() {
-    local ssh_key="${BTRBK_AWS_SSH_KEY:-~/.ssh/btrbk_backup}"
+    local ssh_key="${BTRBK_AWS_SSH_KEY:-~/.ssh/btrfs_sync}"
 
     # If SSH key is specified and exists, use it; otherwise try SSH agent
     if [[ -n "$ssh_key" && -f "$ssh_key" ]]; then

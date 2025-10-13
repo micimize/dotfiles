@@ -1,0 +1,4 @@
+# TODO: maybe unnecessary - see  https://developer.1password.com/docs/ssh/agent/
+[[ssh-keys]]
+item = "btrfs-sync-ssh-key"
+vault = "Personal"

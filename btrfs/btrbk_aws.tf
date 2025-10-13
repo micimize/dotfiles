@@ -22,7 +22,7 @@ variable "ssh_public_key" {
 variable "key_pair_name" {
   description = "The name for the AWS key pair. This is used for SSH access."
   type        = string
-  default     = "btrbk-backup-key"
+  default     = "btrfs-sync-ssh-key"
 }
 
 variable "ebs_volume_size" {

@@ -80,7 +80,7 @@ if ! check_command "tofu" "opentofu (see https://opentofu.org/docs/intro/install
         ((ERRORS--))
     fi
 fi
-check_command "aws" "awscli (pip install awscli or apt install awscli)"
+check_command "aws" "awscli (brew install awscli)"
 check_ssh_client
 check_aws_credentials
 

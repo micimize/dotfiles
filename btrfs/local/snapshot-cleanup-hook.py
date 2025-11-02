@@ -21,7 +21,7 @@ import sys
 import subprocess
 import shutil
 from pathlib import Path
-from typing import List, Optional
+from typing import Generator, Optional
 import logging
 
 # Configure logging
@@ -32,159 +32,150 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+def generate_git_repo_directories(snapshot_path: Path) -> Generator[Path, None, None]:
+    """
+    Find all git repositories within the snapshot.
 
-class SnapshotCleaner:
-    """Removes git-ignored files from btrfs snapshots before they're finalized."""
+    Args:
+        snapshot_path: Root path to search for git repositories
 
-    def __init__(self, snapshot_path: Path):
-        """
-        Initialize the snapshot cleaner.
+    Yields:
+        Path to each git repository root directory
+    """
+    for git_dir in snapshot_path.rglob('.git'):
+        if git_dir.is_dir():
+            yield git_dir.parent
 
-        Args:
-            snapshot_path: Path to the snapshot to clean
 
-        Raises:
-            ValueError: If snapshot path is invalid
-        """
-        if not snapshot_path.exists():
-            raise ValueError(f"Snapshot path does not exist: {snapshot_path}")
+def get_all_git_ignored_files_and_directories(repo_path: Path) -> tuple[Path, ...]:
+    """
+    Get list of git-ignored files in a repository.
 
-        if not snapshot_path.is_dir():
-            raise ValueError(f"Snapshot path is not a directory: {snapshot_path}")
+    Args:
+        repo_path: Path to the git repository root
 
-        self.snapshot_path = snapshot_path
-        logger.info(f"Cleaning up snapshot: {snapshot_path}")
+    Returns:
+        Tuple of paths to ignored files/directories
+    """
+    try:
+        # Run git ls-files to get ignored files
+        # --others: Show untracked files
+        # --ignored: Show ignored files
+        # --exclude-standard: Use standard ignore rules (.gitignore, .git/info/exclude, etc.)
+        # --directory: Show directories (for ignored directories like node_modules)
+        result = subprocess.run(
+            ('git', 'ls-files', '--others', '--ignored', '--exclude-standard', '--directory'),
+            cwd=repo_path,
+            capture_output=True,
+            text=True,
+            check=True
+        )
 
-    def find_git_repositories(self) -> List[Path]:
-        """
-        Find all git repositories within the snapshot.
+        return tuple(
+            repo_path / line.strip()
+            for line in result.stdout.splitlines()
+            if line.strip()
+        )
 
-        Returns:
-            List of paths to git repository root directories
-        """
-        git_repos: List[Path] = []
+    except subprocess.CalledProcessError as e:
+        logger.error(f"    Error running git ls-files in {repo_path}: {e}")
+        return tuple()
 
-        for git_dir in self.snapshot_path.rglob('.git'):
-            if git_dir.is_dir():
-                repo_root = git_dir.parent
-                git_repos.append(repo_root)
-                logger.info(f"  Found git repo: {repo_root}")
 
-        return git_repos
+def remove_path(path: Path, snapshot_path: Path) -> bool:
+    """
+    Safely remove a file or directory.
 
-    def get_ignored_files(self, repo_path: Path) -> List[Path]:
-        """
-        Get list of git-ignored files in a repository.
+    Args:
+        path: Path to remove
+        snapshot_path: Root snapshot path (for relative logging)
 
-        Args:
-            repo_path: Path to the git repository root
-
-        Returns:
-            List of paths to ignored files/directories (relative to repo_path)
-        """
-        try:
-            # Run git ls-files to get ignored files
-            # --others: Show untracked files
-            # --ignored: Show ignored files
-            # --exclude-standard: Use standard ignore rules (.gitignore, .git/info/exclude, etc.)
-            # --directory: Show directories (for ignored directories like node_modules)
-            result = subprocess.run(
-                ['git', 'ls-files', '--others', '--ignored', '--exclude-standard', '--directory'],
-                cwd=repo_path,
-                capture_output=True,
-                text=True,
-                check=True
-            )
-
-            ignored_files = [
-                repo_path / line.strip()
-                for line in result.stdout.splitlines()
-                if line.strip()
-            ]
-
-            return ignored_files
-
-        except subprocess.CalledProcessError as e:
-            logger.error(f"    Error running git ls-files in {repo_path}: {e}")
-            return []
-
-    def remove_path(self, path: Path) -> bool:
-        """
-        Safely remove a file or directory.
-
-        Args:
-            path: Path to remove
-
-        Returns:
-            True if successfully removed, False otherwise
-        """
-        try:
-            if not path.exists():
-                return True
-
-            if path.is_dir() and not path.is_symlink():
-                shutil.rmtree(path)
-                logger.info(f"      Removed directory: {path.relative_to(self.snapshot_path)}")
-            else:
-                path.unlink()
-                logger.info(f"      Removed file: {path.relative_to(self.snapshot_path)}")
-
+    Returns:
+        True if successfully removed, False otherwise
+    """
+    try:
+        if not path.exists():
             return True
 
-        except Exception as e:
-            logger.error(f"      Error removing {path}: {e}")
-            return False
+        if path.is_dir() and not path.is_symlink():
+            shutil.rmtree(path)
+            logger.info(f"      Removed directory: {path.relative_to(snapshot_path)}")
+        else:
+            path.unlink()
+            logger.info(f"      Removed file: {path.relative_to(snapshot_path)}")
 
-    def clean_repository(self, repo_path: Path) -> int:
-        """
-        Remove git-ignored files from a repository.
+        return True
 
-        Args:
-            repo_path: Path to the git repository root
+    except Exception as e:
+        logger.error(f"      Error removing {path}: {e}")
+        return False
 
-        Returns:
-            Number of files/directories removed
-        """
-        logger.info(f"    Processing git repo: {repo_path}")
 
-        ignored_files = self.get_ignored_files(repo_path)
+def clean_repository(repo_path: Path, snapshot_path: Path) -> int:
+    """
+    Remove git-ignored files from a repository.
 
-        if not ignored_files:
-            logger.info(f"      No ignored files found")
-            return 0
+    Args:
+        repo_path: Path to the git repository root
+        snapshot_path: Root snapshot path (for relative logging)
 
-        removed_count = 0
-        for ignored_path in ignored_files:
-            if self.remove_path(ignored_path):
-                removed_count += 1
+    Returns:
+        Number of files/directories removed
+    """
+    logger.info(f"    Processing git repo: {repo_path}")
 
-        logger.info(f"      Removed {removed_count} ignored items")
-        return removed_count
+    ignored_files = get_all_git_ignored_files_and_directories(repo_path)
 
-    def clean(self) -> int:
-        """
-        Remove all git-ignored files from the snapshot.
+    if not ignored_files:
+        logger.info("      No ignored files found")
+        return 0
 
-        Returns:
-            Total number of files/directories removed
-        """
-        logger.info("  Removing git-ignored files...")
+    removed_count = 0
+    for ignored_path in ignored_files:
+        if remove_path(ignored_path, snapshot_path):
+            removed_count += 1
 
-        git_repos = self.find_git_repositories()
+    logger.info(f"      Removed {removed_count} ignored items")
+    return removed_count
 
-        if not git_repos:
-            logger.info("  No git repositories found in snapshot")
-            return 0
 
-        total_removed = 0
-        for repo_path in git_repos:
-            removed = self.clean_repository(repo_path)
-            total_removed += removed
+def clean_snapshot(snapshot_path: Path) -> int:
+    """
+    Remove all git-ignored files from the snapshot.
 
-        logger.info(f"Cleanup complete for: {self.snapshot_path}")
-        logger.info(f"Total items removed: {total_removed}")
+    Args:
+        snapshot_path: Path to the snapshot to clean
 
-        return total_removed
+    Returns:
+        Total number of files/directories removed
+
+    Raises:
+        ValueError: If snapshot path is invalid
+    """
+    if not snapshot_path.exists():
+        raise ValueError(f"Snapshot path does not exist: {snapshot_path}")
+
+    if not snapshot_path.is_dir():
+        raise ValueError(f"Snapshot path is not a directory: {snapshot_path}")
+
+    logger.info(f"Cleaning up snapshot: {snapshot_path}")
+    logger.info("  Removing git-ignored files...")
+
+    git_repos = tuple(generate_git_repo_directories(snapshot_path))
+
+    if not git_repos:
+        logger.info("  No git repositories found in snapshot")
+        return 0
+
+    total_removed = 0
+    for repo_path in git_repos:
+        removed = clean_repository(repo_path, snapshot_path)
+        total_removed += removed
+
+    logger.info(f"Cleanup complete for: {snapshot_path}")
+    logger.info(f"Total items removed: {total_removed}")
+
+    return total_removed
 
 
 def main() -> int:
@@ -204,8 +195,7 @@ def main() -> int:
     snapshot_path = Path(snapshot_path_str)
 
     try:
-        cleaner = SnapshotCleaner(snapshot_path)
-        cleaner.clean()
+        clean_snapshot(snapshot_path)
         return 0
 
     except ValueError as e:

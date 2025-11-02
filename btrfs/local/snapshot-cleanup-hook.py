@@ -33,30 +33,12 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 def generate_git_repo_directories(snapshot_path: Path) -> Generator[Path, None, None]:
-    """
-    Find all git repositories within the snapshot.
-
-    Args:
-        snapshot_path: Root path to search for git repositories
-
-    Yields:
-        Path to each git repository root directory
-    """
     for git_dir in snapshot_path.rglob('.git'):
         if git_dir.is_dir():
             yield git_dir.parent
 
 
 def get_all_git_ignored_files_and_directories(repo_path: Path) -> tuple[Path, ...]:
-    """
-    Get list of git-ignored files in a repository.
-
-    Args:
-        repo_path: Path to the git repository root
-
-    Returns:
-        Tuple of paths to ignored files/directories
-    """
     try:
         # Run git ls-files to get ignored files
         # --others: Show untracked files
@@ -82,27 +64,17 @@ def get_all_git_ignored_files_and_directories(repo_path: Path) -> tuple[Path, ..
         return tuple()
 
 
-def remove_path(path: Path, snapshot_path: Path) -> bool:
-    """
-    Safely remove a file or directory.
-
-    Args:
-        path: Path to remove
-        snapshot_path: Root snapshot path (for relative logging)
-
-    Returns:
-        True if successfully removed, False otherwise
-    """
+def remove_path(path: Path) -> bool:
     try:
         if not path.exists():
             return True
 
         if path.is_dir() and not path.is_symlink():
             shutil.rmtree(path)
-            logger.info(f"      Removed directory: {path.relative_to(snapshot_path)}")
+            logger.info(f"      Removed directory: {path}")
         else:
             path.unlink()
-            logger.info(f"      Removed file: {path.relative_to(snapshot_path)}")
+            logger.info(f"      Removed file: {path}")
 
         return True
 
@@ -111,17 +83,7 @@ def remove_path(path: Path, snapshot_path: Path) -> bool:
         return False
 
 
-def clean_repository(repo_path: Path, snapshot_path: Path) -> int:
-    """
-    Remove git-ignored files from a repository.
-
-    Args:
-        repo_path: Path to the git repository root
-        snapshot_path: Root snapshot path (for relative logging)
-
-    Returns:
-        Number of files/directories removed
-    """
+def remove_and_count_git_ignored_paths_from_repository(repo_path: Path) -> int:
     logger.info(f"    Processing git repo: {repo_path}")
 
     ignored_files = get_all_git_ignored_files_and_directories(repo_path)
@@ -132,26 +94,14 @@ def clean_repository(repo_path: Path, snapshot_path: Path) -> int:
 
     removed_count = 0
     for ignored_path in ignored_files:
-        if remove_path(ignored_path, snapshot_path):
+        if remove_path(ignored_path):
             removed_count += 1
 
     logger.info(f"      Removed {removed_count} ignored items")
     return removed_count
 
 
-def clean_snapshot(snapshot_path: Path) -> int:
-    """
-    Remove all git-ignored files from the snapshot.
-
-    Args:
-        snapshot_path: Path to the snapshot to clean
-
-    Returns:
-        Total number of files/directories removed
-
-    Raises:
-        ValueError: If snapshot path is invalid
-    """
+def remove_git_ignored_files_from_snapshot(snapshot_path: Path) -> None:
     if not snapshot_path.exists():
         raise ValueError(f"Snapshot path does not exist: {snapshot_path}")
 
@@ -165,26 +115,18 @@ def clean_snapshot(snapshot_path: Path) -> int:
 
     if not git_repos:
         logger.info("  No git repositories found in snapshot")
-        return 0
+        return
 
     total_removed = 0
     for repo_path in git_repos:
-        removed = clean_repository(repo_path, snapshot_path)
+        removed = remove_and_count_git_ignored_paths_from_repository(repo_path)
         total_removed += removed
 
     logger.info(f"Cleanup complete for: {snapshot_path}")
     logger.info(f"Total items removed: {total_removed}")
 
-    return total_removed
-
 
 def main() -> int:
-    """
-    Main entry point for the snapshot cleanup hook.
-
-    Returns:
-        Exit code (0 for success, 1 for error)
-    """
     # Get snapshot path from environment variable
     snapshot_path_str: Optional[str] = os.environ.get('SNAPSHOT_SUBVOLUME_PATH')
 
@@ -195,7 +137,7 @@ def main() -> int:
     snapshot_path = Path(snapshot_path_str)
 
     try:
-        clean_snapshot(snapshot_path)
+        remove_git_ignored_files_from_snapshot(snapshot_path)
         return 0
 
     except ValueError as e:

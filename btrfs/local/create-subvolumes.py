@@ -218,11 +218,6 @@ def main() -> int:
         help='Show what would be done without making changes'
     )
     parser.add_argument(
-        '--interactive',
-        action='store_true',
-        help='Interactively convert existing directories to subvolumes'
-    )
-    parser.add_argument(
         '--config',
         type=Path,
         default=Path(__file__).parent / 'btrbk.conf',
@@ -248,16 +243,13 @@ def main() -> int:
         existing, created, failed = process_all_subvolumes_from_config(
             config,
             args.dry_run,
-            args.interactive
+            interactive=True
         )
 
         print("\n=== Summary ===")
         print(f"Already subvolumes: {existing}")
         print(f"{'Would create' if args.dry_run else 'Created'}: {created}")
         print(f"Failed/Skipped: {failed}")
-
-        if failed > 0 and not args.interactive:
-            print("\nUse --interactive to convert existing directories")
 
         if created > 0 and not args.dry_run:
             print(f"\nOriginal directories preserved in: {config.volume_base}/migrating_to_subvolumes/")

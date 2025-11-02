@@ -1,95 +1,72 @@
 #!/usr/bin/env python3
 """
-Create btrfs subvolumes from btrbk configuration
+Create btrfs subvolumes from btrbk configuration.
 
-Parses the btrbk.conf file to find all 'subvolume' declarations and creates
-btrfs subvolumes for directories that aren't already subvolumes.
-
-IMPORTANT: This script must be run as root since it modifies filesystem structure.
+Parses btrbk.conf to find subvolume declarations and converts regular
+directories to btrfs subvolumes.
 
 Usage:
-    sudo ./create-subvolumes.py [--dry-run] [--config PATH]
+    sudo ./create-subvolumes.py [--dry-run] [--config PATH] [--interactive]
 """
 
 import argparse
+import shutil
 import subprocess
 import sys
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
-import logging
-
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='[create-subvolumes] %(message)s',
-)
-logger = logging.getLogger(__name__)
+from typing import Generator
 
 
-def parse_btrbk_config(config_path: Path) -> tuple[Path, tuple[str, ...]]:
-    """
-    Parse btrbk configuration to extract volume base path and subvolume names.
+@dataclass(frozen=True)
+class BtrbkConfig:
+    volume_base: Path
+    subvolume_names: tuple[str, ...]
 
-    Args:
-        config_path: Path to btrbk.conf
 
-    Returns:
-        Tuple of (volume_base_path, tuple of subvolume names)
+def read_lines_from_file(file_path: Path) -> tuple[str, ...]:
+    with open(file_path) as f:
+        return tuple(line.strip() for line in f)
 
-    Example:
-        volume /home/mjr
-          subvolume code
-          subvolume Documents
 
-        Returns: (Path('/home/mjr'), ('code', 'Documents'))
-    """
+def filter_out_comments_and_blank_lines(lines: tuple[str, ...]) -> tuple[str, ...]:
+    return tuple(line for line in lines if line and not line.startswith('#'))
+
+
+def extract_volume_base_from_lines(lines: tuple[str, ...]) -> Path:
+    for line in lines:
+        if line.startswith('volume '):
+            return Path(line.split(maxsplit=1)[1])
+    raise ValueError("No 'volume' declaration found in config")
+
+
+def extract_subvolume_names_from_lines(lines: tuple[str, ...]) -> tuple[str, ...]:
+    names = tuple(
+        line.split(maxsplit=1)[1]
+        for line in lines
+        if line.startswith('subvolume ')
+    )
+    if not names:
+        raise ValueError("No 'subvolume' declarations found in config")
+    return names
+
+
+def parse_btrbk_config_file(config_path: Path) -> BtrbkConfig:
     if not config_path.exists():
         raise FileNotFoundError(f"Config file not found: {config_path}")
 
-    volume_base: Optional[Path] = None
-    subvolumes: list[str] = []
+    lines = read_lines_from_file(config_path)
+    cleaned_lines = filter_out_comments_and_blank_lines(lines)
 
-    with open(config_path) as f:
-        for line in f:
-            line = line.strip()
-
-            # Skip comments and empty lines
-            if not line or line.startswith('#'):
-                continue
-
-            # Parse volume line
-            if line.startswith('volume '):
-                volume_path = line.split(maxsplit=1)[1]
-                volume_base = Path(volume_path)
-                logger.info(f"Found volume base: {volume_base}")
-
-            # Parse subvolume line
-            elif line.startswith('subvolume '):
-                subvol_name = line.split(maxsplit=1)[1]
-                subvolumes.append(subvol_name)
-                logger.info(f"  Found subvolume: {subvol_name}")
-
-    if volume_base is None:
-        raise ValueError("No 'volume' declaration found in config")
-
-    if not subvolumes:
-        raise ValueError("No 'subvolume' declarations found in config")
-
-    return volume_base, tuple(subvolumes)
+    return BtrbkConfig(
+        volume_base=extract_volume_base_from_lines(cleaned_lines),
+        subvolume_names=extract_subvolume_names_from_lines(cleaned_lines)
+    )
 
 
-def is_btrfs_subvolume(path: Path) -> bool:
-    """
-    Check if a path is a btrfs subvolume.
-
-    Args:
-        path: Path to check
-
-    Returns:
-        True if path is a btrfs subvolume, False otherwise
-    """
+def check_if_path_is_btrfs_subvolume(path: Path) -> bool:
     try:
-        result = subprocess.run(
+        subprocess.run(
             ('btrfs', 'subvolume', 'show', str(path)),
             capture_output=True,
             check=True
@@ -99,94 +76,139 @@ def is_btrfs_subvolume(path: Path) -> bool:
         return False
 
 
-def create_btrfs_subvolume(path: Path, dry_run: bool = False) -> bool:
-    """
-    Create a btrfs subvolume at the given path.
+def run_btrfs_subvolume_create(path: Path) -> None:
+    subprocess.run(
+        ('btrfs', 'subvolume', 'create', str(path)),
+        capture_output=True,
+        text=True,
+        check=True
+    )
 
-    IMPORTANT: This only works for directories that don't exist yet or are empty.
-    Cannot convert existing directory with data to subvolume without moving data.
 
-    Args:
-        path: Path where subvolume should be created
-        dry_run: If True, only log what would be done
+def move_directory_to_migration_area(source: Path, migration_base: Path) -> Path:
+    destination = migration_base / source.name
+    migration_base.mkdir(parents=True, exist_ok=True)
+    shutil.move(str(source), str(destination))
+    return destination
 
-    Returns:
-        True if successful or would be successful (dry run)
-    """
+
+def copy_contents_from_migration_to_subvolume(migration_path: Path, subvolume_path: Path) -> None:
+    for item in migration_path.iterdir():
+        destination = subvolume_path / item.name
+        if item.is_dir():
+            shutil.copytree(item, destination, symlinks=True, dirs_exist_ok=True)
+        else:
+            shutil.copy2(item, destination)
+
+
+def ask_user_yes_or_no(prompt: str) -> bool:
+    while True:
+        response = input(f"{prompt} [y/n]: ").lower().strip()
+        if response in ('y', 'yes'):
+            return True
+        if response in ('n', 'no'):
+            return False
+        print("Please answer 'y' or 'n'")
+
+
+def convert_existing_directory_to_subvolume_interactively(
+    directory_path: Path,
+    migration_base: Path,
+    dry_run: bool
+) -> bool:
+    print(f"\n  Path exists as regular directory: {directory_path}")
+    print(f"  Will migrate to: {migration_base / directory_path.name}")
+    print(f"  Then copy contents back to new subvolume")
+    print(f"  Original will be preserved in migration area")
+
+    if not ask_user_yes_or_no("  Convert this directory?"):
+        print("  Skipped")
+        return False
+
     if dry_run:
-        logger.info(f"    [DRY RUN] Would create subvolume: {path}")
+        print("  [DRY RUN] Would convert to subvolume")
         return True
 
     try:
-        subprocess.run(
-            ('btrfs', 'subvolume', 'create', str(path)),
-            capture_output=True,
-            text=True,
-            check=True
-        )
-        logger.info(f"    Created subvolume: {path}")
+        # Move existing directory to migration area
+        print(f"    Moving to migration area...")
+        migrated_path = move_directory_to_migration_area(directory_path, migration_base)
+
+        # Create new subvolume
+        print(f"    Creating subvolume...")
+        run_btrfs_subvolume_create(directory_path)
+
+        # Copy contents back
+        print(f"    Copying contents to subvolume...")
+        copy_contents_from_migration_to_subvolume(migrated_path, directory_path)
+
+        print(f"  ✓ Converted to subvolume")
+        print(f"    Original preserved at: {migrated_path}")
         return True
 
-    except subprocess.CalledProcessError as e:
-        logger.error(f"    Failed to create subvolume {path}: {e.stderr}")
+    except Exception as e:
+        print(f"  ✗ Failed: {e}")
         return False
 
 
-def process_subvolumes(
-    volume_base: Path,
-    subvolume_names: tuple[str, ...],
-    dry_run: bool = False
+def generate_subvolume_paths_from_config(config: BtrbkConfig) -> Generator[Path, None, None]:
+    for name in config.subvolume_names:
+        yield config.volume_base / name
+
+
+def process_all_subvolumes_from_config(
+    config: BtrbkConfig,
+    dry_run: bool,
+    interactive: bool
 ) -> tuple[int, int, int]:
-    """
-    Process subvolumes: check status and create if needed.
+    migration_base = config.volume_base / 'migrating_to_subvolumes'
 
-    Args:
-        volume_base: Base path for all subvolumes
-        subvolume_names: Names of subvolumes to process
-        dry_run: If True, only show what would be done
+    existing_count = 0
+    created_count = 0
+    failed_count = 0
 
-    Returns:
-        Tuple of (existing_count, created_count, failed_count)
-    """
-    existing = 0
-    created = 0
-    failed = 0
+    for path in generate_subvolume_paths_from_config(config):
+        print(f"\nProcessing: {path}")
 
-    for subvol_name in subvolume_names:
-        full_path = volume_base / subvol_name
-
-        logger.info(f"Processing: {full_path}")
-
-        # Check if already a subvolume
-        if is_btrfs_subvolume(full_path):
-            logger.info(f"  ✓ Already a subvolume")
-            existing += 1
+        # Already a subvolume
+        if check_if_path_is_btrfs_subvolume(path):
+            print("  ✓ Already a subvolume")
+            existing_count += 1
             continue
 
-        # Check if path exists as regular directory
-        if full_path.exists():
-            logger.warning(f"  ⚠ Path exists as regular directory/file")
-            logger.warning(f"    Cannot convert in-place - manual intervention required")
-            logger.warning(f"    See docs for how to convert directory with data")
-            failed += 1
+        # Path exists as regular directory
+        if path.exists():
+            if interactive:
+                if convert_existing_directory_to_subvolume_interactively(path, migration_base, dry_run):
+                    created_count += 1
+                else:
+                    failed_count += 1
+            else:
+                print("  ⚠ Exists as regular directory - use --interactive to convert")
+                failed_count += 1
             continue
 
-        # Path doesn't exist - can create subvolume
-        if create_btrfs_subvolume(full_path, dry_run):
-            created += 1
-        else:
-            failed += 1
+        # Path doesn't exist - create subvolume
+        try:
+            if dry_run:
+                print("  [DRY RUN] Would create subvolume")
+            else:
+                run_btrfs_subvolume_create(path)
+                print("  ✓ Created subvolume")
+            created_count += 1
+        except subprocess.CalledProcessError as e:
+            print(f"  ✗ Failed to create: {e}")
+            failed_count += 1
 
-    return existing, created, failed
+    return existing_count, created_count, failed_count
+
+
+def check_running_as_root() -> bool:
+    result = subprocess.run(('id', '-u'), capture_output=True)
+    return result.stdout.strip() == b'0'
 
 
 def main() -> int:
-    """
-    Main entry point.
-
-    Returns:
-        Exit code (0 for success, non-zero for error)
-    """
     parser = argparse.ArgumentParser(
         description='Create btrfs subvolumes from btrbk configuration'
     )
@@ -194,6 +216,11 @@ def main() -> int:
         '--dry-run',
         action='store_true',
         help='Show what would be done without making changes'
+    )
+    parser.add_argument(
+        '--interactive',
+        action='store_true',
+        help='Interactively convert existing directories to subvolumes'
     )
     parser.add_argument(
         '--config',
@@ -204,54 +231,50 @@ def main() -> int:
 
     args = parser.parse_args()
 
-    # Check root privileges (unless dry-run)
-    if not args.dry_run and subprocess.run(['id', '-u'], capture_output=True).stdout.strip() != b'0':
-        logger.error("ERROR: This script must be run as root (use sudo)")
-        logger.info("Or use --dry-run to preview what would be done")
+    if not args.dry_run and not check_running_as_root():
+        print("ERROR: This script must be run as root (use sudo)")
+        print("Or use --dry-run to preview what would be done")
         return 1
 
     try:
-        # Parse config
-        logger.info(f"Reading config: {args.config}")
-        volume_base, subvolume_names = parse_btrbk_config(args.config)
-        logger.info(f"Found {len(subvolume_names)} subvolumes to process\n")
+        print(f"Reading config: {args.config}")
+        config = parse_btrbk_config_file(args.config)
+        print(f"Volume base: {config.volume_base}")
+        print(f"Subvolumes: {len(config.subvolume_names)}")
 
-        # Process subvolumes
         if args.dry_run:
-            logger.info("=== DRY RUN MODE - No changes will be made ===\n")
+            print("\n=== DRY RUN MODE - No changes will be made ===")
 
-        existing, created, failed = process_subvolumes(
-            volume_base,
-            subvolume_names,
-            args.dry_run
+        existing, created, failed = process_all_subvolumes_from_config(
+            config,
+            args.dry_run,
+            args.interactive
         )
 
-        # Summary
-        logger.info("\n=== Summary ===")
-        logger.info(f"Already subvolumes: {existing}")
-        if args.dry_run:
-            logger.info(f"Would create: {created}")
-        else:
-            logger.info(f"Created: {created}")
-        logger.info(f"Failed/Manual intervention needed: {failed}")
+        print("\n=== Summary ===")
+        print(f"Already subvolumes: {existing}")
+        print(f"{'Would create' if args.dry_run else 'Created'}: {created}")
+        print(f"Failed/Skipped: {failed}")
 
-        if failed > 0:
-            logger.warning("\nSome directories need manual conversion.")
-            logger.warning("For directories with existing data, you need to:")
-            logger.warning("  1. Move data out: mv dir dir.tmp")
-            logger.warning("  2. Create subvolume: btrfs subvolume create dir")
-            logger.warning("  3. Move data back: mv dir.tmp/* dir/")
-            logger.warning("  4. Clean up: rm -rf dir.tmp")
-            return 1
+        if failed > 0 and not args.interactive:
+            print("\nUse --interactive to convert existing directories")
+
+        if created > 0 and not args.dry_run:
+            print(f"\nOriginal directories preserved in: {config.volume_base}/migrating_to_subvolumes/")
+            print("You can safely delete them after verifying backups work correctly")
 
         return 0
 
     except (FileNotFoundError, ValueError) as e:
-        logger.error(f"ERROR: {e}")
+        print(f"ERROR: {e}")
         return 1
 
+    except KeyboardInterrupt:
+        print("\n\nInterrupted by user")
+        return 130
+
     except Exception as e:
-        logger.error(f"ERROR: Unexpected error: {e}")
+        print(f"ERROR: Unexpected error: {e}")
         import traceback
         traceback.print_exc()
         return 1

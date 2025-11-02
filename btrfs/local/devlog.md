@@ -258,20 +258,46 @@ This is much simpler but only backs up one directory.
 - ✅ Simple to understand and maintain
 - ✅ Easy to add/remove backup targets
 
+## UPDATED APPROACH: Snapshot Cleanup Hook (FINAL)
+
+**New user requirements (2025-11-02)**:
+- **Cannot move files** - must work with existing subvolume structure
+- **Must exclude sensitive files** - .aws credentials, etc. are security-critical
+- Use btrbk hooks to clean snapshots before they're finalized
+
+### Final Solution: snapshot_create_exec Hook
+
+btrbk provides `snapshot_create_exec` which runs AFTER snapshot creation but BEFORE making it read-only. Perfect timing to remove sensitive files!
+
+**How it works**:
+1. btrbk creates writable snapshot of subvolume
+2. Hook script (`snapshot-cleanup-hook.sh`) runs on snapshot and removes:
+   - Pattern-based exclusions (.env, .venv, *secret*, .aws, node_modules, .cache, .local, .var, old_backup, Downloads, AppImages)
+   - Git-ignored files (using `git ls-files --others --ignored --exclude-standard`)
+3. btrbk makes snapshot read-only
+4. btrbk sends clean snapshot to AWS
+
+**Benefits**:
+- ✅ No file moving or restructuring required
+- ✅ Original data completely unchanged
+- ✅ Sensitive files never reach AWS
+- ✅ Git-aware (respects all .gitignore files)
+- ✅ Works with existing subvolume layout
+
 ## Implementation Progress
 
 ### Completed
 - [x] Create devlog with analysis
-- [x] Create `convert-to-subvolumes.sh` script
+- [x] Create snapshot cleanup hook script
+- [x] Update btrbk.conf with hook configuration
 
 ### In Progress
-- [ ] Create btrbk configuration file
-- [ ] Test subvolume conversion (dry-run first)
-- [ ] Test manual backup
-- [ ] Create systemd automation
+- [ ] Test hook with dry-run
+- [ ] Document hook approach
 
 ### Todo
-- [ ] Handle git-ignored files (future enhancement)
+- [ ] Test manual backup
+- [ ] Create systemd automation
 - [ ] Documentation
 - [ ] Restore procedure testing
 

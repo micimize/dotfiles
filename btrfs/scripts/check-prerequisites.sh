@@ -12,6 +12,8 @@ NC='\033[0m' # No Color
 
 ERRORS=0
 
+# NOTE: Later we need to add 1password open & running check to setup,
+# I imagine that's easier after getting our machine to have 1password CLI access
 check_command() {
     local cmd=$1
     local package=$2

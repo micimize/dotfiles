@@ -19,8 +19,12 @@ retention_policy          90d 52w 120m
 
 # I want:
 # - all of /home/mjr
-# minus .env, .venv, *secret*, node_modules, /.var, /.cache, /.local, 
-# - all of Documents and Downloads
+# minus .env, .venv, *secret*, node_modules, $HOME/.var, $HOME/.cache, /.local, 
+# minus:
+# - $HOME/.aws
+# - $HOME/.var, $HOME/.cache, $HOME/.local,
+# - $HOME/old_backup
+# - git ignored files in git repos
 
 # Backup the main /home subvolume
 # This will create a snapshot of @home and send it to the AWS server.

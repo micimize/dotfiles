@@ -98,7 +98,7 @@ cmd_check_ssh() {
         log_info "Troubleshooting steps:"
         log_info "  1. Check instance is running: aws ec2 describe-instances --instance-ids ${BTRBK_AWS_INSTANCE_ID}"
         log_info "  2. Check security group allows SSH from your IP"
-        log_info "  3. Verify SSH key permissions: chmod 600 ${BTRBK_AWS_SSH_KEY}"
+        log_info "  3. Verify SSH agent has key: ssh-add -l"
         log_info "  4. Try manual connection: $ssh_cmd"
         return 1
     fi

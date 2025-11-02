@@ -22,22 +22,20 @@ This document tracks the implementation of local btrbk configuration for backing
 - **Source**: `/home/mjr` (entire home directory)
 
 ### What to Exclude
-1. Environment/dependency directories:
-   - `.env` files
-   - `.venv` directories (Python virtual environments)
-   - `*secret*` (any file/dir with "secret" in name)
-   - `node_modules` (JavaScript dependencies)
+1. `.gitignore`-ed files in all git repos
 
-2. Cache and temporary data:
+2. Cache, install-specific, and temporary data:
    - `$HOME/.var`
    - `$HOME/.cache`
    - `$HOME/.local`
+   - `$HOME/AppImages`
 
 3. Sensitive data:
    - `$HOME/.aws` (AWS credentials)
 
 4. Other exclusions:
    - `$HOME/old_backup`
+   - `$HOME/Downloads`
    - Git-ignored files within git repositories
 
 ### Technical Constraints
@@ -225,12 +223,65 @@ This is much simpler but only backs up one directory.
 3. **Frequency**: How often should backups run? Daily? Hourly?
 4. **Complexity tolerance**: Prefer simpler (backup less) or complex (backup more with exclusions)?
 
+## Decision: Direct Subvolume Approach (Simplified Option 5)
+
+**User feedback**: Use inclusion-based approach with specific directories. Use git commands to discover exclusions rather than .gitignore parsing.
+
+**Key insight**: Since btrfs is CoW, we can convert existing directories to subvolumes without major disk usage (uses reflinks during conversion).
+
+### Directories to Back Up
+- code
+- Dygma
+- Documents
+- Desktop
+- Templates
+- Pictures
+- Public
+- Videos
+- Music
+- .config
+- .dev_sculptor
+- .sculptor
+- .mozilla
+
+### Implementation Strategy
+
+1. **Convert directories to subvolumes** using `cp --reflink=always` (CoW, no duplication)
+2. **btrbk snapshots subvolumes directly** (no staging needed!)
+3. **Git exclusions**: Document for future, but accept git artifacts in initial implementation (they compress well)
+
+### Why This Works Better
+
+- ✅ No staging copies (less complexity)
+- ✅ CoW conversion is disk-space efficient
+- ✅ btrbk operates directly on subvolumes (native support)
+- ✅ Simple to understand and maintain
+- ✅ Easy to add/remove backup targets
+
+## Implementation Progress
+
+### Completed
+- [x] Create devlog with analysis
+- [x] Create `convert-to-subvolumes.sh` script
+
+### In Progress
+- [ ] Create btrbk configuration file
+- [ ] Test subvolume conversion (dry-run first)
+- [ ] Test manual backup
+- [ ] Create systemd automation
+
+### Todo
+- [ ] Handle git-ignored files (future enhancement)
+- [ ] Documentation
+- [ ] Restore procedure testing
+
 ## Next Steps
 
 1. ✅ Create this devlog
-2. Wait for user input on preferred approach
-3. Implement chosen approach
-4. Test and iterate
+2. ✅ Create conversion script
+3. Create btrbk.conf
+4. Test conversion (dry-run)
+5. Test backup
 
 ## Notes
 

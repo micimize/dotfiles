@@ -159,7 +159,6 @@ apply_infrastructure() {
     log_warning "This will create resources in your AWS account and incur costs."
     log_info "Estimated monthly cost: ~\$11-12 (t3a.nano + 100GB EBS in us-west-1)"
     echo ""
-    echo "Note: IF already deployed this will just refresh local env etc"
 
     read -p "Continue with deployment? (yes/no): " -r
     echo ""

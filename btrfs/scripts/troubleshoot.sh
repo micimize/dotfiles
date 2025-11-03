@@ -85,10 +85,9 @@ EOF
 
 # Check SSH connectivity
 cmd_check_ssh() {
-    log_info "Checking SSH connectivity..."
-
     local ssh_cmd
     ssh_cmd=$(get_ssh_cmd)
+    log_info "Checking SSH connectivity... ($ssh_cmd)"
 
     # Test basic connectivity
     if $ssh_cmd "exit" 2>/dev/null; then

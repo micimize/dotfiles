@@ -128,28 +128,31 @@ def remove_git_ignored_files_from_snapshot(snapshot_path: Path) -> None:
 
 def main() -> int:
     # Get snapshot path from environment variable
-    snapshot_path_str: Optional[str] = os.environ.get('SNAPSHOT_SUBVOLUME_PATH')
+    snapshot_paths = sys.argv[1:]
 
-    if not snapshot_path_str:
+    if not snapshot_paths:
         logger.error("ERROR: SNAPSHOT_SUBVOLUME_PATH environment variable not set")
         return 1
 
-    snapshot_path = Path(snapshot_path_str)
 
-    try:
+    for snapshot_path_str in snapshot_paths:
+        snapshot_path = Path(snapshot_path_str)
+        print(snapshot_path_str)
+        print(snapshot_path.exists())
+        print(snapshot_path.is_dir())
+        assert snapshot_path.exists() and snapshot_path.is_dir(), f"Snapshot path does not exist or isn't a dir: {snapshot_path}"
         remove_git_ignored_files_from_snapshot(snapshot_path)
-        return 0
 
-    except ValueError as e:
-        logger.error(f"ERROR: {e}")
-        return 1
-
-    except Exception as e:
-        logger.error(f"ERROR: Unexpected error: {e}")
-        import traceback
-        traceback.print_exc(file=sys.stderr)
-        return 1
+    return 0
 
 
 if __name__ == '__main__':
     sys.exit(main())
+
+/home/mjr/.snapshots/code.20251103T0859/           /home/mjr/.snapshots/Music.20251103T0859/
+/home/mjr/.snapshots/.config.20251103T0859/        /home/mjr/.snapshots/Pictures.20251103T0859/
+/home/mjr/.snapshots/Desktop.20251103T0859/        /home/mjr/.snapshots/Public.20251103T0859/
+/home/mjr/.snapshots/.dev_sculptor.20251103T0859/  /home/mjr/.snapshots/.sculptor.20251103T0859/
+/home/mjr/.snapshots/Documents.20251103T0859/      /home/mjr/.snapshots/Templates.20251103T0859/
+/home/mjr/.snapshots/Dygma.20251103T0859/          /home/mjr/.snapshots/Videos.20251103T0859/
+/home/mjr/.snapshots/.mozilla.20251103T0859/

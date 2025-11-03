@@ -9,6 +9,7 @@ Usage:
     sudo ./create-subvolumes.py [--dry-run] [--config PATH] [--interactive]
 """
 
+import os
 import argparse
 import shutil
 import subprocess
@@ -98,7 +99,6 @@ def move_directory_to_migration_area(source: Path, migration_base: Path) -> Path
 
 
 def recursively_change_ownership_of_path(path: Path, uid: int, gid: int) -> None:
-    import os
     os.chown(path, uid, gid)
     if path.is_dir():
         for item in path.rglob('*'):

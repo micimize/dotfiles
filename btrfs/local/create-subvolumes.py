@@ -85,11 +85,24 @@ def run_btrfs_subvolume_create(path: Path) -> None:
     )
 
 
+def get_owner_uid_and_gid_from_path(path: Path) -> tuple[int, int]:
+    stat = path.stat()
+    return stat.st_uid, stat.st_gid
+
+
 def move_directory_to_migration_area(source: Path, migration_base: Path) -> Path:
     destination = migration_base / source.name
     migration_base.mkdir(parents=True, exist_ok=True)
     shutil.move(str(source), str(destination))
     return destination
+
+
+def recursively_change_ownership_of_path(path: Path, uid: int, gid: int) -> None:
+    import os
+    os.chown(path, uid, gid)
+    if path.is_dir():
+        for item in path.rglob('*'):
+            os.chown(item, uid, gid, follow_symlinks=False)
 
 
 def copy_contents_from_migration_to_subvolume(migration_path: Path, subvolume_path: Path) -> None:
@@ -130,17 +143,25 @@ def convert_existing_directory_to_subvolume_interactively(
         return True
 
     try:
+        # Capture original ownership before moving
+        print(f"    Capturing original ownership...")
+        original_uid, original_gid = get_owner_uid_and_gid_from_path(directory_path)
+
         # Move existing directory to migration area
         print(f"    Moving to migration area...")
         migrated_path = move_directory_to_migration_area(directory_path, migration_base)
 
-        # Create new subvolume
+        # Create new subvolume (will be owned by root initially)
         print(f"    Creating subvolume...")
         run_btrfs_subvolume_create(directory_path)
 
         # Copy contents back
         print(f"    Copying contents to subvolume...")
         copy_contents_from_migration_to_subvolume(migrated_path, directory_path)
+
+        # Restore original ownership
+        print(f"    Restoring ownership (uid={original_uid}, gid={original_gid})...")
+        recursively_change_ownership_of_path(directory_path, original_uid, original_gid)
 
         print(f"  ✓ Converted to subvolume")
         print(f"    Original preserved at: {migrated_path}")
@@ -159,8 +180,8 @@ def generate_subvolume_paths_from_config(config: BtrbkConfig) -> Generator[Path,
 def process_all_subvolumes_from_config(
     config: BtrbkConfig,
     dry_run: bool,
-    interactive: bool
 ) -> tuple[int, int, int]:
+    interactive = not dry_run
     migration_base = config.volume_base / 'migrating_to_subvolumes'
 
     existing_count = 0
@@ -242,8 +263,7 @@ def main() -> int:
 
         existing, created, failed = process_all_subvolumes_from_config(
             config,
-            args.dry_run,
-            interactive=True
+            args.dry_run
         )
 
         print("\n=== Summary ===")

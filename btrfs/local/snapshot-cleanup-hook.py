@@ -148,11 +148,3 @@ def main() -> int:
 
 if __name__ == '__main__':
     sys.exit(main())
-
-/home/mjr/.snapshots/code.20251103T0859/           /home/mjr/.snapshots/Music.20251103T0859/
-/home/mjr/.snapshots/.config.20251103T0859/        /home/mjr/.snapshots/Pictures.20251103T0859/
-/home/mjr/.snapshots/Desktop.20251103T0859/        /home/mjr/.snapshots/Public.20251103T0859/
-/home/mjr/.snapshots/.dev_sculptor.20251103T0859/  /home/mjr/.snapshots/.sculptor.20251103T0859/
-/home/mjr/.snapshots/Documents.20251103T0859/      /home/mjr/.snapshots/Templates.20251103T0859/
-/home/mjr/.snapshots/Dygma.20251103T0859/          /home/mjr/.snapshots/Videos.20251103T0859/
-/home/mjr/.snapshots/.mozilla.20251103T0859/

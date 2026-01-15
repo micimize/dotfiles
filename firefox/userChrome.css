@@ -304,6 +304,7 @@ toolbar#nav-bar {
   .urlbar-page-action,
   .chromeclass-toolbar-additional:not(#sidebar-button, #back-button, #forward-button),
   #tracking-protection-icon-container,
+  .urlbar-revert-button-container,
   #identity-icon-box {
     transition: 0.125s ease-in-out;
 
@@ -375,6 +376,7 @@ toolbar#nav-bar {
     .urlbar-page-action,
     .chromeclass-toolbar-additional:not(#sidebar-button, #back-button, #forward-button),
     #tracking-protection-icon-container,
+    .urlbar-revert-button-container,
     #identity-icon-box,
     .searchmode-switcher-chicklet {
       opacity: 0.4 !important;

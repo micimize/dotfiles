@@ -49,14 +49,6 @@ for entry in "${__postfix_paths[@]}"; do
   fi
 done
 
-function _load_homebrew_nvm {
-  export NVM_DIR="$HOME/.nvm"
-  mkdir -p $NVM_DIR
-  [ -s "/home/linuxbrew/.linuxbrew/opt/nvm/nvm.sh" ] && \. "/home/linuxbrew/.linuxbrew/opt/nvm/nvm.sh"  # This loads nvm
-  [ -s "/home/linuxbrew/.linuxbrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/home/linuxbrew/.linuxbrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
-}
-_load_homebrew_nvm
-
 ## shopt & set options
 shopt -s cdspell                # This will correct minor spelling errors in a cd command.
 shopt -s histappend             # Append to history rather than overwrite

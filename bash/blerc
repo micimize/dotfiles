@@ -8,8 +8,8 @@ ble-face syntax_error=bg=88,bold
 
 ble-import -d integration/fzf-completion
 ble-import -d integration/fzf-key-bindings
-_ble_contrib_fzf_git_config=key-binding:sabbrev:arpeggio
-ble-import -d integration/fzf-git
+# _ble_contrib_fzf_git_config=key-binding:sabbrev:arpeggio
+# ble-import -d integration/fzf-git
 
 ## Ctrl-C behavior
 function ble/widget/discard-and-cancel {

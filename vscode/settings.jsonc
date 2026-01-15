@@ -79,7 +79,7 @@
   }, // setting to false helps typing performance
   "editor.fontSize": 12,
   "editor.lineHeight": 1.5,
-  "editor.formatOnSave": true,
+  "editor.formatOnSave": false,
   "telemetry.telemetryLevel": "off",
   "workbench.editor.enablePreview": false,
   "workbench.editor.labelFormat": "medium",
@@ -1028,4 +1028,7 @@
   "cursorless.commandHistory": true,
   "github.copilot.nextEditSuggestions.enabled": true,
   "gitlab.duoCodeSuggestions.enabled": true,
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
 }

@@ -100,7 +100,7 @@
   "vim.hlsearch": true,
   "vim.foldfix": true,
   "vim.normalModeKeyBindingsNonRecursive": [
-    // history, marker, file nav 
+    // history, marker, file nav
     {
       "before": [
         "g",
@@ -1028,4 +1028,6 @@
   "cursorless.commandHistory": true,
   "github.copilot.nextEditSuggestions.enabled": true,
   "gitlab.duoCodeSuggestions.enabled": true,
+  "claudeCode.preferredLocation": "terminal",
+  "claudeCode.useTerminal": true,
 }

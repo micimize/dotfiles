@@ -767,11 +767,13 @@
   "gitlens.heatmap.toggleMode": "window",
   "gitlens.blame.toggleMode": "window",
   "gitlens.blame.heatmap.location": "left",
-  "files.": {},
   "files.associations": {
     "*.bq": "sql",
     "*.dart.tmpl": "dart",
     "*.vim": "viml",
+    // note: doesn't work super well b/c vscode is dumb (lsp doesn't care about association)
+    ".claude/settings.local.json": "jsonc",
+    ".claude/settings.json": "jsonc"
   },
   "update.enableWindowsBackgroundUpdates": false,
   "extensions.autoCheckUpdates": false,
@@ -1031,4 +1033,9 @@
   "[typescriptreact]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
+  "claudeCode.preferredLocation": "panel",
+  "claudeCode.useTerminal": false, // broken as hell wtf
+  "claudeCode.selectedModel": "default",
+  "remote.autoForwardPortsSource": "hybrid",
+  "claudeCode.allowDangerouslySkipPermissions": true
 }

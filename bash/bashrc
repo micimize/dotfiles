@@ -4,7 +4,7 @@ if [[ $- != *i* ]]; then
 fi
 
 
-if command -v tmux &>/dev/null && [[ ! "$TERM" =~ screen ]] && [[ ! "$TERM" =~ tmux ]] && [ -z "$TMUX" ]; then
+if command -v tmux &>/dev/null && [[ ! "$TERM" =~ screen ]] && [[ ! "$TERM" =~ tmux ]] && [ -z "$TMUX" ] && [ -z "$WEZTERM_PANE" ]; then
  tmux
 fi
 
@@ -20,9 +20,6 @@ export PAGER=less
 export EDITOR=vim
 
 export LESS='-R'
-
-# temporary
-alias wezterm=k:ome/mjr/code/libraries/wezterm/wezterm-20230712-072601-f4abf8fd/target/release/wezterm
 
 __prefix_paths=(
   "/opt/local/bin"

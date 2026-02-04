@@ -5,6 +5,7 @@
 README.md
 setup.sh
 setup.sh.archive
+*.archive
 
 # Legacy directories (original structure before chezmoi)
 archive/

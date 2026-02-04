@@ -10,6 +10,10 @@ fi
 
 export LANG="${LANG:-en_US.UTF-8}"
 
+# NOTE: DOTFILES_DIR must exist for sourced files below to work.
+# This path is hardcoded because the bashrc sources additional files from the
+# dotfiles repo (aesthetics.sh, completions.sh, etc.). A future migration
+# could inline these files or use chezmoi templates for portability.
 export DOTFILES_DIR="$HOME/code/personal/dotfiles"
 export BASHFILES_DIR="$DOTFILES_DIR/bash"
 export BLESH_DIR="$HOME/.local/share/blesh"

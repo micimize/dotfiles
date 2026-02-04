@@ -3,3 +3,4 @@
 .*.sw[a-p]
 
 zsh/plugins.sh
+.vscode

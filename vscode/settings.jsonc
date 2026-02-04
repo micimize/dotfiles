@@ -771,9 +771,9 @@
     "*.bq": "sql",
     "*.dart.tmpl": "dart",
     "*.vim": "viml",
-    // note: doesn't work super well b/c vscode is dumb (lsp doesn't care about association)
     ".claude/settings.local.json": "jsonc",
-    ".claude/settings.json": "jsonc"
+    ".claude/settings.json": "jsonc",
+    "*.ts": "typescript"
   },
   "update.enableWindowsBackgroundUpdates": false,
   "extensions.autoCheckUpdates": false,

@@ -1,0 +1,42 @@
+# Chezmoi ignore file
+# Exclude legacy files that aren't part of chezmoi management
+
+# Legacy symlink-based structure (kept for reference/fallback)
+README.md
+setup.sh
+setup.sh.archive
+
+# Legacy directories (original structure before chezmoi)
+archive/
+bash/
+blackbox/
+btrfs/
+firefox/
+macos/
+tridactyl/
+vscode/
+
+# Misc
+init.vim
+tmux.conf
+
+# Git and IDE
+.git/
+.gitignore
+.gitmodules
+.vscode/
+
+# Devcontainer (not managed by chezmoi - lives in repo directly)
+.devcontainer/
+bin/
+
+# Platform-specific exclusions using templates
+{{- if ne .chezmoi.os "darwin" }}
+# Exclude macOS-specific files on non-macOS systems
+# (none currently in dot_config)
+{{- end }}
+
+{{- if ne .chezmoi.os "linux" }}
+# Exclude Linux-specific files on non-Linux systems
+# (none currently in dot_config)
+{{- end }}

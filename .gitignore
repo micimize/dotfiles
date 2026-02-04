@@ -4,3 +4,6 @@
 
 zsh/plugins.sh
 .vscode
+
+# Lace generated files
+.lace/

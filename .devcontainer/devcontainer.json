@@ -29,6 +29,14 @@
       "settings": {
         "terminal.integrated.defaultProfile.linux": "bash"
       }
+    },
+    // Lace plugins - mounted at /mnt/lace/plugins/<name>
+    // This enables the wezterm config to load the lace plugin from a consistent path
+    "lace": {
+      "plugins": {
+        // Lace repo provides the wezterm plugin for devcontainer SSH domain access
+        "github.com/weftwiseink/lace": {}
+      }
     }
   }
 }

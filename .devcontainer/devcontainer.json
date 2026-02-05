@@ -15,12 +15,12 @@
     }
   },
   // Expose sshd port for WezTerm SSH domain multiplexing
-  // Uses port 2223 to avoid conflict with lace devcontainer (port 2222)
-  "appPort": ["2223:2222"],
+  // Port 22426 is in the lace discovery range (22425-22499) for auto-discovery
+  "appPort": ["22426:2222"],
   "mounts": [
     // SSH public key for WezTerm SSH domain access (host -> container)
-    // One-time setup: ssh-keygen -t ed25519 -f ~/.ssh/dotfiles_devcontainer -N ""
-    "source=${localEnv:HOME}/.ssh/dotfiles_devcontainer.pub,target=/home/vscode/.ssh/authorized_keys,type=bind,readonly"
+    // One-time setup: ssh-keygen -t ed25519 -f ~/.ssh/lace_devcontainer -N ""
+    "source=${localEnv:HOME}/.ssh/lace_devcontainer.pub,target=/home/vscode/.ssh/authorized_keys,type=bind,readonly"
   ],
   // Start wezterm mux daemon for SSH domain multiplexing (sshd is started by the sshd feature)
   "postStartCommand": "wezterm-mux-server --daemonize 2>/dev/null || true",

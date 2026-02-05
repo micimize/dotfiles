@@ -1,0 +1,156 @@
+{
+  "better-comments.tags": [
+    {
+      "tag": "!",
+      "color": "#FF2D00",
+      "strikethrough": false,
+      "backgroundColor": "transparent"
+    },
+    {
+      "tag": "?",
+      "color": "#3498DB",
+      "strikethrough": false,
+      "backgroundColor": "transparent"
+    },
+    {
+      "tag": "//",
+      "color": "#474747",
+      "strikethrough": true,
+      "backgroundColor": "transparent"
+    },
+    {
+      "tag": "todo",
+      "color": "#FF8C00",
+      "strikethrough": false,
+      "backgroundColor": "transparent"
+    },
+    {
+      "tag": "*",
+      "color": "#98C379",
+      "strikethrough": false,
+      "backgroundColor": "transparent"
+    }
+  ],
+
+  "vim.normalModeKeyBindingsNonRecursive": [
+    // Start softwrap support
+    {
+      "before": [
+        "down"
+      ],
+      "after": [
+        "g",
+        "j"
+      ]
+    },
+    {
+      "before": [
+        "up"
+      ],
+      "after": [
+        "g",
+        "k"
+      ]
+    },
+    {
+      "before": [
+        "j"
+      ],
+      "after": [
+        "g",
+        "j"
+      ]
+    },
+    {
+      "before": [
+        "k"
+      ],
+      "after": [
+        "g",
+        "k"
+      ]
+    },
+    // workaround for https://github.com/VSCodeVim/Vim/issues/2032
+    {
+      "before": [
+        "k"
+      ],
+      "after": [
+        "g",
+        "k"
+      ]
+    }        {
+      "before": [
+        "g",
+        "$"
+      ],
+      "commands": [
+        {
+          "command": "cursorMove",
+          "args": {
+            "to": "wrappedLineEnd"
+          }
+        }
+      ]
+    }
+  ],
+  "vim.visualModeKeyBindingsNonRecursive": [
+    // Start softwrap support
+    {
+      "before": [
+        "down"
+      ],
+      "after": [
+        "g",
+        "j"
+      ]
+    },
+    {
+      "before": [
+        "up"
+      ],
+      "after": [
+        "g",
+        "k"
+      ]
+    },
+    {
+      "before": [
+        "j"
+      ],
+      "after": [
+        "g",
+        "j"
+      ]
+    },
+    // workaround for https://github.com/VSCodeVim/Vim/issues/2032
+    {
+      "before": [
+        "k"
+      ],
+      "after": [
+        "g",
+        "k"
+      ]
+    }        {
+      "before": [
+        "g",
+        "$"
+      ],
+      "commands": [
+        {
+          "command": "cursorMove",
+          "args": {
+            "to": "wrappedLineEnd"
+          }
+        }
+      ]
+    }
+  ]
+  // https://github.com/be5invis/Iosevka/blob/main/doc/custom-build.md
+  // /home/mjr/code/libraries/Iosevka
+  //"terminal.integrated.fontFamily": "Hack",
+  //"terminal.integrated.fontFamily": "'Droid Sans Mono', 'monospace', monospace",
+  //"editor.fontFamily": "'Droid Sans Mono', 'monospace', monospace",
+  //"editor.fontFamily": "Menlo, Monaco, 'Courier New', monospace",
+}

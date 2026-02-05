@@ -23,6 +23,12 @@ config.tab_bar_at_bottom = true
 config.use_fancy_tab_bar = false
 
 -- =============================================================================
+-- Shell
+-- =============================================================================
+
+config.default_prog = { '/home/mjr/.cargo/bin/nu' }
+
+-- =============================================================================
 -- Core Settings
 -- =============================================================================
 
@@ -104,66 +110,37 @@ config.keys = {
 
 -- =============================================================================
 -- Lace Plugin (for devcontainer access)
--- Loads from host path or container mount path
+-- Discovers running lace devcontainers via Docker and provides a project picker.
+-- Plugin repo: https://github.com/weftwiseink/lace.wezterm
 -- =============================================================================
 
-local function get_lace_plugin_path()
-  -- Check if running in a container with lace mounted as a plugin
-  local is_container = os.getenv("REMOTE_CONTAINERS") ~= nil
-  if is_container then
-    return "file:///mnt/lace/plugins/lace/config/wezterm/lace-plugin"
-  else
-    -- Host path - adjust to your local lace checkout
-    return "file://" .. wezterm.home_dir .. "/code/weft/lace/config/wezterm/lace-plugin"
+local function get_lace_plugin_url()
+  -- Use local checkout for development; set LACE_WEZTERM_DEV=1 to force local path,
+  -- or fall back to local path if the checkout exists.
+  local dev_override = os.getenv("LACE_WEZTERM_DEV")
+  local local_path = wezterm.home_dir .. "/code/weft/lace.wezterm"
+  if dev_override or wezterm.GLOBAL.lace_use_local then
+    return "file://" .. local_path
   end
+  -- Default to local checkout (switch to GitHub URL when plugin is stable):
+  -- return "https://github.com/weftwiseink/lace.wezterm"
+  return "file://" .. local_path
 end
 
-local ok, lace_plugin = pcall(wezterm.plugin.require, get_lace_plugin_path())
+local ok, lace_plugin = pcall(wezterm.plugin.require, get_lace_plugin_url())
 if ok then
-  -- Configure lace devcontainer access
+  -- Configure lace devcontainer access.
+  -- The new plugin uses Docker-based port-range discovery (ports 22425-22499)
+  -- and pre-registers SSH domains for the entire range.
   lace_plugin.apply_to_config(config, {
     ssh_key = wezterm.home_dir .. "/.ssh/lace_devcontainer",
-    domain_name = "lace",
-    ssh_port = "localhost:2222",
   })
 
-  -- Leader+D: Connect to lace devcontainer
-  table.insert(config.keys, {
-    key = "d",
-    mods = "LEADER",
-    action = lace_plugin.connect_action({
-      domain_name = "lace",
-      workspace_path = "/workspace",
-      main_worktree = "lace",
-    }),
-  })
-
-  -- Leader+W: Lace worktree picker
+  -- Leader+W: Open the lace project picker (discovers running devcontainers)
   table.insert(config.keys, {
     key = "w",
     mods = "LEADER",
-    action = act.EmitEvent(lace_plugin.get_picker_event("lace")),
-  })
-
-  -- Configure dotfiles devcontainer access (different port)
-  lace_plugin.apply_to_config(config, {
-    ssh_key = wezterm.home_dir .. "/.ssh/dotfiles_devcontainer",
-    domain_name = "dotfiles",
-    ssh_port = "localhost:2223",
-    workspace_path = "/workspaces",  -- devcontainer default
-    main_worktree = "dotfiles",
-    enable_status_bar = false,  -- Already registered by lace config
-  })
-
-  -- Leader+F: Connect to dotfiles devcontainer
-  table.insert(config.keys, {
-    key = "f",
-    mods = "LEADER",
-    action = lace_plugin.connect_action({
-      domain_name = "dotfiles",
-      workspace_path = "/workspaces",
-      main_worktree = "dotfiles",
-    }),
+    action = act.EmitEvent(lace_plugin.get_picker_event()),
   })
 else
   wezterm.log_warn("Failed to load lace plugin: " .. tostring(lace_plugin))

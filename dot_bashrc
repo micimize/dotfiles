@@ -15,7 +15,7 @@ export LANG="${LANG:-en_US.UTF-8}"
 # dotfiles repo (aesthetics.sh, completions.sh, etc.). A future migration
 # could inline these files or use chezmoi templates for portability.
 export DOTFILES_DIR="$HOME/code/personal/dotfiles"
-export BASHFILES_DIR="$DOTFILES_DIR/bash"
+export BASHFILES_DIR="$DOTFILES_DIR/archive/legacy/bash"
 export BLESH_DIR="$HOME/.local/share/blesh"
 export XDG_CONFIG_HOME="$HOME/.config"
 
@@ -105,11 +105,11 @@ source "$BASHFILES_DIR/aesthetics.sh"
 source "$BASHFILES_DIR/completions.sh"
 source "$BASHFILES_DIR/prompt_and_history.sh"
 source "$BASHFILES_DIR/utils.sh"
-source "$DOTFILES_DIR/vscode/init.sh"
+source "$DOTFILES_DIR/archive/legacy/vscode/init.sh"
 
 case $(uname -s) in
   Darwin | FreeBSD) source "$DOTFILES_DIR/macos/macos.sh" ;;
-  Linux) source "$DOTFILES_DIR/blackbox/blackbox.sh" ;;
+  Linux) source "$DOTFILES_DIR/archive/legacy/blackbox/blackbox.sh" ;;
 esac
 
 

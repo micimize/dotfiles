@@ -1,6 +1,6 @@
 # mjr dotfiles
 
-Personal dotfiles managed by [chezmoi](https://www.chezmoi.io/). Config for nushell, bash, wezterm, starship, and supporting tools.
+Personal dotfiles managed by [chezmoi](https://www.chezmoi.io/). Config for nushell, neovim, wezterm, supporting tools.
 
 The repo lives at `~/code/personal/dotfiles/`. Chezmoi maps files from here to `$HOME` using its naming conventions (`dot_bashrc` -> `~/.bashrc`, `dot_config/` -> `~/.config/`, etc.). There are no chezmoi templates -- everything is plain copies.
 
@@ -26,7 +26,7 @@ chezmoi apply -v
 - `run_once_before_30-install-carapace.sh`: [carapace](https://carapace-sh.github.io/) fzf-like for nushell (during apply)
 - `.chezmoiignore` ignores old or not-yet-migrated paths (ncluding `firefox` and `tridactyl`)
 
-## WezTerm + Nushell + Starship orientation
+## WezTerm + Nushell + Neovim orientation
 
 Config: `~/.config/wezterm/wezterm.lua`
 
@@ -142,15 +142,164 @@ http get https://api.github.com/zen
 
 ### Neovim
 
-Config: `~/.config/nvim/` (source: `dot_config/nvim/`). Uses lazy.nvim for plugin management (`init.lua` + `lua/` directory). The `vim` alias points to `nvim`, and `$EDITOR` / `$VISUAL` are both set to `nvim`.
+Config: `~/.config/nvim/` (source: `dot_config/nvim/`). Uses lazy.nvim for plugin management (`init.lua` + `lua/plugins/`). The `vim` alias points to `nvim`, and `$EDITOR` / `$VISUAL` are both set to `nvim`.
 
-### Starship
+**Leader key: `Space`** (300ms timeout). Press `Space` and wait -- which-key will pop up a hint panel showing available next keys and their descriptions.
 
-Config: `~/.config/starship.toml`
+Appearance: Solarized Dark, relative line numbers, indent guides, bufferline (tab-like bar at top showing open buffers), lualine statusbar at bottom showing mode/branch/diagnostics/filename.
 
-Starship is the prompt for both bash and nushell. It shows: time (MM-DD HH:MM), a custom shortened path, git branch, git status, and background job count. The color scheme is Solarized Dark to match wezterm.
+#### Finding things
 
-Installed by the `run_once_before_10-install-starship.sh` script via `cargo install starship --locked`.
+The VSCode equivalent of `Ctrl+P` (quick open) and `Ctrl+Shift+F` (search across files) is Telescope. Inside any Telescope picker, use `Ctrl+J/K` to move up/down, `Enter` to select, `Esc` to close, and `Ctrl+Q` to send results to the quickfix list.
+
+| Action | Keys | VSCode equivalent |
+|---|---|---|
+| Find file by name | `Ctrl+Space` or `Space f f` | `Ctrl+P` |
+| Live grep (search file contents) | `Space f g` | `Ctrl+Shift+F` |
+| Grep word under cursor | `Space f w` | right-click "Find All References" |
+| Open buffers (open files) | `Space f b` | tab switcher |
+| Recent files | `Space f r` | recent files list |
+| Command palette | `Ctrl+Shift+Space` or `Space f c` | `Ctrl+Shift+P` |
+| Help tags | `Space f h` | -- |
+| Find TODOs | `Space f t` | -- |
+| Document symbols | `Space f s` | `Ctrl+Shift+O` |
+| Workspace symbols | `Space f S` | `Ctrl+T` |
+
+#### File explorer
+
+Neo-tree provides a sidebar file tree (left side, 35 columns wide). It follows the current file and shows hidden files and git status.
+
+| Action | Keys |
+|---|---|
+| Toggle file explorer | `Space n` |
+| Reveal current file in explorer | `Space e` |
+
+Inside the neo-tree window: `l` or `o` to open, `h` to collapse, `s` to open in a vertical split. Standard filesystem operations (create, rename, delete) are available from the neo-tree menu.
+
+#### Code navigation (LSP)
+
+LSP servers are auto-installed by Mason. Configured out of the box: TypeScript/JavaScript (`ts_ls`), Lua (`lua_ls`), CSS, HTML, JSON. Add more via `:Mason`.
+
+| Action | Keys | VSCode equivalent |
+|---|---|---|
+| Go to definition | `g d` | `F12` or `Ctrl+Click` |
+| Go to declaration | `g D` | -- |
+| Find references | `g r` | `Shift+F12` |
+| Go to implementation | `g i` | `Ctrl+F12` |
+| Go to type definition | `g t` | -- |
+| Hover documentation | `K` | mouse hover |
+| Signature help | `Ctrl+K` | parameter hints |
+| Rename symbol | `Space r n` | `F2` |
+| Code action (quickfix/refactor) | `Space c a` | `Ctrl+.` |
+| Format buffer | `Space f` | `Shift+Alt+F` |
+
+#### Diagnostics
+
+Errors, warnings, and hints appear inline and in the gutter (sign column). The statusbar also shows diagnostic counts.
+
+| Action | Keys |
+|---|---|
+| Next diagnostic | `g e` |
+| Previous diagnostic | `g E` |
+| Show diagnostic float | `Space e` |
+| Send diagnostics to location list | `Space q` |
+
+#### Completion
+
+nvim-cmp provides autocompletion from LSP, snippets (LuaSnip), buffer words, and file paths.
+
+| Action | Keys |
+|---|---|
+| Trigger/next completion item | `Tab` |
+| Next item | `Ctrl+N` or `Tab` |
+| Previous item | `Ctrl+P` |
+| Confirm selection | `Enter` |
+| Dismiss completion | `Ctrl+E` |
+
+`Tab` is context-aware: it inserts a literal tab at the start of a line or after whitespace, and triggers completion otherwise.
+
+#### Git
+
+Gitsigns shows added/changed/deleted lines in the gutter and line numbers. Fugitive provides full git porcelain. Diffview gives a VSCode-like side-by-side diff.
+
+| Action | Keys |
+|---|---|
+| Next changed hunk | `] h` |
+| Previous changed hunk | `[ h` |
+| Stage hunk | `Space h s` |
+| Reset hunk | `Space h r` |
+| Stage entire buffer | `Space h S` |
+| Undo stage hunk | `Space h u` |
+| Reset entire buffer | `Space h R` |
+| Preview hunk (inline diff) | `Space h p` |
+| Blame current line | `Space h b` |
+| Diff current file | `Space h d` |
+| Toggle inline blame | `Space t b` |
+| Toggle deleted lines | `Space t d` |
+| Git status (fugitive) | `Space g g` |
+| Git blame (full file) | `Space g b` |
+| Git log | `Space g l` |
+| Git commits (telescope) | `Space g c` |
+| Git status (telescope) | `Space g s` |
+| Diff view (all changes) | `Space g d` |
+| File history | `Space g h` |
+
+#### Buffers and windows
+
+Buffers are neovim's equivalent of open files. The bufferline at the top shows them as tabs. Windows are splits within the current view.
+
+| Action | Keys |
+|---|---|
+| Next buffer | `Ctrl+N` |
+| Previous buffer | `Ctrl+P` |
+| Close buffer | `Space b d` |
+| Pin buffer | `Space b p` |
+| Close unpinned buffers | `Space b P` |
+| Move to left/down/up/right window | `Ctrl+H/J/K/L` |
+| Vertical split | `:vs` |
+| Horizontal split | `:sp` |
+| Save | `Space w` |
+
+Note: `Ctrl+N/P` means different things depending on context -- in normal mode they switch buffers, inside a completion menu they navigate the list.
+
+#### Editing helpers
+
+| Action | Keys |
+|---|---|
+| Comment line/selection | `gcc` (line) / `gc` (visual) |
+| Surround add | `ys{motion}{char}` (e.g., `ysiw"` to surround word with quotes) |
+| Surround change | `cs{old}{new}` (e.g., `cs"'` to change double to single quotes) |
+| Surround delete | `ds{char}` (e.g., `ds"` to remove surrounding quotes) |
+| Move lines up/down | `J` / `K` in visual mode |
+| Better indenting | `<` / `>` in visual mode (stays in visual) |
+| Yank entire file | `y p` |
+| Expand selection (treesitter) | `s` then `s` to grow, `S` to shrink |
+| Flash treesitter select | `S` in normal mode |
+| Clear search highlight | `Esc` |
+| Exit insert mode | `jk` or `jj` |
+
+#### Sessions
+
+Persistence auto-saves your session (open buffers, window layout, tabs) and can restore it later.
+
+| Action | Keys |
+|---|---|
+| Restore session (current dir) | `Space q s` |
+| Restore last session | `Space q l` |
+| Stop saving session | `Space q d` |
+
+#### Quick orientation checklist
+
+If you just landed here from VSCode, try these in order:
+
+1. Open a project directory: `nvim .`
+2. Toggle the file tree: `Space n`
+3. Find a file by name: `Ctrl+Space` and start typing
+4. Search across all files: `Space f g` and type a pattern
+5. Jump to a symbol definition: cursor on a symbol, press `g d`
+6. See what changed in git: `Space g g` (fugitive status) or `Space g d` (diff view)
+7. Press `Space` and wait to see what else is available via which-key
+
 
 ---
 

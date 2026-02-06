@@ -4,77 +4,35 @@ Personal dotfiles managed by [chezmoi](https://www.chezmoi.io/). Config for nush
 
 The repo lives at `~/code/personal/dotfiles/`. Chezmoi maps files from here to `$HOME` using its naming conventions (`dot_bashrc` -> `~/.bashrc`, `dot_config/` -> `~/.config/`, etc.). There are no chezmoi templates -- everything is plain copies.
 
-## Chezmoi Setup
-
-Chezmoi has never been applied on this machine. The repo is already structured for it, so the workflow is: point chezmoi at the existing repo, preview what it will do, then apply.
-
-### Install chezmoi
-
+## Chezmoi
 ```bash
-# Fedora/DNF
-sudo dnf install chezmoi
+# install
+brew install chezmoi
 
-# Or via go
-go install github.com/twpayne/chezmoi/v2@latest
-
-# Or the official one-liner
-sh -c "$(curl -fsLS get.chezmoi.io)"
-```
-
-### Point chezmoi at this repo
-
-```bash
+# init
 chezmoi init --source ~/code/personal/dotfiles
-```
 
-This tells chezmoi where the source files live. It does not copy or change anything yet.
-
-### Preview what will happen
-
-```bash
 # List all files chezmoi would manage
 chezmoi managed
 
 # Show a diff of what chezmoi would change on your system
 chezmoi diff
-```
 
-Review the diff carefully. Chezmoi will overwrite existing files at the target paths (`~/.bashrc`, `~/.config/nushell/`, `~/.config/wezterm/`, etc.). Back up anything you want to keep.
-
-### Apply
-
-```bash
+# apply 
 chezmoi apply -v
 ```
 
-The `-v` flag prints each action as it runs.
+- `run_once_before_10-install-starship.sh`: [starship](https://starship.rs/) promptline (during apply)
+- `run_once_before_30-install-carapace.sh`: [carapace](https://carapace-sh.github.io/) fzf-like for nushell (during apply)
+- `.chezmoiignore` ignores old or not-yet-migrated paths (ncluding `firefox` and `tridactyl`)
 
-### run_once scripts
-
-Chezmoi runs these automatically during `apply`, once per machine (tracked by script content hash):
-
-- **`run_once_before_10-install-starship.sh`** -- Installs [starship](https://starship.rs/) via `cargo install`. Requires the Rust toolchain. Skips if starship is already installed.
-- **`run_once_before_30-install-carapace.sh`** -- Installs [carapace](https://carapace-sh.github.io/) via `go install` for nushell tab completions. Skips if carapace is already installed. Optional -- nushell works without it, just with fewer completions.
-
-Both scripts are non-fatal: if the required toolchain (`cargo` or `go`) is missing, they print a message and let chezmoi continue.
-
-### What chezmoi ignores
-
-The `.chezmoiignore` excludes legacy directories that are kept in the repo for reference but should not be deployed: `archive/`, `firefox/`, `tridactyl/`, `macos/`, `btrfs/`, `bash/`, `vscode/`, `blackbox/`, plus repo scaffolding (`.git/`, `.devcontainer/`, `bin/`, `README.md`, etc.).
-
----
-
-## Getting Started: WezTerm + Nushell + Starship
-
-After applying, this is the stack you are working with. This section is a walkthrough to get oriented, not a reference manual.
-
-### WezTerm
+## WezTerm + Nushell + Starship orientation
 
 Config: `~/.config/wezterm/wezterm.lua`
 
 **Leader key: `Alt+Z`** (1 second timeout).
 
-Key bindings (modeled after a tmux workflow):
+Key bindings (modeled after old tmux workflow):
 
 | Action | Keys |
 |---|---|
@@ -184,7 +142,7 @@ http get https://api.github.com/zen
 
 ### Neovim
 
-Neovim config is **not in this repo** (the `dot_config/nvim/` directory does not exist here). The `vim` alias points to `nvim`, and `$EDITOR` / `$VISUAL` are both set to `nvim`.
+Config: `~/.config/nvim/` (source: `dot_config/nvim/`). Uses lazy.nvim for plugin management (`init.lua` + `lua/` directory). The `vim` alias points to `nvim`, and `$EDITOR` / `$VISUAL` are both set to `nvim`.
 
 ### Starship
 

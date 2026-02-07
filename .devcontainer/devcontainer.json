@@ -15,8 +15,9 @@
     }
   },
   // Expose sshd port for WezTerm SSH domain multiplexing
-  // Port 22426 is in the lace discovery range (22425-22499) for auto-discovery
-  "appPort": ["22426:2222"],
+  // ${lace.port()} allocates a stable host port in the lace range (22425-22499)
+  // Asymmetric mapping: lace-allocated host port -> container sshd port 2222
+  "appPort": ["${lace.port(wezterm-server/sshPort)}:2222"],
   "mounts": [
     // SSH public key for WezTerm SSH domain access (host -> container)
     // One-time setup: ssh-keygen -t ed25519 -f ~/.ssh/lace_devcontainer -N ""
@@ -30,10 +31,10 @@
         "terminal.integrated.defaultProfile.linux": "bash"
       }
     },
-    // Lace plugins - mounted at /mnt/lace/plugins/<name>
+    // Lace repo mounts - mounted at /mnt/lace/repos/<name>
     // This enables the wezterm config to load the lace plugin from a consistent path
     "lace": {
-      "plugins": {
+      "repoMounts": {
         // Lace repo provides the wezterm plugin for devcontainer SSH domain access
         "github.com/weftwiseink/lace": {}
       }

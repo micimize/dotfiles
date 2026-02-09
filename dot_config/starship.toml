@@ -81,6 +81,7 @@ format = '[$number$symbol ]($style)'
 
 [custom.dir]
 when = true
+shell = ["bash", "--noprofile", "--norc"]
 style = "bg:black fg:purple"
 command = '''
 short_path() {

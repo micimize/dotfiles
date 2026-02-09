@@ -52,6 +52,42 @@ config.unix_domains = {
 -- config.default_gui_startup_args = { "connect", "unix" }
 
 -- =============================================================================
+-- Mouse Bindings
+-- Route mouse selection to PrimarySelection only (not system clipboard).
+-- On Linux, the convention is: mouse select -> primary selection (middle-click),
+-- explicit copy (Ctrl-C / y in copy mode) -> system clipboard.
+-- =============================================================================
+
+local function mouse_bind(dir, streak, button, mods, action)
+  return {
+    event = { [dir] = { streak = streak, button = button } },
+    mods = mods,
+    action = action,
+  }
+end
+
+config.mouse_bindings = {
+  -- Single click release: complete selection to primary, or open link
+  mouse_bind('Up', 1, 'Left', 'NONE',
+    act.CompleteSelectionOrOpenLinkAtMouseCursor('PrimarySelection')),
+  -- Shift+click (extend selection): primary only
+  mouse_bind('Up', 1, 'Left', 'SHIFT',
+    act.CompleteSelectionOrOpenLinkAtMouseCursor('PrimarySelection')),
+  -- Alt+click: primary only
+  mouse_bind('Up', 1, 'Left', 'ALT',
+    act.CompleteSelection('PrimarySelection')),
+  -- Shift+Alt+click: primary only
+  mouse_bind('Up', 1, 'Left', 'SHIFT|ALT',
+    act.CompleteSelectionOrOpenLinkAtMouseCursor('PrimarySelection')),
+  -- Double click (word select): primary only
+  mouse_bind('Up', 2, 'Left', 'NONE',
+    act.CompleteSelection('PrimarySelection')),
+  -- Triple click (line select): primary only
+  mouse_bind('Up', 3, 'Left', 'NONE',
+    act.CompleteSelection('PrimarySelection')),
+}
+
+-- =============================================================================
 -- Keybindings
 -- Modeled after tmux config:
 -- - Ctrl+H/J/K/L: pane navigation
@@ -157,28 +193,93 @@ end
 
 -- =============================================================================
 -- Copy Mode Customization
+-- Vim/tmux-like copy mode keybindings.
+-- Enter copy mode: Alt+C
+-- Limitations (upstream wezterm): no %, no W/B/E, no text objects, no count
+-- prefix, no Ctrl-Y/Ctrl-E scroll, no marks, no registers.
+-- See: https://github.com/wezterm/wezterm/issues/4471
 -- =============================================================================
 
 local copy_mode = nil
+local search_mode = nil
 if wezterm.gui then
-  copy_mode = wezterm.gui.default_key_tables().copy_mode
+  local defaults = wezterm.gui.default_key_tables()
+  copy_mode = defaults.copy_mode
+  search_mode = defaults.search_mode
 end
 
 if copy_mode then
-  config.key_tables = {
-    copy_mode = copy_mode,
-  }
+  -- Helper: find and replace a binding in the key table by key+mods
+  local function override_binding(tbl, key, mods, new_action)
+    for i, binding in ipairs(tbl) do
+      if binding.key == key and (binding.mods or 'NONE') == (mods or 'NONE') then
+        tbl[i].action = new_action
+        return
+      end
+    end
+    -- Not found -- append
+    table.insert(tbl, { key = key, mods = mods or 'NONE', action = new_action })
+  end
+
+  -- y: yank to clipboard + primary, scroll to bottom, exit copy mode
+  -- MoveToScrollbackBottom returns the cursor to the live terminal area before closing.
+  -- Note: 'ScrollToBottom' is NOT a valid CopyMode variant in wezterm 20240203;
+  -- MoveToScrollbackBottom is the correct CopyMode action for this purpose.
+  override_binding(copy_mode, 'y', 'NONE', act.Multiple {
+    { CopyTo = 'ClipboardAndPrimarySelection' },
+    { CopyMode = 'MoveToScrollbackBottom' },
+    { CopyMode = 'Close' },
+  })
+
+  -- Y: yank entire line (enter line mode, copy, exit)
+  -- New binding (no default Y in copy_mode). Selects the current line, copies, and exits.
+  override_binding(copy_mode, 'Y', 'SHIFT', act.Multiple {
+    { CopyMode = { SetSelectionMode = 'Line' } },
+    { CopyTo = 'ClipboardAndPrimarySelection' },
+    { CopyMode = 'MoveToScrollbackBottom' },
+    { CopyMode = 'Close' },
+  })
+
+  -- Escape: clear selection if active, otherwise exit copy mode.
+  -- This is closer to vim behavior (Escape in visual -> normal mode)
+  -- than the default (Escape always exits copy mode).
+  override_binding(copy_mode, 'Escape', 'NONE',
+    wezterm.action_callback(function(window, pane)
+      local has_selection = window:get_selection_text_for_pane(pane) ~= ''
+      if has_selection then
+        window:perform_action(act.CopyMode('ClearSelectionMode'), pane)
+      else
+        window:perform_action(act.Multiple {
+          { CopyMode = 'MoveToScrollbackBottom' },
+          { CopyMode = 'Close' },
+        }, pane)
+      end
+    end))
+
+  -- q: always exit copy mode (no selection, no copy)
+  override_binding(copy_mode, 'q', 'NONE', act.Multiple {
+    { CopyMode = 'ClearSelectionMode' },
+    { CopyMode = 'MoveToScrollbackBottom' },
+    { CopyMode = 'Close' },
+  })
+
+  config.key_tables = config.key_tables or {}
+  config.key_tables.copy_mode = copy_mode
+  config.key_tables.search_mode = search_mode
 end
 
 -- =============================================================================
 -- Startup
 -- =============================================================================
 
-wezterm.on("gui-startup", function(cmd)
-  local tab, pane, window = wezterm.mux.spawn_window({
-    workspace = "main",
-    cwd = wezterm.home_dir,
-  })
-end)
+if not wezterm.GLOBAL.gui_startup_registered then
+  wezterm.GLOBAL.gui_startup_registered = true
+  wezterm.on("gui-startup", function(cmd)
+    local tab, pane, window = wezterm.mux.spawn_window({
+      workspace = "main",
+      cwd = wezterm.home_dir,
+    })
+  end)
+end
 
 return config

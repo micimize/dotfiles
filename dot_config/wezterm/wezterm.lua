@@ -66,10 +66,31 @@ local function mouse_bind(dir, streak, button, mods, action)
   }
 end
 
+-- Mouse selection -> copy mode helper.
+-- Saves selection to PrimarySelection, then enters copy mode.
+-- NOTE: ActivateCopyMode clears the visual selection (compiled Rust, CopyOverlay
+-- initializes with start=None). The text IS in PrimarySelection for middle-click.
+-- To revert to simple selection without copy mode entry, replace the callback
+-- bindings below with act.CompleteSelectionOrOpenLinkAtMouseCursor('PrimarySelection').
+local function mouse_select_into_copy_mode(window, pane)
+  if window:active_key_table() == 'copy_mode' then
+    window:perform_action(act.CompleteSelection('PrimarySelection'), pane)
+    return
+  end
+  local sel = window:get_selection_text_for_pane(pane)
+  if sel ~= '' then
+    window:perform_action(act.CompleteSelection('PrimarySelection'), pane)
+    window:perform_action(act.ActivateCopyMode, pane)
+  else
+    window:perform_action(
+      act.CompleteSelectionOrOpenLinkAtMouseCursor('PrimarySelection'), pane)
+  end
+end
+
 config.mouse_bindings = {
-  -- Single click release: complete selection to primary, or open link
+  -- Single click release: enter copy mode if text selected, else open link
   mouse_bind('Up', 1, 'Left', 'NONE',
-    act.CompleteSelectionOrOpenLinkAtMouseCursor('PrimarySelection')),
+    wezterm.action_callback(mouse_select_into_copy_mode)),
   -- Shift+click (extend selection): primary only
   mouse_bind('Up', 1, 'Left', 'SHIFT',
     act.CompleteSelectionOrOpenLinkAtMouseCursor('PrimarySelection')),
@@ -79,12 +100,12 @@ config.mouse_bindings = {
   -- Shift+Alt+click: primary only
   mouse_bind('Up', 1, 'Left', 'SHIFT|ALT',
     act.CompleteSelectionOrOpenLinkAtMouseCursor('PrimarySelection')),
-  -- Double click (word select): primary only
+  -- Double click (word select): enter copy mode
   mouse_bind('Up', 2, 'Left', 'NONE',
-    act.CompleteSelection('PrimarySelection')),
-  -- Triple click (line select): primary only
+    wezterm.action_callback(mouse_select_into_copy_mode)),
+  -- Triple click (line select): enter copy mode
   mouse_bind('Up', 3, 'Left', 'NONE',
-    act.CompleteSelection('PrimarySelection')),
+    wezterm.action_callback(mouse_select_into_copy_mode)),
 }
 
 -- =============================================================================
@@ -240,21 +261,14 @@ if copy_mode then
     { CopyMode = 'Close' },
   })
 
-  -- Escape: clear selection if active, otherwise exit copy mode.
-  -- This is closer to vim behavior (Escape in visual -> normal mode)
-  -- than the default (Escape always exits copy mode).
-  override_binding(copy_mode, 'Escape', 'NONE',
-    wezterm.action_callback(function(window, pane)
-      local has_selection = window:get_selection_text_for_pane(pane) ~= ''
-      if has_selection then
-        window:perform_action(act.CopyMode('ClearSelectionMode'), pane)
-      else
-        window:perform_action(act.Multiple {
-          { CopyMode = 'MoveToScrollbackBottom' },
-          { CopyMode = 'Close' },
-        }, pane)
-      end
-    end))
+  -- Escape: always exit copy mode cleanly.
+  -- Previous version tried vim-like "clear selection first, exit second" but
+  -- get_selection_text_for_pane returns PrimarySelection content even without
+  -- an active copy mode selection, causing Escape to appear stuck.
+  override_binding(copy_mode, 'Escape', 'NONE', act.Multiple {
+    { CopyMode = 'MoveToScrollbackBottom' },
+    { CopyMode = 'Close' },
+  })
 
   -- q: always exit copy mode (no selection, no copy)
   override_binding(copy_mode, 'q', 'NONE', act.Multiple {

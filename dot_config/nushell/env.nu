@@ -15,6 +15,8 @@ use std/util "path add"
 path add "~/.local/bin"
 path add "~/.cargo/bin"
 path add "/opt/local/bin"
+# Temporary: wez-into prototype lives in lace repo bin/ during testing
+path add "/var/home/mjr/code/weft/lace/bin"
 
 # FZF solarized dark (still used for ad-hoc fzf invocations)
 $env.FZF_DEFAULT_OPTS = ([

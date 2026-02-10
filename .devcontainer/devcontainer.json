@@ -10,9 +10,6 @@
     "source=${localEnv:HOME}/.ssh/lace_devcontainer.pub,target=/home/vscode/.ssh/authorized_keys,type=bind,readonly"
   ],
   // Start wezterm mux daemon for SSH domain multiplexing (sshd is started by the sshd feature)
-  // Port mapping for SSH domain multiplexing. lace up resolves the template
-  // to a port in 22425-22499 range, mapping it to container port 2222 (where sshd listens).
-  "appPort": ["${lace.port(wezterm-server/hostSshPort)}:2222"],
   "postStartCommand": "wezterm-mux-server --daemonize 2>/dev/null || true",
   "customizations": {
     "vscode": {

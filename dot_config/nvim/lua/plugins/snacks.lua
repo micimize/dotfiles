@@ -67,6 +67,24 @@ return {
           { section = "startup" },
         },
       },
+
+      -- Phase 4: Picker and bufdelete
+      picker = {
+        enabled = true,
+        ui_select = true,
+        sources = {
+          files = { hidden = true },
+          grep = { hidden = true },
+        },
+        win = {
+          input = {
+            keys = {
+              ["<Esc>"] = { "close", mode = { "n", "i" } },
+            },
+          },
+        },
+      },
+      bufdelete = { enabled = true },
     },
     keys = {
       -- Explorer
@@ -75,6 +93,24 @@ return {
       -- Notifications
       { "<leader>nh", function() Snacks.notifier.show_history() end, desc = "Notification history" },
       { "<leader>nd", function() Snacks.notifier.hide() end, desc = "Dismiss notifications" },
+      -- Picker (replaces telescope.nvim)
+      { "<C-Space>", function() Snacks.picker.files() end, desc = "Find files" },
+      { "<C-S-Space>", function() Snacks.picker.commands() end, desc = "Command palette" },
+      { "<C-s>", function() Snacks.picker.files() end, desc = "Find files" },
+      { "<leader>ff", function() Snacks.picker.files() end, desc = "Find files" },
+      { "<leader>fg", function() Snacks.picker.grep() end, desc = "Live grep" },
+      { "<leader>fb", function() Snacks.picker.buffers() end, desc = "Buffers" },
+      { "<leader>fh", function() Snacks.picker.help() end, desc = "Help tags" },
+      { "<leader>fr", function() Snacks.picker.recent() end, desc = "Recent files" },
+      { "<leader>fc", function() Snacks.picker.commands() end, desc = "Commands" },
+      { "<leader>fs", function() Snacks.picker.lsp_symbols() end, desc = "Document symbols" },
+      { "<leader>fS", function() Snacks.picker.lsp_workspace_symbols() end, desc = "Workspace symbols" },
+      { "<leader>gc", function() Snacks.picker.git_log() end, desc = "Git commits" },
+      { "<leader>gs", function() Snacks.picker.git_status() end, desc = "Git status" },
+      { "<leader>fw", function() Snacks.picker.grep_word() end, desc = "Grep word under cursor" },
+      { "<leader>ft", function() Snacks.picker.todo_comments() end, desc = "Find todos" },
+      -- Buffer delete (replaces :bdelete in init.lua)
+      { "<leader>bd", function() Snacks.bufdelete() end, desc = "Delete buffer" },
     },
     init = function()
       -- Set up toggles after snacks loads

@@ -89,9 +89,6 @@ keymap("n", "<C-l>", "<C-w>l", { desc = "Move to right window" })
 keymap("n", "<C-n>", "<cmd>bnext<CR>", { desc = "Next buffer" })
 keymap("n", "<C-p>", "<cmd>bprevious<CR>", { desc = "Previous buffer" })
 
--- Close buffer without closing window
-keymap("n", "<leader>bd", "<cmd>bdelete<CR>", { desc = "Delete buffer" })
-
 -- Quick save
 keymap("n", "<leader>w", "<cmd>w<CR>", { desc = "Save" })
 
@@ -127,7 +124,7 @@ require("lazy").setup({
   performance = {
     rtp = {
       disabled_plugins = {
-        "gzip", "tarPlugin", "tohtml", "tutor", "zipPlugin",
+        "gzip", "netrwPlugin", "tarPlugin", "tohtml", "tutor", "zipPlugin",
       },
     },
   },

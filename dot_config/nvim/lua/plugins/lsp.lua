@@ -137,7 +137,7 @@ return {
         mapping = cmp.mapping.preset.insert({
           ["<C-n>"] = cmp.mapping.select_next_item(),
           ["<C-p>"] = cmp.mapping.select_prev_item(),
-          -- NOTE: <C-Space> removed - now used for telescope file finder in normal mode
+          -- NOTE: <C-Space> removed - now used for snacks file finder in normal mode
           -- Tab handles completion triggering (see below)
           ["<C-e>"] = cmp.mapping.abort(),
           ["<CR>"] = cmp.mapping.confirm({ select = true }),

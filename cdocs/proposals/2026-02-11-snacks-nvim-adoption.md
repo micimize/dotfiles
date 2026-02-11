@@ -6,7 +6,7 @@ first_authored:
 task_list: neovim/snacks-migration
 type: proposal
 state: live
-status: implementation_wip
+status: implementation_accepted
 tags: [neovim, snacks-nvim, plugin-migration, ui, notifications, dashboard, picker, keybindings]
 last_reviewed:
   status: revision_requested

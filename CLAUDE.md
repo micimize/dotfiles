@@ -1,3 +1,5 @@
+@.claude/rules/cdocs.md
+
 # Dotfiles Repository
 
 This repository is managed by **chezmoi**. The source files here are templates/sources
@@ -134,3 +136,55 @@ wezterm cli list  # Should return a table of open panes without error
 > `wezterm --config-file <path> ls-fonts 2>&1 | grep ERROR` could catch parse errors
 > before they are ever committed. It would not catch silently dropped bindings, but it
 > would prevent the most catastrophic class of failures (total config parse errors).
+
+## Live Neovim Iteration
+
+Neovim exposes a unix socket server on every instance at `/run/user/1000/nvim.<PID>.0`.
+Use `nvim --server <socket> --remote-expr '<expr>'` to query or control a running instance
+without interrupting the user. This enables a tight edit-deploy-verify loop:
+
+### Workflow
+
+1. Edit source files under `dot_config/nvim/`
+2. `chezmoi apply --force` to deploy
+3. Query the running nvim to verify changes took effect
+
+### Useful Commands
+
+```sh
+# Find all nvim sockets
+find /run/user/1000 -name "nvim*" -type s
+
+# Get current buffer filetype
+nvim --server <socket> --remote-expr 'luaeval("vim.bo.filetype")'
+
+# Execute lua in a running instance
+nvim --server <socket> --remote-expr 'luaeval("Snacks.config.dashboard.preset.header")'
+
+# Check extmarks on current buffer
+nvim --server <socket> --remote-expr 'luaeval("#vim.api.nvim_buf_get_extmarks(0, vim.api.nvim_create_namespace(\"ns_name\"), 0, -1, {})")'
+
+# Open a specific view (e.g., dashboard)
+nvim --server <socket> --remote-expr 'execute("lua Snacks.dashboard()")'
+
+# Find instance with a specific filetype
+for sock in /run/user/1000/nvim.*/0; do
+  ft=$(nvim --server "$sock" --remote-expr 'luaeval("vim.bo.filetype")' 2>/dev/null)
+  [ "$ft" = "snacks_dashboard" ] && echo "$sock"
+done
+```
+
+### Headless Testing (No UI)
+
+For config validation without a running instance, use headless mode. See the
+`memory/MEMORY.md` notes on headless testing quirks (`print()` goes to stderr,
+`vim.defer_fn` needed for plugin load timing, `io.open` for reliable output).
+
+### Gotchas
+
+- The dashboard buffer has `bufhidden = "wipe"` -- it's destroyed as soon as
+  the user navigates away. Query it immediately or re-open it via `--remote-expr`.
+- `--remote-expr` is synchronous and blocks the target nvim briefly. Avoid
+  calling it in tight loops on an nvim the user is actively typing in.
+- Neovim events like `SnacksDashboardOpened` can't be tested headless because
+  the dashboard requires a real window to open.

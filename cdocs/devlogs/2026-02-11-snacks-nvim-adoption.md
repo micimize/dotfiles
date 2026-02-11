@@ -7,7 +7,7 @@ first_authored:
 task_list: neovim/snacks-migration
 type: devlog
 state: live
-status: review_ready
+status: accepted
 tags: [neovim, snacks-nvim, plugin-migration, handoff]
 last_reviewed:
   status: revision_requested

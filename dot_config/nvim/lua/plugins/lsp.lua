@@ -63,16 +63,14 @@ return {
             vim.lsp.buf.format({ async = true })
           end, { desc = "Format buffer via LSP" })
 
-          if not vim.b[bufnr].autoformat_disabled then
-            vim.api.nvim_create_autocmd("BufWritePre", {
-              buffer = bufnr,
-              callback = function()
-                if not vim.b[bufnr].autoformat_disabled then
-                  vim.lsp.buf.format({ async = false })
-                end
-              end,
-            })
-          end
+          vim.api.nvim_create_autocmd("BufWritePre", {
+            buffer = bufnr,
+            callback = function()
+              if not vim.b[bufnr].autoformat_disabled then
+                vim.lsp.buf.format({ async = false })
+              end
+            end,
+          })
         end,
       })
 

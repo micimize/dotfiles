@@ -54,7 +54,7 @@ return {
     keys = {
       { "]t", function() require("todo-comments").jump_next() end, desc = "Next todo" },
       { "[t", function() require("todo-comments").jump_prev() end, desc = "Previous todo" },
-      { "<leader>ft", function() Snacks.picker.todo_comments() end, desc = "Find todos" },
+      -- <leader>ft is in snacks.lua (Snacks.picker.todo_comments)
     },
   },
 

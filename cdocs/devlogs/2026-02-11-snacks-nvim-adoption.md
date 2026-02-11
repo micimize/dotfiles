@@ -1,4 +1,6 @@
 ---
+title: "snacks.nvim Adoption Implementation"
+date: 2026-02-11
 first_authored:
   by: "@claude-opus-4-6"
   at: 2026-02-11T00:00:00-05:00
@@ -7,6 +9,11 @@ type: devlog
 state: live
 status: review_ready
 tags: [neovim, snacks-nvim, plugin-migration, handoff]
+last_reviewed:
+  status: revision_requested
+  by: "@claude-opus-4-6"
+  at: 2026-02-11T22:30:00-05:00
+  round: 1
 ---
 
 # snacks.nvim Adoption: Handoff Devlog
@@ -113,6 +120,8 @@ Each phase verified before committing:
 > NOTE(opus/implementation): The explorer filetype for bufferline offset is `snacks_layout_box` (verified at runtime via headless nvim), not `snacks_explorer` as might be expected.
 
 > NOTE(opus/implementation): The `Esc` key in the picker was configured to close from both insert and normal mode (`["<Esc>"] = { "close", mode = { "n", "i" } }`), matching the current telescope behavior where `<Esc>` always closes.
+
+> NOTE(opus/implementation): The proposal specified explicit `<C-j>`/`<C-k>` navigation and `<C-q>` quickfix bindings for the picker. These are **not explicitly configured** because snacks.picker's defaults already include them (`defaults.lua` lines 251-255: `<c-j>` = list_down, `<c-k>` = list_up, `<c-q>` = qflist). Adding them would be redundant. Verified in snacks source.
 
 ## Verification
 

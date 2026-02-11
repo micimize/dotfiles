@@ -79,11 +79,8 @@ local keymap = vim.keymap.set
 -- Clear search highlight
 keymap("n", "<Esc>", "<cmd>nohlsearch<CR>")
 
--- Window navigation: Ctrl+H/J/K/L (matches wezterm, tmux)
-keymap("n", "<C-h>", "<C-w>h", { desc = "Move to left window" })
-keymap("n", "<C-j>", "<C-w>j", { desc = "Move to lower window" })
-keymap("n", "<C-k>", "<C-w>k", { desc = "Move to upper window" })
-keymap("n", "<C-l>", "<C-w>l", { desc = "Move to right window" })
+-- Window navigation: Ctrl+H/J/K/L handled by smart-splits.nvim
+-- (see lua/plugins/navigation.lua for cross-pane WezTerm integration)
 
 -- Buffer navigation: Ctrl+N/P (matching mjr's init.vim preference)
 keymap("n", "<C-n>", "<cmd>bnext<CR>", { desc = "Next buffer" })

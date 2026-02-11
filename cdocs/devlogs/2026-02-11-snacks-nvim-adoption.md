@@ -5,7 +5,7 @@ first_authored:
 task_list: neovim/snacks-migration
 type: devlog
 state: live
-status: wip
+status: review_ready
 tags: [neovim, snacks-nvim, plugin-migration, handoff]
 ---
 
@@ -98,8 +98,59 @@ Each phase verified before committing:
 
 | File | Description |
 |------|-------------|
-| *(implementation pending)* | |
+| `dot_config/nvim/lua/plugins/snacks.lua` | **Created** -- all snacks.nvim config: 14 modules, 18 keybindings, toggle integrations |
+| `dot_config/nvim/lua/plugins/ui.lua` | Removed neo-tree, nvim-notify, indent-blankline, dressing; updated bufferline offset to `snacks_layout_box`; added `<leader>n` notifications which-key group |
+| `dot_config/nvim/lua/plugins/colorscheme.lua` | Removed NeoTree highlight overrides (dead code) |
+| `dot_config/nvim/lua/plugins/lsp.lua` | Relocated `<leader>e` → `ge`, `ge`/`gE` → `gne`/`gpe`; replaced `<leader>f` format with `:Format` command + `BufWritePre` autocmd; fixed stale telescope comment |
+| `dot_config/nvim/lua/plugins/editor.lua` | Changed todo-comments `<leader>ft` from `TodoTelescope` to `Snacks.picker.todo_comments()` |
+| `dot_config/nvim/lua/plugins/telescope.lua` | **Deleted** -- replaced entirely by snacks.picker |
+| `dot_config/nvim/init.lua` | Added JSONL notify logger (VeryLazy autocmd); removed `<leader>bd` keymap; added `netrwPlugin` to disabled_plugins |
+
+## Deviations from Proposal
+
+> NOTE(opus/implementation): The proposal stated `Snacks.picker.todo_comments` is a built-in snacks source. It is not -- it is registered by `todo-comments.nvim` itself when it detects snacks.picker is available (via `lua/todo-comments/snacks.lua`). The binding works correctly, but the integration is provided by todo-comments, not snacks.
+
+> NOTE(opus/implementation): The explorer filetype for bufferline offset is `snacks_layout_box` (verified at runtime via headless nvim), not `snacks_explorer` as might be expected.
+
+> NOTE(opus/implementation): The `Esc` key in the picker was configured to close from both insert and normal mode (`["<Esc>"] = { "close", mode = { "n", "i" } }`), matching the current telescope behavior where `<Esc>` always closes.
 
 ## Verification
 
-*(to be filled during implementation)*
+### Headless Validation (45/45 PASS)
+
+Comprehensive validation script (`/tmp/nvim_final_validate.lua`) run via `nvim --headless`:
+
+```
+PASS: Snacks global
+PASS: Config loaded
+PASS: P1: bigfile, quickfile, scope, words, statuscolumn (5/5)
+PASS: P2: notifier, indent, input, explorer, rename, toggle (6/6)
+PASS: P2: notifier.top_down=false, style=compact, filter function (3/3)
+PASS: P3: dashboard, dashboard.sections (2/2)
+PASS: P4: picker, picker.ui_select, bufdelete (3/3)
+PASS: All 18 keybindings registered (18/18)
+PASS: nvim-notify, neo-tree, dressing, telescope, indent-blankline NOT loaded (5/5)
+PASS: telescope.lua removed from deployed config (1/1)
+```
+
+### JSONL Logger Verified
+
+```json
+{"t":"2026-02-11T21:03:57Z","m":"test log entry","l":2,"s":"test"}
+```
+
+Written to `~/.local/state/nvim/notify.jsonl`.
+
+### Remaining Cleanup (User Action Required)
+
+- Run `:Lazy clean` to remove unused telescope.nvim, telescope-fzf-native.nvim, nvim-notify, indent-blankline.nvim, dressing.nvim, neo-tree.nvim, nui.nvim plugin directories
+- `lazy-lock.json` will update automatically after `:Lazy clean`
+
+### Commits
+
+| Hash | Phase | Description |
+|------|-------|-------------|
+| `5822cac` | 1 | feat(nvim): add snacks.nvim with zero-config foundations |
+| `8c9eb5b` | 2 | feat(nvim): replace notify, indent, dressing, neo-tree with snacks |
+| `44e7f1c` | 3 | feat(nvim): add snacks dashboard with recent files and projects |
+| `fa82b51` | 4 | feat(nvim): replace telescope with snacks.picker, add bufdelete |

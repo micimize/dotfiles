@@ -1,46 +1,6 @@
--- UI components: file explorer, bufferline, statusline, which-key
+-- UI components: bufferline, statusline, which-key
+-- Explorer, notifications, indent, and input are handled by snacks.nvim (see snacks.lua)
 return {
-  -- File explorer (replaces fern.vim)
-  {
-    "nvim-neo-tree/neo-tree.nvim",
-    branch = "v3.x",
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-      "nvim-tree/nvim-web-devicons",
-      "MunifTanjim/nui.nvim",
-    },
-    cmd = "Neotree",
-    keys = {
-      -- Leader+n toggles (matching mjr's init.vim)
-      { "<leader>n", "<cmd>Neotree toggle<CR>", desc = "Toggle file explorer" },
-      -- Leader+e opens in current file's directory
-      { "<leader>e", "<cmd>Neotree reveal<CR>", desc = "Reveal in explorer" },
-    },
-    opts = {
-      close_if_last_window = true,
-      filesystem = {
-        follow_current_file = { enabled = true },
-        use_libuv_file_watcher = true,
-        filtered_items = {
-          visible = true,
-          hide_dotfiles = false,
-          hide_gitignored = false,
-        },
-      },
-      window = {
-        position = "left",
-        width = 35,
-        mappings = {
-          ["<space>"] = "none",
-          ["o"] = "open",
-          ["s"] = "open_vsplit",
-          ["h"] = "close_node",
-          ["l"] = "open",
-        },
-      },
-    },
-  },
-
   -- Bufferline (tab-like buffer bar)
   {
     "akinsho/bufferline.nvim",
@@ -56,7 +16,7 @@ return {
         separator_style = "thin",
         offsets = {
           {
-            filetype = "neo-tree",
+            filetype = "snacks_layout_box",
             text = "Explorer",
             highlight = "Directory",
             separator = true,
@@ -110,49 +70,10 @@ return {
         { "<leader>c", group = "code" },
         { "<leader>f", group = "find" },
         { "<leader>g", group = "git" },
+        { "<leader>n", group = "notifications" },
         { "<leader>r", group = "refactor" },
         { "<leader>t", group = "toggle" },
       })
-    end,
-  },
-
-  -- Indent guides
-  {
-    "lukas-reineke/indent-blankline.nvim",
-    main = "ibl",
-    event = { "BufReadPre", "BufNewFile" },
-    opts = {
-      indent = { char = "│" },
-      scope = { enabled = true },
-      exclude = {
-        filetypes = { "help", "neo-tree", "lazy", "mason" },
-      },
-    },
-  },
-
-  -- Better UI for vim.ui.select and vim.ui.input
-  {
-    "stevearc/dressing.nvim",
-    event = "VeryLazy",
-    opts = {},
-  },
-
-  -- Notifications
-  {
-    "rcarriga/nvim-notify",
-    event = "VeryLazy",
-    opts = {
-      timeout = 3000,
-      max_height = function()
-        return math.floor(vim.o.lines * 0.75)
-      end,
-      max_width = function()
-        return math.floor(vim.o.columns * 0.75)
-      end,
-    },
-    config = function(_, opts)
-      require("notify").setup(opts)
-      vim.notify = require("notify")
     end,
   },
 }

@@ -51,13 +51,28 @@ return {
           -- Actions
           map("<leader>rn", vim.lsp.buf.rename, "Rename symbol")
           map("<leader>ca", vim.lsp.buf.code_action, "Code action")
-          map("<leader>f", function() vim.lsp.buf.format({ async = true }) end, "Format buffer")
 
-          -- Diagnostics (matching mjr's ge/gE pattern)
-          map("ge", vim.diagnostic.goto_next, "Next diagnostic")
-          map("gE", vim.diagnostic.goto_prev, "Previous diagnostic")
-          map("<leader>e", vim.diagnostic.open_float, "Show diagnostic")
+          -- Diagnostics (ge = "go error", gne/gpe = "go next/prev error")
+          map("ge", vim.diagnostic.open_float, "Show diagnostic")
+          map("gne", vim.diagnostic.goto_next, "Next diagnostic")
+          map("gpe", vim.diagnostic.goto_prev, "Previous diagnostic")
           map("<leader>q", vim.diagnostic.setloclist, "Diagnostic list")
+
+          -- Format-on-save (toggle with <leader>tf)
+          vim.api.nvim_buf_create_user_command(bufnr, "Format", function()
+            vim.lsp.buf.format({ async = true })
+          end, { desc = "Format buffer via LSP" })
+
+          if not vim.b[bufnr].autoformat_disabled then
+            vim.api.nvim_create_autocmd("BufWritePre", {
+              buffer = bufnr,
+              callback = function()
+                if not vim.b[bufnr].autoformat_disabled then
+                  vim.lsp.buf.format({ async = false })
+                end
+              end,
+            })
+          end
         end,
       })
 

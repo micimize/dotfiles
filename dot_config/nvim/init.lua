@@ -138,3 +138,29 @@ require("lazy").setup({
 -- =============================================================================
 
 vim.cmd.colorscheme("solarized")
+
+-- =============================================================================
+-- JSONL Notify Logger (runs after snacks.notifier replaces vim.notify)
+-- =============================================================================
+
+vim.api.nvim_create_autocmd("User", {
+  pattern = "VeryLazy",
+  callback = function()
+    local log_path = vim.fn.stdpath("log") .. "/notify.jsonl"
+    local visual_notify = vim.notify
+    vim.notify = function(msg, level, opts)
+      local file = io.open(log_path, "a")
+      if file then
+        local ok, entry = pcall(vim.json.encode, {
+          t = os.date("!%Y-%m-%dT%H:%M:%SZ"),
+          l = level or 2,
+          m = msg,
+          s = opts and opts.title or nil,
+        })
+        if ok then file:write(entry .. "\n") end
+        file:close()
+      end
+      return visual_notify(msg, level, opts)
+    end
+  end,
+})

@@ -109,9 +109,44 @@ config.mouse_bindings = {
 }
 
 -- =============================================================================
+-- Smart Splits Integration (seamless neovim/wezterm pane navigation)
+-- Requires smart-splits.nvim on the neovim side.
+-- See: cdocs/proposals/2026-02-11-smart-splits-adoption.md
+-- =============================================================================
+
+local function is_nvim(pane)
+  return pane:get_user_vars().IS_NVIM == "true"
+end
+
+local direction_keys = {
+  Left = "h", Down = "j", Up = "k", Right = "l",
+  h = "Left", j = "Down", k = "Up", l = "Right",
+}
+
+local function split_nav(resize_or_move, key)
+  local mods = resize_or_move == "resize" and "CTRL|ALT" or "CTRL"
+  return {
+    key = key,
+    mods = mods,
+    action = wezterm.action_callback(function(win, pane)
+      if is_nvim(pane) then
+        win:perform_action({ SendKey = { key = key, mods = mods } }, pane)
+      else
+        if resize_or_move == "resize" then
+          win:perform_action({ AdjustPaneSize = { direction_keys[key], 5 } }, pane)
+        else
+          win:perform_action({ ActivatePaneDirection = direction_keys[key] }, pane)
+        end
+      end
+    end),
+  }
+end
+
+-- =============================================================================
 -- Keybindings
 -- Modeled after tmux config:
--- - Ctrl+H/J/K/L: pane navigation
+-- - Ctrl+H/J/K/L: pane navigation (smart-splits aware)
+-- - Ctrl+Alt+H/J/K/L: resize (smart-splits aware)
 -- - Alt+H/J/K/L: splits
 -- - Alt+N/P: tab navigation
 -- - Alt+C: copy mode
@@ -120,11 +155,11 @@ config.mouse_bindings = {
 config.leader = { key = "z", mods = "ALT", timeout_milliseconds = 1000 }
 
 config.keys = {
-  -- Pane navigation: Ctrl+H/J/K/L
-  { key = "h", mods = "CTRL", action = act.ActivatePaneDirection("Left") },
-  { key = "j", mods = "CTRL", action = act.ActivatePaneDirection("Down") },
-  { key = "k", mods = "CTRL", action = act.ActivatePaneDirection("Up") },
-  { key = "l", mods = "CTRL", action = act.ActivatePaneDirection("Right") },
+  -- Pane navigation: Ctrl+H/J/K/L (smart-splits aware)
+  split_nav("move", "h"),
+  split_nav("move", "j"),
+  split_nav("move", "k"),
+  split_nav("move", "l"),
 
   -- Splits: Alt+H/J/K/L (preserving cwd)
   { key = "l", mods = "ALT", action = act.SplitPane({ direction = "Right", size = { Percent = 50 } }) },
@@ -154,11 +189,11 @@ config.keys = {
   -- Pane zoom toggle: Leader+Z
   { key = "z", mods = "LEADER", action = act.TogglePaneZoomState },
 
-  -- Resize panes: Ctrl+Alt+H/J/K/L
-  { key = "h", mods = "CTRL|ALT", action = act.AdjustPaneSize({ "Left", 5 }) },
-  { key = "j", mods = "CTRL|ALT", action = act.AdjustPaneSize({ "Down", 5 }) },
-  { key = "k", mods = "CTRL|ALT", action = act.AdjustPaneSize({ "Up", 5 }) },
-  { key = "l", mods = "CTRL|ALT", action = act.AdjustPaneSize({ "Right", 5 }) },
+  -- Resize panes: Ctrl+Alt+H/J/K/L (smart-splits aware)
+  split_nav("resize", "h"),
+  split_nav("resize", "j"),
+  split_nav("resize", "k"),
+  split_nav("resize", "l"),
 
   -- Quick actions
   { key = ":", mods = "LEADER", action = act.ActivateCommandPalette },

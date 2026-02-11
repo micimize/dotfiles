@@ -1,4 +1,6 @@
 ---
+title: "Smart-Splits Adoption: Implementation Devlog"
+date: 2026-02-11
 first_authored:
   by: "claude-opus-4-6"
   at: 2026-02-11T22:45:00-05:00
@@ -7,6 +9,11 @@ type: devlog
 state: live
 status: review_ready
 tags: [smart-splits, wezterm, neovim, navigation, handoff]
+last_reviewed:
+  status: revision_requested
+  by: "@claude-opus-4-6"
+  at: 2026-02-11T23:30:00-05:00
+  round: 1
 ---
 
 # Smart-Splits Adoption: Devlog

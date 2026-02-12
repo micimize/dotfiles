@@ -354,26 +354,15 @@ end
 
 -- =============================================================================
 -- Status Bar + Mode Indication
--- Unified handler: workspace (left), mode badge or clock (right),
--- muted amber pane dividers in copy/search mode.
+-- Unified handler: workspace (left), mode badge or clock (right).
+-- No set_config_overrides — avoids Issue #5318 (key table stack clearing)
+-- and the colors table replacement bug that wiped slate palette.
 -- =============================================================================
-
--- Muted amber for pane dividers during copy/search (visible but not aggressive)
-local split_copy_mode = "#6b5300"
 
 wezterm.on("update-status", function(window, pane)
   local key_table = window:active_key_table()
   local is_copy = key_table == "copy_mode"
   local is_search = key_table == "search_mode"
-
-  -- Pane divider color: muted amber in copy/search, default slate otherwise
-  local overrides = window:get_config_overrides() or {}
-  if is_copy or is_search then
-    overrides.colors = { split = split_copy_mode }
-  else
-    overrides.colors = nil
-  end
-  window:set_config_overrides(overrides)
 
   -- Right status: mode badge or clock
   local right

@@ -4,8 +4,8 @@ first_authored:
   at: "2026-02-12T10:00:00-08:00"
 task_list: styling/slate-theme
 type: devlog
-state: live
-status: wip
+state: done
+status: complete
 tags: [styling, wezterm, neovim, theme, copy-mode, handoff]
 ---
 

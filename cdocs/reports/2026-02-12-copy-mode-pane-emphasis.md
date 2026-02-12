@@ -4,8 +4,8 @@ first_authored:
   at: "2026-02-12T14:00:00-08:00"
 task_list: styling/copy-mode
 type: report
-state: live
-status: in_review
+state: done
+status: accepted
 tags: [investigation, wezterm, copy-mode, ux, per-pane-styling, api-research]
 ---
 

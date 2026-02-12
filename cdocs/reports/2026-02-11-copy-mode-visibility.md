@@ -4,7 +4,7 @@ first_authored:
   at: "2026-02-11T18:30:00-08:00"
 task_list: styling/copy-mode
 type: report
-state: live
+state: archived
 status: complete
 tags: [investigation, styling, wezterm, copy-mode, ux, modal-state]
 ---

@@ -4,8 +4,8 @@ first_authored:
   at: "2026-02-11T17:10:00-08:00"
 task_list: styling/slate-theme
 type: proposal
-state: live
-status: review_ready
+state: done
+status: implemented
 tags: [styling, wezterm, neovim, theme, migration]
 ---
 

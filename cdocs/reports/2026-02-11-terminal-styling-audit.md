@@ -4,7 +4,7 @@ first_authored:
   at: "2026-02-11T17:05:00-08:00"
 task_list: styling/audit
 type: report
-state: live
+state: archived
 status: complete
 tags: [status, styling, wezterm, neovim, tmux, migration]
 ---

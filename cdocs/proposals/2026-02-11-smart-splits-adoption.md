@@ -5,7 +5,7 @@ first_authored:
 task_list: dotfiles/wezterm-neovim-navigation
 type: proposal
 state: live
-status: implementation_wip
+status: implementation_accepted
 tags: [wezterm, neovim, navigation, smart-splits, keybindings]
 ---
 

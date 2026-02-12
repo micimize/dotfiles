@@ -123,6 +123,26 @@ local direction_keys = {
   h = "Left", j = "Down", k = "Up", l = "Right",
 }
 
+-- Send a Neovim ex command to a pane via synthetic keystrokes.
+-- Uses <C-\><C-n> (force normal mode without triggering buffer-local Escape
+-- mappings, e.g. snacks picker closes on Escape), then :<cmd><Enter>.
+local function send_nvim_cmd(win, target_pane, cmd)
+  local keys = {
+    { SendKey = { key = "\\", mods = "CTRL" } },
+    { SendKey = { key = "n", mods = "CTRL" } },
+    { SendKey = { key = ":" } },
+  }
+  for i = 1, #cmd do
+    table.insert(keys, { SendKey = { key = cmd:sub(i, i) } })
+  end
+  table.insert(keys, { SendKey = { key = "Enter" } })
+  win:perform_action(act.Multiple(keys), target_pane)
+end
+
+-- Entry direction: when navigating INTO a Neovim pane, which edge should
+-- get focus. Key "l" (navigating right) means entered from the left.
+local entry_from = { h = "right", l = "left", k = "down", j = "up" }
+
 local function split_nav(resize_or_move, key)
   local mods = resize_or_move == "resize" and "CTRL|ALT" or "CTRL"
   return {
@@ -135,7 +155,16 @@ local function split_nav(resize_or_move, key)
         if resize_or_move == "resize" then
           win:perform_action({ AdjustPaneSize = { direction_keys[key], 5 } }, pane)
         else
+          -- Peek at the target pane before navigating
+          local tab = win:active_tab()
+          local target = tab:get_pane_direction(direction_keys[key])
+
           win:perform_action({ ActivatePaneDirection = direction_keys[key] }, pane)
+
+          -- If we just landed on Neovim, focus the directionally-correct split
+          if target and target:get_user_vars().IS_NVIM == "true" then
+            send_nvim_cmd(win, target, "FocusFromEdge " .. entry_from[key])
+          end
         end
       end
     end),

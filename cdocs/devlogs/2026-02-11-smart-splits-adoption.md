@@ -7,7 +7,7 @@ first_authored:
 task_list: dotfiles/wezterm-neovim-navigation
 type: devlog
 state: live
-status: review_ready
+status: done
 tags: [smart-splits, wezterm, neovim, navigation, handoff]
 last_reviewed:
   status: revision_requested

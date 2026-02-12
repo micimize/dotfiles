@@ -6,21 +6,105 @@ local act = wezterm.action
 local config = wezterm.config_builder()
 
 -- =============================================================================
+-- Slate Palette
+-- Greyscale replacement for solarized base colors, drawn from legacy VSCode
+-- customizations. Solarized accent colors (syntax highlighting) are unchanged.
+-- =============================================================================
+
+local slate = {
+  bg_deep    = "#151515",  -- deepest: sidebar, tab bar, borders
+  bg         = "#1c1c1c",  -- primary background
+  bg_raised  = "#232323",  -- elevated: line highlight, hover
+  bg_surface = "#282828",  -- inactive tabs, pane dividers
+  bg_select  = "#333333",  -- selection, active items
+  fg_dim     = "#586e75",  -- muted text (solarized base01)
+  fg         = "#839496",  -- primary text (solarized base0)
+  fg_bright  = "#93a1a1",  -- emphasized text (solarized base1)
+  -- Solarized accents (unchanged)
+  yellow     = "#b58900",
+  orange     = "#cb4b16",
+  red        = "#dc322f",
+  magenta    = "#d33682",
+  violet     = "#6c71c4",
+  blue       = "#268bd2",
+  cyan       = "#2aa198",
+  green      = "#859900",
+}
+
+-- =============================================================================
 -- Appearance
 -- =============================================================================
 
+-- Keep the scheme for its 16 ANSI color definitions; override backgrounds/chrome below
 config.color_scheme = "Solarized Dark (Gogh)"
 config.font = wezterm.font("JetBrains Mono", { weight = "Medium" })
 config.font_size = 12.0
 config.line_height = 1.2
 
+-- Slate background and chrome overrides (merge with color_scheme's ANSI palette)
+config.colors = {
+  background = slate.bg_raised,
+  cursor_bg = slate.fg,
+  cursor_border = slate.fg,
+  selection_bg = slate.bg_select,
+  selection_fg = slate.fg_bright,
+  split = slate.bg_surface,
+  tab_bar = {
+    background = slate.bg_deep,
+    active_tab = {
+      bg_color = slate.bg_raised,
+      fg_color = slate.fg_bright,
+      intensity = "Bold",
+    },
+    inactive_tab = {
+      bg_color = slate.bg_surface,
+      fg_color = slate.fg_dim,
+    },
+    inactive_tab_hover = {
+      bg_color = slate.bg_select,
+      fg_color = slate.fg,
+    },
+    new_tab = {
+      bg_color = slate.bg_deep,
+      fg_color = slate.fg_dim,
+    },
+    new_tab_hover = {
+      bg_color = slate.bg_select,
+      fg_color = slate.fg,
+    },
+  },
+  -- Copy mode: yellow highlight on active search match
+  copy_mode_active_highlight_bg = { Color = slate.yellow },
+  copy_mode_active_highlight_fg = { Color = slate.bg },
+  copy_mode_inactive_highlight_bg = { Color = slate.bg_select },
+  copy_mode_inactive_highlight_fg = { Color = slate.fg },
+}
+
+-- Dim inactive panes (recreates the tmux bg-contrast gutter effect)
+config.inactive_pane_hsb = {
+  saturation = 0.8,
+  brightness = 0.7,
+}
+
 -- Window
 config.window_background_opacity = 0.95
-config.window_padding = { left = 4, right = 4, top = 4, bottom = 4 }
+config.window_padding = { left = 8, right = 8, top = 8, bottom = 4 }
 config.window_decorations = "RESIZE"
+config.window_frame = {
+  border_left_width = "4px",
+  border_right_width = "4px",
+  border_bottom_height = "4px",
+  border_top_height = "4px",
+  border_left_color = slate.bg_deep,
+  border_right_color = slate.bg_deep,
+  border_bottom_color = slate.bg_deep,
+  border_top_color = slate.bg_deep,
+}
 config.hide_tab_bar_if_only_one_tab = false
 config.tab_bar_at_bottom = true
 config.use_fancy_tab_bar = false
+config.tab_max_width = 40
+config.show_new_tab_button_in_tab_bar = false
 
 -- =============================================================================
 -- Shell
@@ -35,6 +119,7 @@ config.default_prog = { '/home/mjr/.cargo/bin/nu' }
 config.scrollback_lines = 99999
 config.enable_scroll_bar = false
 config.check_for_updates = false
+config.status_update_interval = 200  -- ms, fast mode detection for copy/search badges
 
 -- Disable CSI u key encoding for compatibility with apps that expect traditional sequences.
 -- Without this, shift+space sends [27;2;32~ which some tools (Claude Code) don't handle well.
@@ -265,16 +350,65 @@ if ok then
   })
 else
   wezterm.log_warn("Failed to load lace plugin: " .. tostring(lace_plugin))
-  -- Fallback: just show workspace in status bar
-  wezterm.on("update-status", function(window, pane)
-    local workspace = window:active_workspace()
-    window:set_left_status(wezterm.format({
-      { Background = { Color = "#073642" } },
-      { Foreground = { Color = "#2aa198" } },
-      { Text = "  " .. workspace .. " " },
-    }))
-  end)
 end
+
+-- =============================================================================
+-- Status Bar + Mode Indication
+-- Unified handler: workspace (left), mode badge or clock (right),
+-- muted amber pane dividers in copy/search mode.
+-- =============================================================================
+
+-- Muted amber for pane dividers during copy/search (visible but not aggressive)
+local split_copy_mode = "#6b5300"
+
+wezterm.on("update-status", function(window, pane)
+  local key_table = window:active_key_table()
+  local is_copy = key_table == "copy_mode"
+  local is_search = key_table == "search_mode"
+
+  -- Pane divider color: muted amber in copy/search, default slate otherwise
+  local overrides = window:get_config_overrides() or {}
+  if is_copy or is_search then
+    overrides.colors = { split = split_copy_mode }
+  else
+    overrides.colors = nil
+  end
+  window:set_config_overrides(overrides)
+
+  -- Right status: mode badge or clock
+  local right
+  if is_copy then
+    right = wezterm.format({
+      { Background = { Color = slate.yellow } },
+      { Foreground = { Color = slate.bg_deep } },
+      { Attribute = { Intensity = "Bold" } },
+      { Text = " 󰆐 COPY " },
+    })
+  elseif is_search then
+    right = wezterm.format({
+      { Background = { Color = slate.blue } },
+      { Foreground = { Color = slate.bg_deep } },
+      { Attribute = { Intensity = "Bold" } },
+      { Text = "  SEARCH " },
+    })
+  else
+    right = wezterm.format({
+      { Background = { Color = slate.bg_deep } },
+      { Foreground = { Color = slate.fg_dim } },
+      { Text = " " .. wezterm.strftime("%H:%M") .. "  " },
+    })
+  end
+  window:set_right_status(right)
+
+  -- Left status: workspace name (always visible)
+  window:set_left_status(wezterm.format({
+    { Background = { Color = slate.bg_deep } },
+    { Foreground = { Color = slate.cyan } },
+    { Text = "  " .. window:active_workspace() .. " " },
+    { Foreground = { Color = slate.fg_dim } },
+    { Text = " " },
+  }))
+end)
 
 -- =============================================================================
 -- Copy Mode Customization

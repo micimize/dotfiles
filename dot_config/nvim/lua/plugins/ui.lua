@@ -37,7 +37,14 @@ return {
     event = "VeryLazy",
     opts = {
       options = {
-        theme = "solarized_dark",
+        theme = {
+          normal   = { a = { bg = "#333333", fg = "#93a1a1", gui = "bold" }, b = { bg = "#282828", fg = "#839496" }, c = { bg = "#232323", fg = "#586e75" } },
+          insert   = { a = { bg = "#859900", fg = "#232323", gui = "bold" } },
+          visual   = { a = { bg = "#b58900", fg = "#232323", gui = "bold" } },
+          replace  = { a = { bg = "#dc322f", fg = "#232323", gui = "bold" } },
+          command  = { a = { bg = "#268bd2", fg = "#232323", gui = "bold" } },
+          inactive = { a = { bg = "#1c1c1c", fg = "#586e75" }, c = { bg = "#1c1c1c", fg = "#586e75" } },
+        },
         component_separators = { left = "", right = "" },
         section_separators = { left = "", right = "" },
       },

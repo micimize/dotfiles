@@ -200,7 +200,7 @@ return {
       })
 
       -- Stripe fill between file path and key on every other row
-      vim.api.nvim_set_hl(0, "SnacksDashboardStripe", { fg = "#073642" })  -- solarized base02, barely visible
+      vim.api.nvim_set_hl(0, "SnacksDashboardStripe", { fg = "#282828" })  -- slate bg_surface, barely visible
 
       -- Reset file counter when dashboard opens
       vim.api.nvim_create_autocmd("User", {

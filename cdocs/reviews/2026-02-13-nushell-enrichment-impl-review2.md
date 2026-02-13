@@ -4,8 +4,8 @@ first_authored:
   at: 2026-02-13T15:00:00-06:00
 reviews: proposals/2026-02-13-nushell-enrichment
 type: review
-state: live
-status: wip
+state: archived
+status: result_accepted
 tags: [review, nushell, implementation]
 verdict: accept
 ---

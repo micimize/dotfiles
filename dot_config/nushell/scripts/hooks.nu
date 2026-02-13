@@ -19,3 +19,17 @@ $env.config.hooks.env_change.PWD ++= [{||
     $env.PATH = do (env-conversions).path.from_string $env.PATH
   }
 }]
+
+# ── Display output hook ──
+# Adaptive table rendering: expanded tables when terminal is wide enough,
+# collapsed otherwise. This affects how pipeline output is displayed.
+$env.config.hooks.display_output = {||
+  if (term size).columns >= 100 { table -ed 1 } else { table }
+}
+
+# ── Command not found hook ──
+# On Fedora, suggest which package provides the missing command via dnf.
+# Wrapped in try so it's silent if dnf is unavailable or slow.
+$env.config.hooks.command_not_found = {|cmd|
+  try { ^dnf provides $"*/bin/($cmd)" } catch { null }
+}

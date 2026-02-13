@@ -1,5 +1,9 @@
 # env.nu -- loaded first, before config.nu
 
+# Fedora Atomic /var/home symlink workaround (see scripts/fix-atomic-home.nu)
+use ($nu.default-config-dir | path join "scripts/fix-atomic-home.nu") fix-cwd
+fix-cwd
+
 # Core environment
 $env.EDITOR = "nvim"
 $env.VISUAL = "nvim"

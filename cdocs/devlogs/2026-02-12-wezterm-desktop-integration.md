@@ -5,7 +5,7 @@ first_authored:
 task_list: dotfiles/wezterm
 type: devlog
 state: live
-status: review_ready
+status: done
 tags: [wezterm, kde, desktop-integration, chezmoi, handoff]
 last_reviewed:
   status: accepted

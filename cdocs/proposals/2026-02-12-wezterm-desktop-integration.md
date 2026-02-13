@@ -5,7 +5,7 @@ first_authored:
 task_list: dotfiles/wezterm
 type: proposal
 state: live
-status: implementation_wip
+status: implemented
 tags: [wezterm, kde, desktop-integration, chezmoi]
 last_reviewed:
   status: accepted

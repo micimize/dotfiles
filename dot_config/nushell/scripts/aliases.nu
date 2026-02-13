@@ -21,6 +21,6 @@ alias vim = ^nvim
 # Quick exit (vi habit)
 alias ':q' = exit
 
-# Disk usage
-alias duf = ^df -h
+# Disk usage (dfh avoids shadowing the `duf` disk utility if installed)
+alias dfh = ^df -h
 alias duh = ^du -h -c

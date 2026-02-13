@@ -1,8 +1,14 @@
 # Delete line from SSH known_hosts by line number
+# (SSH error messages report line numbers: "Offending key in known_hosts:42")
 def ssh-del [line: int] {
   let hosts = (open ~/.ssh/known_hosts | lines)
   $hosts | drop nth ($line - 1) | save -f ~/.ssh/known_hosts
   print $"Deleted line ($line) from known_hosts"
+}
+
+# Delete SSH known_hosts entry by hostname (canonical approach)
+def ssh-del-host [host: string] {
+  ^ssh-keygen -R $host
 }
 
 # Show current public IP
@@ -11,29 +17,27 @@ def showip [] {
 }
 
 # Universal archive extraction
+# Modern tar auto-detects compression, so all tar.* variants use `tar xf`.
+# Standalone compression formats (gz, bz2, xz, zst, lz4) are handled separately.
 def extract [file: path] {
   let ext = ($file | path parse | get extension)
-  match $ext {
-    "gz" => {
-      if ($file | str ends-with ".tar.gz") or ($file | str ends-with ".tgz") {
-        ^tar xzf $file
-      } else {
-        ^gunzip $file
-      }
+  # tar.* compound extensions: modern tar auto-detects compression
+  let is_tar = ($file =~ '\.(tar(\.(gz|bz2|xz|zst|lz4))?|tgz|tbz2|txz)$')
+  if $is_tar {
+    ^tar xf $file
+  } else {
+    match $ext {
+      "gz" => { ^gunzip $file }
+      "bz2" => { ^bunzip2 $file }
+      "xz" => { ^unxz $file }
+      "zst" => { ^unzstd $file }
+      "lz4" => { ^lz4 -d $file }
+      "zip" => { ^unzip $file }
+      "rar" => { ^rar x $file }
+      "7z" => { ^7z x $file }
+      "Z" => { ^uncompress $file }
+      _ => { error make { msg: $"Cannot extract '($file)': unknown extension '($ext)'" } }
     }
-    "bz2" => {
-      if ($file | str ends-with ".tar.bz2") or ($file | str ends-with ".tbz2") {
-        ^tar xjf $file
-      } else {
-        ^bunzip2 $file
-      }
-    }
-    "tar" => { ^tar xf $file }
-    "zip" => { ^unzip $file }
-    "rar" => { ^rar x $file }
-    "7z" => { ^7z x $file }
-    "Z" => { ^uncompress $file }
-    _ => { error make { msg: $"Cannot extract '($file)': unknown extension '($ext)'" } }
   }
 }
 
@@ -51,13 +55,9 @@ def git-track-all [] {
   print "To update, run: git fetch --all && git pull --all"
 }
 
-# Docker cleanup
+# Docker/Podman cleanup (single command handles containers, images, networks, build cache)
 def docker-clean [] {
-  print "Removing stopped containers..."
-  ^docker rm -v (^docker ps -a -q -f status=exited | lines) err> /dev/null
-  print "Removing dangling images..."
-  ^docker rmi (^docker images -f "dangling=true" -q | lines) err> /dev/null
-  print "Done."
+  ^docker system prune -f
 }
 
 # Kill tmux sessions by prefix (skip current)

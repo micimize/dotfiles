@@ -53,8 +53,36 @@ if (which carapace | is-not-empty) {
   $env.CARAPACE_LENIENT = 1
 }
 
-# Starship init (generates vendor autoload file)
+# Tool init script generation with freshness caching.
+# Generated scripts go to scripts/generated/ under the config dir, then are sourced
+# from config.nu. Note: `def` in env.nu is not callable from the same file (nushell
+# evaluates env.nu in a special scope), so the cache logic is inlined per tool.
+
+const _generated_dir = ($nu.default-config-dir | path join "scripts/generated")
+
+# Starship init (cached with freshness check, sourced from config.nu)
 if (which starship | is-not-empty) {
-  mkdir ($nu.data-dir | path join "vendor/autoload")
-  starship init nu | save -f ($nu.data-dir | path join "vendor/autoload/starship.nu")
+  let cache = ($_generated_dir | path join "starship.nu")
+  let bin = (which starship | first | get path)
+  let needs_regen = if ($cache | path exists) {
+    (ls $bin | first | get modified) > (ls $cache | first | get modified)
+  } else { true }
+  if $needs_regen {
+    mkdir $_generated_dir
+    starship init nu | save -f $cache
+  }
+}
+
+# Zoxide init (cached with freshness check, sourced from config.nu)
+# Placed after fix-cwd so zoxide sees /home/ not /var/home/ paths
+if (which zoxide | is-not-empty) {
+  let cache = ($_generated_dir | path join "zoxide.nu")
+  let bin = (which zoxide | first | get path)
+  let needs_regen = if ($cache | path exists) {
+    (ls $bin | first | get modified) > (ls $cache | first | get modified)
+  } else { true }
+  if $needs_regen {
+    mkdir $_generated_dir
+    zoxide init nushell | save -f $cache
+  }
 }

@@ -7,3 +7,6 @@ zsh/plugins.sh
 
 # Lace generated files
 .lace/
+
+# Nushell generated tool init scripts (machine-specific, freshness-cached)
+dot_config/nushell/scripts/generated/

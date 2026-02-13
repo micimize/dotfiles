@@ -9,7 +9,6 @@ $env.EDITOR = "nvim"
 $env.VISUAL = "nvim"
 $env.PAGER = "less"
 $env.LESS = "-R"
-$env.LANG = ($env.LANG? | default "en_US.UTF-8")
 
 # XDG
 $env.XDG_CONFIG_HOME = ($env.HOME | path join ".config")

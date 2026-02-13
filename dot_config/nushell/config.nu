@@ -3,6 +3,10 @@
 # ── Disable banner ──
 $env.config.show_banner = false
 
+# ── Hints ──
+# Show inline hints as you type (new in 0.110). Explicit opt-in.
+$env.config.show_hints = true
+
 # ── Editor ──
 $env.config.buffer_editor = "nvim"
 

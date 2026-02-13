@@ -33,15 +33,18 @@ $env.config.keybindings ++= [
       send: SearchHistory
     }
   }
-  # Tab: completion menu
+  # Tab: completion menu (open → cycle → inline-complete)
   {
     name: completion_menu
     modifier: none
     keycode: tab
     mode: [vi_insert]
     event: {
-      send: menu
-      name: completion_menu
+      until: [
+        { send: menu name: completion_menu }
+        { send: menunext }
+        { edit: complete }
+      ]
     }
   }
   # Shift-Tab: completion menu previous

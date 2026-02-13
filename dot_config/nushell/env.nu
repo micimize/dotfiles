@@ -50,8 +50,7 @@ $env.STARSHIP_SHELL = "nu"
 # Carapace (if installed)
 if (which carapace | is-not-empty) {
   $env.CARAPACE_BRIDGES = "zsh,fish,bash,inshellisense"
-  mkdir ~/.cache/carapace
-  carapace _carapace nushell | save -f ~/.cache/carapace/init.nu
+  $env.CARAPACE_LENIENT = 1
 }
 
 # Starship init (generates vendor autoload file)

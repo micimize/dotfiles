@@ -22,5 +22,6 @@ let external_completer = if (which carapace | is-not-empty) {
 
 $env.config.completions.external = {
   enable: true
+  max_results: 100
   completer: $external_completer
 }

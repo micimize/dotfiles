@@ -53,6 +53,9 @@ if (which carapace | is-not-empty) {
   $env.CARAPACE_LENIENT = 1
 }
 
+# Direnv: silence verbose output (remove this line to see direnv messages)
+$env.DIRENV_LOG_FORMAT = ""
+
 # Tool init script generation with freshness caching.
 # Generated scripts go to scripts/generated/ under the config dir, then are sourced
 # from config.nu. Note: `def` in env.nu is not callable from the same file (nushell

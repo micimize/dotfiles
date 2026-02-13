@@ -86,7 +86,7 @@ def colors-256 [] {
     } else {
       $color
     }
-  } | str join ""
+  } | str join "" | print
 }
 
 # Process search (replaces `ps -ef | grep`)

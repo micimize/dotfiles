@@ -1,20 +1,14 @@
 # External completer setup
 # Uses carapace if installed, otherwise gracefully degrades to no external completions
+# Note: nushell 0.108+ handles alias expansion natively -- no need for manual scope lookup
 
 let external_completer = if (which carapace | is-not-empty) {
-  # Carapace provides completions for 1000+ commands out of the box
-  let carapace_completer = {|spans: list<string>|
-    carapace $spans.0 nushell ...$spans | from json
-  }
   {|spans: list<string>|
-    # Resolve aliases before passing to carapace
-    let expanded_alias = (scope aliases | where name == $spans.0 | get -o 0.expansion)
-    let spans = if $expanded_alias != null {
-      $spans | skip 1 | prepend ($expanded_alias | split row " " | take 1)
-    } else {
-      $spans
+    try {
+      carapace $spans.0 nushell ...$spans | from json
+    } catch {
+      null  # Fall back to file completion on carapace errors
     }
-    do $carapace_completer $spans
   }
 } else {
   {|spans: list<string>| null }  # No external completions available

@@ -41,8 +41,8 @@ $env.LESS_TERMCAP_so = $"(ansi escape)[01;44;33m"
 $env.LESS_TERMCAP_ue = $"(ansi escape)[0m"
 $env.LESS_TERMCAP_us = $"(ansi escape)[01;32m"
 
-# Hostname (cached for use in pre_execution hook -- avoids calling sys host on every command)
-$env._HOSTNAME = (sys host | get hostname)
+# Hostname (cached for prompt/scripts -- avoids calling external command on every use)
+$env._HOSTNAME = (^hostname | str trim)
 
 # Starship
 $env.STARSHIP_SHELL = "nu"

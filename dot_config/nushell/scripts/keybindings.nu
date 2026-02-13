@@ -13,22 +13,12 @@ $env.config.keybindings ++= [
       { edit: Clear }
     ]
   }
-  # Ctrl-R: reverse history search in normal mode
+  # Ctrl-R: reverse history search in both vi modes
   {
     name: history_search
     modifier: control
     keycode: char_r
-    mode: [vi_normal]
-    event: {
-      send: SearchHistory
-    }
-  }
-  # Ctrl-R: reverse history search in insert mode too
-  {
-    name: history_search_insert
-    modifier: control
-    keycode: char_r
-    mode: [vi_insert]
+    mode: [vi_insert vi_normal]
     event: {
       send: SearchHistory
     }

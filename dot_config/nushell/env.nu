@@ -20,7 +20,7 @@ path add "~/.cargo/bin"
 path add "/opt/local/bin"
 path add "/home/linuxbrew/.linuxbrew/bin"
 # Temporary: wez-into prototype lives in lace repo bin/ during testing
-path add "/var/home/mjr/code/weft/lace/bin"
+path add "/var/home/mjr/code/weft/lace/main/bin"
 
 # FZF solarized dark (still used for ad-hoc fzf invocations)
 $env.FZF_DEFAULT_OPTS = ([

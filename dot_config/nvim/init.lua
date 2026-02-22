@@ -27,7 +27,7 @@ vim.g.maplocalleader = " "
 
 -- Line numbers
 vim.opt.number = true
-vim.opt.relativenumber = true
+vim.opt.relativenumber = false
 
 -- Indentation (2 spaces default, matching mjr's CodeMode)
 vim.opt.tabstop = 2

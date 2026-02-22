@@ -1,0 +1,8 @@
+// Override showmethekey's default rule that auto-allows wheel users.
+// Forces admin password prompt with 5-minute cache.
+polkit.addRule(function (action, subject) {
+  if (action.id === "one.alynx.showmethekey.cli" &&
+      subject.local && subject.active) {
+    return polkit.Result.AUTH_ADMIN_KEEP;
+  }
+});

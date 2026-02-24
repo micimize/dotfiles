@@ -12,14 +12,14 @@ local config = wezterm.config_builder()
 -- =============================================================================
 
 local slate = {
-  bg_deep    = "#151515",  -- deepest: sidebar, tab bar, borders
-  bg         = "#1c1c1c",  -- primary background
-  bg_raised  = "#232323",  -- elevated: line highlight, hover
-  bg_surface = "#282828",  -- inactive tabs, pane dividers
-  bg_select  = "#333333",  -- selection, active items
-  fg_dim     = "#586e75",  -- muted text (solarized base01)
-  fg         = "#839496",  -- primary text (solarized base0)
-  fg_bright  = "#93a1a1",  -- emphasized text (solarized base1)
+  bg_deep    = "#151515", -- deepest: sidebar, tab bar, borders
+  bg         = "#1c1c1c", -- primary background
+  bg_raised  = "#232323", -- elevated: line highlight, hover
+  bg_surface = "#282828", -- inactive tabs, pane dividers
+  bg_select  = "#333333", -- selection, active items
+  fg_dim     = "#586e75", -- muted text (solarized base01)
+  fg         = "#839496", -- primary text (solarized base0)
+  fg_bright  = "#93a1a1", -- emphasized text (solarized base1)
   -- Solarized accents (unchanged)
   yellow     = "#b58900",
   orange     = "#cb4b16",
@@ -37,9 +37,18 @@ local slate = {
 
 -- Keep the scheme for its 16 ANSI color definitions; override backgrounds/chrome below
 config.color_scheme = "Solarized Dark (Gogh)"
-config.font = wezterm.font("JetBrains Mono", { weight = "Medium" })
-config.font_size = 12.0
-config.line_height = 1.2
+-- Font: uncomment one line to switch. DemiBold compensates for NO_HINTING thin strokes.
+-- JetBrains Mono is WezTerm's built-in; FiraCode and Iosevka installed to ~/.local/share/fonts/NerdFonts/.
+config.font = wezterm.font("JetBrains Mono", { weight = "DemiBold" })
+-- config.font = wezterm.font("FiraCode Nerd Font", { weight = "DemiBold" })
+-- config.font = wezterm.font("Iosevka Nerd Font", { weight = "DemiBold" })
+config.font_size = 10.0
+-- config.line_height = 1.2
+-- WezTerm uses fractional pixel positioning for glyphs, which can cause inconsistent
+-- character rendering at small sizes. NO_HINTING avoids the worst conflicts between
+-- FreeType hinting and WezTerm's sub-pixel layout. See: #3774
+config.freetype_load_flags = "NO_HINTING"
+config.harfbuzz_features = { "calt=0", "clig=0", "liga=0" } -- disable ligatures
 
 -- Slate background and chrome overrides (merge with color_scheme's ANSI palette)
 config.colors = {
@@ -86,19 +95,29 @@ config.inactive_pane_hsb = {
   brightness = 0.7,
 }
 
+local border_color = slate.bg_surface
+local border_width = "2px"
+local border_padding = "6px"
 -- Window
+config.initial_cols = 200
+config.initial_rows = 100
 config.window_background_opacity = 0.95
-config.window_padding = { left = 8, right = 8, top = 8, bottom = 4 }
-config.window_decorations = "RESIZE"
+config.window_padding = {
+  left = border_padding,
+  right = border_padding,
+  top = border_padding,
+  bottom = border_padding
+}
+config.window_decorations = "TITLE | RESIZE"
 config.window_frame = {
-  border_left_width = "4px",
-  border_right_width = "4px",
-  border_bottom_height = "4px",
-  border_top_height = "4px",
-  border_left_color = slate.bg_deep,
-  border_right_color = slate.bg_deep,
-  border_bottom_color = slate.bg_deep,
-  border_top_color = slate.bg_deep,
+  border_left_width = border_width,
+  border_right_width = border_width,
+  border_bottom_height = border_width,
+  border_top_height = border_width,
+  border_left_color = border_color,
+  border_right_color = border_color,
+  border_bottom_color = border_color,
+  border_top_color = border_color,
 }
 config.hide_tab_bar_if_only_one_tab = false
 config.tab_bar_at_bottom = true
@@ -119,7 +138,7 @@ config.default_prog = { '/home/mjr/.cargo/bin/nu' }
 config.scrollback_lines = 99999
 config.enable_scroll_bar = false
 config.check_for_updates = false
-config.status_update_interval = 200  -- ms, fast mode detection for copy/search badges
+config.status_update_interval = 200 -- ms, fast mode detection for copy/search badges
 
 -- Disable CSI u key encoding for compatibility with apps that expect traditional sequences.
 -- Without this, shift+space sends [27;2;32~ which some tools (Claude Code) don't handle well.
@@ -204,8 +223,14 @@ local function is_nvim(pane)
 end
 
 local direction_keys = {
-  Left = "h", Down = "j", Up = "k", Right = "l",
-  h = "Left", j = "Down", k = "Up", l = "Right",
+  Left = "h",
+  Down = "j",
+  Up = "k",
+  Right = "l",
+  h = "Left",
+  j = "Down",
+  k = "Up",
+  l = "Right",
 }
 
 -- Send a Neovim ex command to a pane via synthetic keystrokes.
@@ -276,32 +301,32 @@ config.keys = {
   split_nav("move", "l"),
 
   -- Splits: Alt+H/J/K/L (preserving cwd)
-  { key = "l", mods = "ALT", action = act.SplitPane({ direction = "Right", size = { Percent = 50 } }) },
-  { key = "h", mods = "ALT", action = act.SplitPane({ direction = "Left", size = { Percent = 50 } }) },
-  { key = "j", mods = "ALT", action = act.SplitPane({ direction = "Down", size = { Percent = 50 } }) },
-  { key = "k", mods = "ALT", action = act.SplitPane({ direction = "Up", size = { Percent = 50 } }) },
+  { key = "l", mods = "ALT",       action = act.SplitPane({ direction = "Right", size = { Percent = 50 } }) },
+  { key = "h", mods = "ALT",       action = act.SplitPane({ direction = "Left", size = { Percent = 50 } }) },
+  { key = "j", mods = "ALT",       action = act.SplitPane({ direction = "Down", size = { Percent = 50 } }) },
+  { key = "k", mods = "ALT",       action = act.SplitPane({ direction = "Up", size = { Percent = 50 } }) },
 
   -- Tab management: Alt+N (new), Alt+N/P (cycle)
   { key = "n", mods = "ALT|SHIFT", action = act.SpawnTab("CurrentPaneDomain") },
-  { key = "n", mods = "ALT", action = act.ActivateTabRelative(1) },
-  { key = "p", mods = "ALT", action = act.ActivateTabRelative(-1) },
+  { key = "n", mods = "ALT",       action = act.ActivateTabRelative(1) },
+  { key = "p", mods = "ALT",       action = act.ActivateTabRelative(-1) },
 
   -- Close pane: Alt+W
-  { key = "w", mods = "ALT", action = act.CloseCurrentPane({ confirm = true }) },
+  { key = "w", mods = "ALT",       action = act.CloseCurrentPane({ confirm = true }) },
 
   -- Copy mode: Alt+C
-  { key = "c", mods = "ALT", action = act.ActivateCopyMode },
+  { key = "c", mods = "ALT",       action = act.ActivateCopyMode },
 
   -- Workspace switching
-  { key = "s", mods = "LEADER", action = act.ShowLauncherArgs({ flags = "FUZZY|WORKSPACES" }) },
+  { key = "s", mods = "LEADER",    action = act.ShowLauncherArgs({ flags = "FUZZY|WORKSPACES" }) },
 
   -- Quick workspace access
-  { key = "1", mods = "LEADER", action = act.SwitchToWorkspace({ name = "main" }) },
-  { key = "2", mods = "LEADER", action = act.SwitchToWorkspace({ name = "feature" }) },
-  { key = "3", mods = "LEADER", action = act.SwitchToWorkspace({ name = "scratch" }) },
+  { key = "1", mods = "LEADER",    action = act.SwitchToWorkspace({ name = "main" }) },
+  { key = "2", mods = "LEADER",    action = act.SwitchToWorkspace({ name = "feature" }) },
+  { key = "3", mods = "LEADER",    action = act.SwitchToWorkspace({ name = "scratch" }) },
 
   -- Pane zoom toggle: Leader+Z
-  { key = "z", mods = "LEADER", action = act.TogglePaneZoomState },
+  { key = "z", mods = "LEADER",    action = act.TogglePaneZoomState },
 
   -- Resize panes: Ctrl+Alt+H/J/K/L (smart-splits aware)
   split_nav("resize", "h"),

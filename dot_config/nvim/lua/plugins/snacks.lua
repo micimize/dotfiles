@@ -144,11 +144,23 @@ return {
         sources = {
           files = { hidden = true },
           grep = { hidden = true },
+          explorer = {
+            hidden = true,
+            ignored = false,
+          },
         },
         win = {
           input = {
             keys = {
-              ["<Esc>"] = { "close", mode = { "n", "i" } },
+              ["<Esc>"] = { "close", mode = "n" },
+              ["<C-j>"] = { "focus_list", mode = { "n", "i" } },
+              ["<C-k>"] = false,
+            },
+          },
+          list = {
+            keys = {
+              ["<C-k>"] = "focus_input",
+              ["<C-j>"] = false,
             },
           },
         },

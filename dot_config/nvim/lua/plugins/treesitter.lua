@@ -13,7 +13,7 @@ return {
       -- Install parsers (async)
       local parsers = {
         "typescript", "tsx", "javascript", "lua", "vim", "vimdoc",
-        "html", "css", "json", "yaml", "markdown", "markdown_inline",
+        "html", "css", "json", "jsonc", "yaml", "markdown", "markdown_inline",
         "bash", "rust", "python",
       }
       vim.schedule(function()

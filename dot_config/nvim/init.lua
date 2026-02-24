@@ -71,6 +71,29 @@ vim.opt.list = true
 vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
 
 -- =============================================================================
+-- Filetype Detection
+-- =============================================================================
+
+vim.filetype.add({
+  pattern = {
+    -- VSCode config files are always JSONC
+    [".*/%.vscode/.*%.json"] = "jsonc",
+    -- Content-based: any .json file containing C-style comments
+    [".*%.json"] = {
+      priority = -1,
+      function(path, bufnr)
+        local lines = vim.api.nvim_buf_get_lines(bufnr, 0, 50, false)
+        for _, line in ipairs(lines) do
+          if line:find("^%s*//") or line:find("/%*") then
+            return "jsonc"
+          end
+        end
+      end,
+    },
+  },
+})
+
+-- =============================================================================
 -- Basic Keymaps (before plugins)
 -- =============================================================================
 

@@ -30,7 +30,7 @@ return {
     event = "InsertEnter",
     opts = {
       mapping = { "jk", "jj" },
-      timeout = 300,
+      timeout = 200,
     },
   },
 

@@ -64,7 +64,8 @@ vim.opt.mouse = "a"
 
 -- Faster updates
 vim.opt.updatetime = 250
-vim.opt.timeoutlen = 300
+vim.opt.timeoutlen = 200
+vim.opt.ttimeoutlen = 10
 
 -- Whitespace visualization
 vim.opt.list = true

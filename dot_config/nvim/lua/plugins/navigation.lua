@@ -5,8 +5,24 @@ return {
   {
     "mrjones2014/smart-splits.nvim",
     lazy = false,  -- Must set IS_NVIM user var at startup for WezTerm detection
+    init = function()
+      -- Disable mux BEFORE plugin loads to prevent M.__mux caching.
+      -- smart-splits auto-detects WezTerm via $TERM_PROGRAM and enables its
+      -- built-in mux backend, which spawns 2-7 synchronous wezterm cli
+      -- subprocesses per edge keypress (~60-300ms blocking). We handle edge
+      -- navigation with a single async call instead.
+      -- See: cdocs/proposals/2026-02-24-reduce-ctrl-hjkl-latency.md
+      vim.g.smart_splits_multiplexer_integration = false
+    end,
     opts = {
-      at_edge = "stop",  -- Do not wrap; let WezTerm handle cross-pane navigation
+      at_edge = function(ctx)
+        -- At the edge of all nvim splits: fire-and-forget async pane switch.
+        -- No :wait() — returns immediately, Neovim is never blocked.
+        vim.system({
+          'wezterm', 'cli', 'activate-pane-direction',
+          ({ left = 'Left', right = 'Right', up = 'Up', down = 'Down' })[ctx.direction],
+        })
+      end,
     },
     keys = {
       -- Navigation: Ctrl+h/j/k/l (all modes -- pane nav is higher-order than vim modes)
@@ -22,6 +38,22 @@ return {
     },
     config = function(_, opts)
       require("smart-splits").setup(opts)
+
+      -- Manually set IS_NVIM user variable. Normally done by mux.on_init(),
+      -- which we disabled. WezTerm reads this to distinguish nvim panes from
+      -- regular terminals for conditional Ctrl+HJKL dispatch.
+      local function set_is_nvim(val)
+        vim.fn['smart_splits#write_wezterm_var'](
+          vim.fn['smart_splits#format_wezterm_var'](val)
+        )
+      end
+      set_is_nvim('true')
+      vim.api.nvim_create_autocmd('VimResume', {
+        callback = function() set_is_nvim('true') end,
+      })
+      vim.api.nvim_create_autocmd('VimLeavePre', {
+        callback = function() set_is_nvim('false') end,
+      })
 
       -- FocusFromEdge: WezTerm sends this after ActivatePaneDirection lands on
       -- a Neovim pane, so the correct edge split gets focus. The direction arg

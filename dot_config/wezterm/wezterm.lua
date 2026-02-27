@@ -380,6 +380,81 @@ else
 end
 
 -- =============================================================================
+-- Resurrect Plugin (cross-reboot session persistence)
+-- Serializes workspace layouts to JSON on disk. Paired with unix domain mux
+-- (live persistence) for two-layer coverage. Shell commands (`wez save/restore`)
+-- communicate via OSC 1337 user variable IPC.
+-- Plugin repo: https://github.com/MLFlexer/resurrect.wezterm
+-- =============================================================================
+
+local ok_resurrect, resurrect = pcall(
+  wezterm.plugin.require,
+  "https://github.com/MLFlexer/resurrect.wezterm"
+)
+
+if ok_resurrect then
+  -- Override save directory to a stable path (default is inside the plugin's
+  -- URL-encoded directory, which is fragile for shell-side access)
+  resurrect.state_manager.change_state_save_dir(
+    wezterm.home_dir .. "/.local/share/wezterm/resurrect/"
+  )
+  resurrect.state_manager.set_max_nlines(5000)
+
+  resurrect.state_manager.periodic_save({
+    interval_seconds = 300,
+    save_workspaces = true,
+    save_windows = true,
+    save_tabs = true,
+  })
+
+  -- Parse IPC command: "action|arg|nonce" → action, arg (nonce discarded)
+  local function parse_ipc(value)
+    local parts = {}
+    for part in value:gmatch("[^|]+") do
+      table.insert(parts, part)
+    end
+    return parts[1] or "", parts[2] or ""
+  end
+
+  wezterm.on('user-var-changed', function(window, pane, name, value)
+    if name ~= "WEZ_SESSION_CMD" then return end
+    local action, arg = parse_ipc(value)
+
+    if action == "save" then
+      local state = resurrect.workspace_state.get_workspace_state()
+      if arg ~= "" then
+        resurrect.state_manager.save_state(state, arg)
+      else
+        resurrect.state_manager.save_state(state)
+      end
+      local label = arg ~= "" and arg or window:active_workspace()
+      window:toast_notification("wezterm", "Session saved: " .. label, nil, 3000)
+
+    elseif action == "restore" then
+      local state = resurrect.state_manager.load_state(arg, "workspace")
+      if state and state.workspace then
+        resurrect.workspace_state.restore_workspace(state, {
+          window = window:mux_window(),
+          relative = true,
+          restore_text = true,
+          close_open_tabs = true,
+          on_pane_restore = resurrect.tab_state.default_on_pane_restore,
+        })
+        window:toast_notification("wezterm", "Session restored: " .. arg, nil, 3000)
+      else
+        window:toast_notification("wezterm", "No saved session: " .. arg, nil, 3000)
+      end
+    end
+  end)
+
+  wezterm.on("resurrect.error", function(err)
+    wezterm.log_error("resurrect error: " .. tostring(err))
+  end)
+else
+  wezterm.log_warn("Failed to load resurrect plugin: " .. tostring(resurrect))
+end
+
+-- =============================================================================
 -- Status Bar + Mode Indication
 -- Unified handler: workspace (left), mode badge or clock (right).
 -- No set_config_overrides — avoids Issue #5318 (key table stack clearing)

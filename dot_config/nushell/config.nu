@@ -56,3 +56,24 @@ source ($nu.default-config-dir | path join "scripts/hooks.nu")
 source ($nu.default-config-dir | path join "scripts/keybindings.nu")
 source ($nu.default-config-dir | path join "scripts/utils.nu")
 source ($nu.default-config-dir | path join "scripts/wez-session.nu")
+
+# ── WezTerm session restore on fresh boot ──
+# Offers to restore a saved session when starting in pane 0 of a fresh mux server.
+# Uses pre_prompt (not inline) because nushell doesn't guarantee interactive I/O
+# during config evaluation. One-shot guard prevents re-trigger on subsequent prompts.
+$env.config.hooks.pre_prompt = ($env.config.hooks.pre_prompt? | default [])
+$env.config.hooks.pre_prompt ++= [{||
+  if ($env._WEZ_RESTORE_OFFERED? | default false) { return }
+  $env._WEZ_RESTORE_OFFERED = true
+
+  if ($env.WEZTERM_PANE? | default "") != "0" { return }
+
+  let sessions = (wez-list-sessions)
+  if ($sessions | is-empty) { return }
+
+  let choices = ($sessions | append "[Start fresh]")
+  let selection = ($choices | input list "Restore a saved WezTerm session?")
+  if ($selection | is-not-empty) and ($selection != "[Start fresh]") {
+    wez-ipc "restore" $selection
+  }
+}]

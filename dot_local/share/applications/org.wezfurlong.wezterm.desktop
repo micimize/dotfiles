@@ -6,7 +6,7 @@ Keywords=shell;prompt;command;commandline;cmd;cli;terminal;console;wezterm;
 Icon=org.wezfurlong.wezterm
 StartupWMClass=org.wezfurlong.wezterm
 TryExec=/home/linuxbrew/.linuxbrew/bin/wezterm
-Exec=/home/linuxbrew/.linuxbrew/bin/wezterm start --cwd .
+Exec=/home/linuxbrew/.linuxbrew/bin/wezterm
 Type=Application
 Categories=System;TerminalEmulator;Utility;
 Terminal=false
@@ -16,7 +16,7 @@ Actions=new-window;new-tab;
 
 [Desktop Action new-window]
 Name=New Window
-Exec=/home/linuxbrew/.linuxbrew/bin/wezterm start
+Exec=/home/linuxbrew/.linuxbrew/bin/wezterm
 Icon=window-new
 
 [Desktop Action new-tab]

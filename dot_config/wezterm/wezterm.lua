@@ -152,8 +152,7 @@ config.unix_domains = {
   { name = "unix" },
 }
 
--- Uncomment to auto-connect to mux on startup
--- config.default_gui_startup_args = { "connect", "unix" }
+config.default_gui_startup_args = { "connect", "unix" }
 
 -- =============================================================================
 -- Mouse Bindings
@@ -334,6 +333,9 @@ config.keys = {
   split_nav("resize", "k"),
   split_nav("resize", "l"),
 
+  -- Detach from mux domain (like tmux prefix+d)
+  { key = "d", mods = "LEADER", action = act.DetachDomain 'CurrentPaneDomain' },
+
   -- Quick actions
   { key = ":", mods = "LEADER", action = act.ActivateCommandPalette },
   { key = "r", mods = "LEADER", action = act.ReloadConfiguration },
@@ -498,14 +500,13 @@ end
 -- Startup
 -- =============================================================================
 
-if not wezterm.GLOBAL.gui_startup_registered then
-  wezterm.GLOBAL.gui_startup_registered = true
-  wezterm.on("gui-startup", function(cmd)
-    local tab, pane, window = wezterm.mux.spawn_window({
-      workspace = "main",
-      cwd = wezterm.home_dir,
-    })
-  end)
-end
+-- mux-startup fires once when the mux server first starts.
+-- Does NOT fire on GUI reconnect — only on initial server spawn.
+wezterm.on("mux-startup", function()
+  local tab, pane, window = wezterm.mux.spawn_window({
+    workspace = "main",
+    cwd = wezterm.home_dir,
+  })
+end)
 
 return config

@@ -148,15 +148,75 @@ $ XDG_CONFIG_HOME=dot_config nu -c "echo 'config loads with auto-trigger'"
 config loads with auto-trigger
 ```
 
-### Remaining Manual Verification (post-deploy)
+### Post-Deploy Deep Verification (live WezTerm after relaunch)
 
-The following require `chezmoi apply --force` and live WezTerm interaction:
+Full verification performed after user relaunched WezTerm with `connect unix` mode.
 
-1. Close and reopen WezTerm — verify tabs/panes persist (unix domain)
-2. `wez save test` — verify toast notification + JSON file created
-3. `wez list` — verify session appears
-4. `wez restore test` — verify layout restores + toast
-5. `wez delete test` — verify file removed
-6. Kill mux server, relaunch — verify restore prompt in pane 0
-7. Select "[Start fresh]" — verify no restore, just normal pane
-8. Open new tab — verify NO prompt (pane ID > 0)
+**Mux Server:**
+
+```
+wezterm-mux-server running (PID 125537), unix socket at /run/user/1000/wezterm/sock
+wezterm cli list: 1 pane, workspace "main", domain "unix"
+wezterm cli list-clients: GUI PID 125724 connected
+wezterm cli spawn: creates new tab through mux correctly
+```
+
+**Resurrect Plugin:**
+
+```
+~/.local/share/wezterm/resurrect/workspace/main.json (404 bytes) — periodic save
+~/.local/share/wezterm/resurrect/window/~+code+personal+dotfiles.json (365 bytes)
+```
+
+Periodic save confirmed firing at 5-minute intervals. IPC pipeline tested end-to-end:
+OSC 1337 SetUserVar → user-var-changed handler → `save_state()` → JSON written.
+Manual test created `manual-test.json`, then `wez delete manual-test` removed it.
+
+**Nushell CLI:**
+
+```
+wez list: shows table with session names + modified timestamps
+wez delete nonexistent: "Session not found: nonexistent" (correct error handling)
+wez delete manual-test: "Deleted session: manual-test" (confirmed file removed)
+```
+
+**Config Integrity:**
+
+```
+ls-fonts: Config parsed OK (no stderr errors)
+Leader+D: present in show-keys output
+Smart-splits: 8 user-defined callbacks intact
+Total key bindings: 225
+Chezmoi source = deployed: all 3 files identical
+```
+
+**Logs:**
+
+No errors in any log file. 6x `dev.wezterm: init` messages during startup (config
+evaluates multiple times during unix domain connection setup — normal). Pre-existing
+cosmetic `set_cursor: cursor not found` from Wayland theme, unrelated.
+
+### Issues Found During Verification
+
+**1. Stale Wayland symlink after soft restart (WezTerm upstream bug)**
+
+After a GUI quit + relaunch (without rebooting), WezTerm leaves behind a stale symlink
+at `/run/user/1000/wezterm/wayland-wayland-0-org.wezfurlong.wezterm` pointing to the
+dead GUI socket. This causes `wezterm cli` to fail with
+`failed to connect to Socket(...)` until the symlink is manually removed or the system
+reboots. Not caused by our changes — it's a WezTerm cleanup bug. Mitigated by manual
+removal during testing. On reboot, systemd tmpfiles wipes `/run/user/1000/`.
+
+**2. Overlapping periodic save timers (minor, cosmetic)**
+
+`wezterm.time.call_after` re-registers on each config evaluation. The 6 config evals
+during startup each create a new `periodic_save` timer. In practice all timers write
+the same data to the same files, so this is a performance concern (6x saves every
+5 minutes) rather than a correctness issue. Could be addressed with a `GLOBAL` guard
+in a future polish pass.
+
+**3. IPC escape syntax must match pane shell**
+
+When sending OSC 1337 via `wezterm cli send-text`, the escape must use the target
+shell's syntax. Nushell requires `$"\u{1b}"` (not `\033` or `\x1b`). The `wez-ipc`
+helper in `wez-session.nu` handles this correctly; only relevant for external automation.

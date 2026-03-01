@@ -7,6 +7,11 @@ type: devlog
 state: live
 status: review_ready
 tags: [wezterm, nushell, session-persistence, resurrect, wayland, cleanup]
+last_reviewed:
+  status: revision_requested
+  by: "@claude-opus-4-6"
+  at: "2026-03-01T12:00:00-06:00"
+  round: 1
 ---
 
 # WezTerm Session Persistence Polish: Devlog
@@ -51,9 +56,16 @@ is simpler and correct — a live GUI recreates its Wayland symlinks immediately
 implementation follows this approach: `glob` + `rm -f` with no liveness check.
 
 The cleanup runs after the one-shot guard (`_WEZ_RESTORE_OFFERED`) but before the
-`WEZTERM_PANE == "0"` check. This means it runs for every shell session inside WezTerm
-(not just pane 0), which is correct — any shell can benefit from cleaning stale symlinks
-for `wezterm cli` to work.
+`WEZTERM_PANE == "0"` check. This means it runs once per pane lifetime (the one-shot
+guard ensures it does not re-trigger on subsequent prompts). It runs in all panes, not
+just pane 0, which is correct: any pane can benefit from cleaning stale symlinks for
+`wezterm cli` to work.
+
+### Open question: gui-sock-* cleanup
+
+The proposal's open question about cleaning stale `gui-sock-*` files was not addressed.
+These are harmless (WezTerm ignores them) and accumulate slowly. Left for a future
+polish pass if they become a nuisance.
 
 ## Changes Made
 
@@ -81,9 +93,40 @@ $ XDG_CONFIG_HOME=$PWD/dot_config nu -c "echo 'config loads OK'"
 config loads OK
 ```
 
-### Commits
+### Post-Deploy Functional Verification
+
+Deployed with `chezmoi apply --force`, then tested both fixes live.
+
+**GLOBAL guard: timer reduction confirmed.**
+
+Compared `dev.wezterm: init` counts in mux server logs (a proxy for config evaluations
+that reach the plugin block):
 
 ```
-0363513 fix(wezterm): guard resurrect plugin init with wezterm.GLOBAL
-2c25dc8 fix(nushell): clean stale WezTerm Wayland symlinks on shell start
+Old mux server (pre-fix, PID 125537): 10 config evals
+Current mux server (post-fix, PID 374572): 1 config eval
+```
+
+The GLOBAL guard prevents `periodic_save`, event handlers, and config overrides from
+re-registering on subsequent config evaluations. The `pcall(wezterm.plugin.require, ...)`
+still runs on each eval (it's outside the guard), but plugin loading is idempotent.
+
+**Symlink cleanup: stale symlink removal confirmed.**
+
+```
+$ ln -sf /tmp/nonexistent-dead-socket /run/user/1000/wezterm/wayland-wayland-0-org.wezfurlong.wezterm
+$ ls /run/user/1000/wezterm/wayland-*
+wayland-wayland-0-org.wezfurlong.wezterm -> /tmp/nonexistent-dead-socket
+
+$ nu -c '
+  let wez_runtime = "/run/user/1000/wezterm"
+  let before = (glob $"($wez_runtime)/wayland-*-org.wezfurlong.wezterm" | length)
+  glob $"($wez_runtime)/wayland-*-org.wezfurlong.wezterm" | each { |f| rm -f $f }
+  let after = (glob $"($wez_runtime)/wayland-*-org.wezfurlong.wezterm" | length)
+  print $"Symlinks before: ($before), after: ($after)"
+'
+Symlinks before: 1, after: 0
+
+$ wezterm cli list
+(works correctly, no connection errors)
 ```

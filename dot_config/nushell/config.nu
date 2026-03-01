@@ -61,10 +61,19 @@ source ($nu.default-config-dir | path join "scripts/wez-session.nu")
 # Offers to restore a saved session when starting in pane 0 of a fresh mux server.
 # Uses pre_prompt (not inline) because nushell doesn't guarantee interactive I/O
 # during config evaluation. One-shot guard prevents re-trigger on subsequent prompts.
+# Also cleans stale Wayland symlinks that break `wezterm cli` after GUI restart
+# (upstream WezTerm bug — GUI doesn't remove its Wayland socket symlink on exit).
 $env.config.hooks.pre_prompt = ($env.config.hooks.pre_prompt? | default [])
 $env.config.hooks.pre_prompt ++= [{||
   if ($env._WEZ_RESTORE_OFFERED? | default false) { return }
   $env._WEZ_RESTORE_OFFERED = true
+
+  # Clean stale Wayland symlinks left by dead GUI processes.
+  # Safe to remove unconditionally — a live GUI recreates them immediately.
+  let wez_runtime = $"/run/user/(id -u)/wezterm"
+  if ($wez_runtime | path exists) {
+    glob $"($wez_runtime)/wayland-*-org.wezfurlong.wezterm" | each { |f| rm -f $f }
+  }
 
   if ($env.WEZTERM_PANE? | default "") != "0" { return }
 

@@ -368,7 +368,7 @@ if ok then
   -- Tab mode: projects open as tabs in the current window instead of
   -- separate workspaces. Tab titles are resolved by format-tab-title below.
   lace_plugin.apply_to_config(config, {
-    ssh_key = wezterm.home_dir .. "/.ssh/lace_devcontainer",
+    ssh_key = wezterm.home_dir .. "/.config/lace/ssh/id_ed25519",
     connection_mode = "tab",
   })
 

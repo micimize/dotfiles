@@ -406,7 +406,9 @@ local ok_resurrect, resurrect = pcall(
   "https://github.com/MLFlexer/resurrect.wezterm"
 )
 
-if ok_resurrect then
+if ok_resurrect and not wezterm.GLOBAL.resurrect_initialized then
+  wezterm.GLOBAL.resurrect_initialized = true
+
   -- Override save directory to a stable path (default is inside the plugin's
   -- URL-encoded directory, which is fragile for shell-side access)
   resurrect.state_manager.change_state_save_dir(
@@ -464,7 +466,7 @@ if ok_resurrect then
   wezterm.on("resurrect.error", function(err)
     wezterm.log_error("resurrect error: " .. tostring(err))
   end)
-else
+elseif not ok_resurrect then
   wezterm.log_warn("Failed to load resurrect plugin: " .. tostring(resurrect))
 end
 

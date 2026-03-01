@@ -365,8 +365,11 @@ if ok then
   -- Configure lace devcontainer access.
   -- The new plugin uses Docker-based port-range discovery (ports 22425-22499)
   -- and pre-registers SSH domains for the entire range.
+  -- Tab mode: projects open as tabs in the current window instead of
+  -- separate workspaces. Tab titles are resolved by format-tab-title below.
   lace_plugin.apply_to_config(config, {
     ssh_key = wezterm.home_dir .. "/.ssh/lace_devcontainer",
+    connection_mode = "tab",
   })
 
   -- Leader+W: Open the lace project picker (discovers running devcontainers)
@@ -375,6 +378,17 @@ if ok then
     mods = "LEADER",
     action = act.EmitEvent(lace_plugin.get_picker_event()),
   })
+
+  -- Tab title resolution: prefer explicit tab title, then lace discovery
+  -- cache (project name by domain port), then fall back to pane title.
+  -- This makes lace tab titles immune to OSC title changes from TUIs.
+  wezterm.on("format-tab-title", function(tab, tabs, panes, cfg, hover, max_width)
+    local title = lace_plugin.format_tab_title(tab)
+    if #title > max_width - 2 then
+      title = title:sub(1, max_width - 5) .. "..."
+    end
+    return " " .. title .. " "
+  end)
 else
   wezterm.log_warn("Failed to load lace plugin: " .. tostring(lace_plugin))
 end

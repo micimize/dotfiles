@@ -56,6 +56,7 @@ source ($nu.default-config-dir | path join "scripts/hooks.nu")
 source ($nu.default-config-dir | path join "scripts/keybindings.nu")
 source ($nu.default-config-dir | path join "scripts/utils.nu")
 source ($nu.default-config-dir | path join "scripts/wez-session.nu")
+source ($nu.default-config-dir | path join "scripts/wt-clone.nu")
 
 # ── WezTerm session restore on fresh boot ──
 # Offers to restore a saved session when starting in pane 0 of a fresh mux server.

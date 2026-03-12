@@ -383,7 +383,12 @@ if ok then
   -- cache (project name by domain port), then fall back to pane title.
   -- This makes lace tab titles immune to OSC title changes from TUIs.
   wezterm.on("format-tab-title", function(tab, tabs, panes, cfg, hover, max_width)
-    local title = lace_plugin.format_tab_title(tab)
+    local title
+    if lace_plugin.format_tab_title then
+      title = lace_plugin.format_tab_title(tab)
+    else
+      title = tab.tab_title ~= "" and tab.tab_title or tab.active_pane.title
+    end
     if #title > max_width - 2 then
       title = title:sub(1, max_width - 5) .. "..."
     end

@@ -93,3 +93,16 @@ def colors-256 [] {
 def searchjobs [pattern: string] {
   ps | where name =~ $pattern
 }
+
+# Clear screen preserving scrollback (works around tmux scroll-on-clear off)
+# Temporarily re-enables scroll-on-clear for this pane so the intentional clear
+# saves screen contents to scrollback, then disables it again.
+def clear [] {
+  if "TMUX" in $env {
+    ^tmux set -p scroll-on-clear on
+    ^clear
+    ^tmux set -p scroll-on-clear off
+  } else {
+    ^clear
+  }
+}

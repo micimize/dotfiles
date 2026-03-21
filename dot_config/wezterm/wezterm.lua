@@ -12,6 +12,11 @@ local config = wezterm.config_builder()
 
 config.color_scheme = "Catppuccin Mocha"
 
+-- Override background to crust (#11111b) for maximum contrast
+config.colors = {
+  background = "#11111b",
+}
+
 config.font = wezterm.font("JetBrains Mono", { weight = "DemiBold" })
 config.font_size = 10.0
 config.freetype_load_flags = "NO_HINTING"
@@ -28,7 +33,7 @@ config.inactive_pane_hsb = {
 
 config.initial_cols = 200
 config.initial_rows = 100
-config.window_background_opacity = 0.95
+config.window_background_opacity = 1.0
 config.window_padding = {
   left = "6px",
   right = "6px",

@@ -21,6 +21,9 @@ vscode/
 init.vim
 tmux.conf
 
+# Runtime-generated tool init scripts (nushell regenerates these on startup)
+.config/nushell/scripts/generated/
+
 # Git and IDE
 .git/
 .gitignore

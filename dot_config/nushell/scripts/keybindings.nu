@@ -47,4 +47,15 @@ $env.config.keybindings ++= [
       send: menuprevious
     }
   }
+  # Ctrl-L: clear screen preserving scrollback (overrides reedline's ClearScreen)
+  {
+    name: clear_with_scrollback
+    modifier: control
+    keycode: char_l
+    mode: [vi_insert vi_normal]
+    event: {
+      send: ExecuteHostCommand
+      cmd: "clear"
+    }
+  }
 ]

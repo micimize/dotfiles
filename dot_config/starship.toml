@@ -10,7 +10,6 @@ ${custom.dir}\
 $git_branch\
 $git_status\
 $jobs\
-[](fg:base bg:surface0) \
 """
 
 # Disable the blank line at the start of the prompt
@@ -19,12 +18,12 @@ add_newline = false
 [time]
 disabled = false
 time_format = "%m-%d %R"
-style = "fg:sky bg:base"
-format = '[ $time ]($style)'
+style = "sky"
+format = '[$time ]($style)'
 
 [directory]
 truncate_to_repo = false
-style = "fg:mauve bg:base"
+style = "mauve"
 format = "[$path ]($style)"
 truncation_length = 3
 truncation_symbol = "…/"
@@ -38,16 +37,16 @@ truncation_symbol = "…/"
 
 [docker_context]
 symbol = " "
-style = "fg:teal bg:base"
-format = '[ $symbol $context ]($style) $path'
+style = "teal"
+format = '[$symbol $context ]($style) $path'
 
 [git_branch]
 symbol = ""
-style = "fg:yellow bg:base"
+style = "yellow"
 format = '[$branch ]($style)'
 
 [git_status]
-style = "fg:yellow bg:base"
+style = "yellow"
 format = '[$all_status$ahead_behind ]($style)'
 
 [git_metrics]
@@ -56,30 +55,30 @@ added_style = "green"
 
 [nodejs]
 symbol = ""
-style = "fg:blue bg:base"
-format = '[ $symbol ($version) ]($style)'
+style = "blue"
+format = '[$symbol ($version) ]($style)'
 
 [rust]
 symbol = ""
-style = "fg:red bg:base"
-format = '[ $symbol ($version) ]($style)'
+style = "red"
+format = '[$symbol ($version) ]($style)'
 
 [python]
 version_format = 'py$major.$minor'
-style = "fg:text bg:base"
+style = "text"
 format = '[$virtualenv ]($style)'
 detect_files = []
 detect_extensions = [ ]
 
 [jobs]
-style = "fg:blue bg:base"
+style = "blue"
 symbol = "&"
 format = '[$number$symbol ]($style)'
 
 [custom.dir]
 when = true
 shell = ["bash", "--noprofile", "--norc"]
-style = "fg:mauve bg:base"
+style = "mauve"
 command = '''
 short_path() {
   if [[ $PWD == $HOME ]]; then

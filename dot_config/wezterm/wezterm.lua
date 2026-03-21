@@ -299,7 +299,9 @@ config.keys = {
   split_nav("move", "k"),
   split_nav("move", "l"),
 
-  -- Splits: Alt+H/J/K/L (preserving cwd)
+  -- Splits: Alt+H/J/K/L (inherits current pane domain)
+  -- In ExecDomain panes (lace container tabs), splits SSH into the same container.
+  -- In local panes, splits open local shells as usual.
   { key = "l", mods = "ALT",       action = act.SplitPane({ direction = "Right", size = { Percent = 50 } }) },
   { key = "h", mods = "ALT",       action = act.SplitPane({ direction = "Left", size = { Percent = 50 } }) },
   { key = "j", mods = "ALT",       action = act.SplitPane({ direction = "Down", size = { Percent = 50 } }) },

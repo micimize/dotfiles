@@ -22,11 +22,12 @@ path add "/home/linuxbrew/.linuxbrew/bin"
 # lace-into and lace-discover live in lace repo bin/
 path add "/var/home/mjr/code/weft/lace/main/bin"
 
-# FZF solarized dark (still used for ad-hoc fzf invocations)
+# FZF catppuccin mocha
 $env.FZF_DEFAULT_OPTS = ([
-  "--color=bg+:#073642,bg:#002b36,spinner:#2aa198,hl:#268bd2"
-  "--color=fg:#839496,header:#268bd2,info:#b58900,pointer:#2aa198"
-  "--color=marker:#2aa198,fg+:#eee8d5,prompt:#b58900,hl+:#268bd2"
+  "--color=bg+:#313244,bg:#1e1e2e,spinner:#f5e0dc,hl:#f38ba8"
+  "--color=fg:#cdd6f4,header:#f38ba8,info:#cba6f7,pointer:#f5e0dc"
+  "--color=marker:#b4befe,fg+:#cdd6f4,prompt:#cba6f7,hl+:#f38ba8"
+  "--color=selected-bg:#45475a"
 ] | str join " ")
 
 # LESS colors (man page highlighting)

@@ -1,4 +1,5 @@
 # cargo install starship --locked
+# Catppuccin Mocha palette
 
 format = """
 $time\
@@ -7,13 +8,8 @@ ${custom.dir}\
 $git_branch\
 $git_status\
 $jobs\
-[](fg:black bg:brightblack) \
+[](fg:#1e1e2e bg:#313244) \
 """
-
-# [](fg:black bg:yellow)\
-# [](fg:yellow bg:black)\
-# $python\ $nodejs\ $rust\
-# [](fg:bright-black bg:black)\
 
 # Disable the blank line at the start of the prompt
 add_newline = false
@@ -21,12 +17,12 @@ add_newline = false
 [time]
 disabled = false
 time_format = "%m-%d %R"
-style = "fg:cyan bg:black"
+style = "fg:#89dceb bg:#1e1e2e"
 format = '[ $time ]($style)'
 
 [directory]
 truncate_to_repo = false
-style = "fg:purple bg:black"
+style = "fg:#cba6f7 bg:#1e1e2e"
 format = "[$path ]($style)"
 truncation_length = 3
 truncation_symbol = "…/"
@@ -34,55 +30,54 @@ truncation_symbol = "…/"
 [directory.substitutions]
 # Order matters (most precise first)
 "Documents" = "󰈙 "
-"Downloads" = " "
-"Music" = " "
-"Pictures" = " "
+"Downloads" = " "
+"Music" = " "
+"Pictures" = " "
 
 [docker_context]
-symbol = " "
-style = "bg:#06969A"
+symbol = " "
+style = "fg:#89dceb bg:#1e1e2e"
 format = '[ $symbol $context ]($style) $path'
 
 [git_branch]
-symbol = ""
-style = "fg:yellow bg:black"
-# truncation_length = 5
+symbol = ""
+style = "fg:#f9e2af bg:#1e1e2e"
 format = '[$branch ]($style)'
 
 [git_status]
-style = "fg:yellow bg:black"
+style = "fg:#f9e2af bg:#1e1e2e"
 format = '[$all_status$ahead_behind ]($style)'
 
 [git_metrics]
 disabled = true
-added_style = "green"
+added_style = "#a6e3a1"
 
 [nodejs]
-symbol = ""
-style = "fg:blue bg:black"
+symbol = ""
+style = "fg:#89b4fa bg:#1e1e2e"
 format = '[ $symbol ($version) ]($style)'
 
 [rust]
-symbol = ""
-style = "fg:red bg:black"
+symbol = ""
+style = "fg:#f38ba8 bg:#1e1e2e"
 format = '[ $symbol ($version) ]($style)'
 
 [python]
 version_format = 'py$major.$minor'
-style = "bg:black fg:white"
+style = "fg:#cdd6f4 bg:#1e1e2e"
 format = '[$virtualenv ]($style)'
 detect_files = []
 detect_extensions = [ ]
 
 [jobs]
-style = "bg:black fg:blue"
+style = "fg:#89b4fa bg:#1e1e2e"
 symbol = "&"
 format = '[$number$symbol ]($style)'
 
 [custom.dir]
 when = true
 shell = ["bash", "--noprofile", "--norc"]
-style = "bg:black fg:purple"
+style = "fg:#cba6f7 bg:#1e1e2e"
 command = '''
 short_path() {
   if [[ $PWD == $HOME ]]; then
@@ -90,13 +85,13 @@ short_path() {
   else
     # Replace the home directory part
     _dir=$(echo "$PWD" | sed "s|$HOME|~|g")
-    
+
     # Define a regex to match directory names with more than three characters
     more_than_three_chars='/\([^/][^/][^/]\)[^/]\+'
-    
+
     # Use sed to replace the long names with their three-character short versions
     dir=$(echo "$_dir" | sed "s|$more_than_three_chars|/\1|g")
-    
+
     # Print the final, plain-text path
     echo "$dir"
   fi

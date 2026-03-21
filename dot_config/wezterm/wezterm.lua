@@ -10,16 +10,12 @@ local config = wezterm.config_builder()
 -- Appearance
 -- =============================================================================
 
-config.color_scheme = "Solarized Dark (Gogh)"
+config.color_scheme = "Catppuccin Mocha"
 
 config.font = wezterm.font("JetBrains Mono", { weight = "DemiBold" })
 config.font_size = 10.0
 config.freetype_load_flags = "NO_HINTING"
 config.harfbuzz_features = { "calt=0", "clig=0", "liga=0" }
-
-config.colors = {
-  background = "#232323",
-}
 
 config.inactive_pane_hsb = {
   saturation = 0.8,
@@ -48,7 +44,8 @@ config.enable_tab_bar = false
 -- Shell
 -- =============================================================================
 
-config.default_prog = { '/home/mjr/.cargo/bin/nu' }
+-- Auto-attach to tmux: join existing session or create new one
+config.default_prog = { 'tmux', 'new-session', '-A', '-s', 'main' }
 
 -- =============================================================================
 -- Core Settings

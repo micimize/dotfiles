@@ -1,67 +1,169 @@
-# Catppuccin Mocha color configuration for nushell table rendering
-# Reference: https://github.com/catppuccin/nushell
+# Catppuccin Mocha color configuration for nushell
+# Source: https://github.com/catppuccin/nushell
 
-let catppuccin_mocha = {
-  separator: "#585b70"                              # surface2
-  leading_trailing_space_bg: { attr: n }
-  header: { fg: "#f9e2af" attr: b }                 # yellow, bold
-  empty: "#6c7086"                                  # overlay0
-  bool: "#94e2d5"                                   # teal
-  int: "#89b4fa"                                    # blue
-  float: "#89b4fa"                                  # blue
-  filesize: "#94e2d5"                               # teal
-  duration: "#94e2d5"                               # teal
-  date: "#cba6f7"                                   # mauve
-  range: "#89b4fa"                                  # blue
-  string: "#cdd6f4"                                 # text
-  nothing: "#6c7086"                                # overlay0
-  binary: "#cba6f7"                                 # mauve
-  cell_path: "#cdd6f4"                              # text
-  row_index: { fg: "#a6e3a1" attr: b }              # green, bold
-  record: "#cdd6f4"                                 # text
-  list: "#cdd6f4"                                   # text
-  block: "#cdd6f4"                                  # text
-  hints: "#6c7086"                                  # overlay0
-  search_result: { fg: "#1e1e2e" bg: "#f9e2af" }    # base on yellow
-
-  shape_and: { fg: "#cba6f7" attr: b }              # mauve
-  shape_binary: { fg: "#cba6f7" attr: b }           # mauve
-  shape_block: { fg: "#89b4fa" attr: b }            # blue
-  shape_bool: "#94e2d5"                             # teal
-  shape_closure: { fg: "#a6e3a1" attr: b }          # green
-  shape_custom: "#a6e3a1"                           # green
-  shape_datetime: { fg: "#94e2d5" attr: b }         # teal
-  shape_directory: "#94e2d5"                        # teal
-  shape_external: "#94e2d5"                         # teal
-  shape_externalarg: { fg: "#a6e3a1" attr: b }      # green
-  shape_external_resolved: { fg: "#94e2d5" attr: b } # teal
-  shape_filepath: "#94e2d5"                         # teal
-  shape_flag: { fg: "#89b4fa" attr: b }             # blue
-  shape_float: { fg: "#cba6f7" attr: b }            # mauve
-  shape_garbage: { fg: "#cdd6f4" bg: "#f38ba8" attr: b } # text on red
-  shape_glob_interpolation: { fg: "#94e2d5" attr: b } # teal
-  shape_globpattern: { fg: "#94e2d5" attr: b }      # teal
-  shape_int: { fg: "#cba6f7" attr: b }              # mauve
-  shape_internalcall: { fg: "#94e2d5" attr: b }     # teal
-  shape_keyword: { fg: "#cba6f7" attr: b }          # mauve
-  shape_list: { fg: "#94e2d5" attr: b }             # teal
-  shape_literal: "#89b4fa"                          # blue
-  shape_match_pattern: "#a6e3a1"                    # green
-  shape_matching_brackets: { attr: u }
-  shape_nothing: "#94e2d5"                          # teal
-  shape_operator: "#f9e2af"                         # yellow
-  shape_or: { fg: "#cba6f7" attr: b }               # mauve
-  shape_pipe: { fg: "#cba6f7" attr: b }             # mauve
-  shape_range: { fg: "#f9e2af" attr: b }            # yellow
-  shape_raw_string: { fg: "#cdd6f4" attr: b }       # text
-  shape_record: { fg: "#94e2d5" attr: b }           # teal
-  shape_redirection: { fg: "#cba6f7" attr: b }      # mauve
-  shape_signature: { fg: "#a6e3a1" attr: b }        # green
-  shape_string: "#a6e3a1"                           # green
-  shape_string_interpolation: { fg: "#94e2d5" attr: b } # teal
-  shape_table: { fg: "#89b4fa" attr: b }            # blue
-  shape_variable: { fg: "#cba6f7" attr: b }         # mauve
-  shape_vardecl: { fg: "#cba6f7" attr: b }          # mauve
+let theme = {
+  rosewater: "#f5e0dc"
+  flamingo: "#f2cdcd"
+  pink: "#f5c2e7"
+  mauve: "#cba6f7"
+  red: "#f38ba8"
+  maroon: "#eba0ac"
+  peach: "#fab387"
+  yellow: "#f9e2af"
+  green: "#a6e3a1"
+  teal: "#94e2d5"
+  sky: "#89dceb"
+  sapphire: "#74c7ec"
+  blue: "#89b4fa"
+  lavender: "#b4befe"
+  text: "#cdd6f4"
+  subtext1: "#bac2de"
+  subtext0: "#a6adc8"
+  overlay2: "#9399b2"
+  overlay1: "#7f849c"
+  overlay0: "#6c7086"
+  surface2: "#585b70"
+  surface1: "#45475a"
+  surface0: "#313244"
+  base: "#1e1e2e"
+  mantle: "#181825"
+  crust: "#11111b"
 }
 
-$env.config.color_config = $catppuccin_mocha
+let scheme = {
+  recognized_command: $theme.blue
+  unrecognized_command: $theme.text
+  constant: $theme.peach
+  punctuation: $theme.overlay2
+  operator: $theme.sky
+  string: $theme.green
+  virtual_text: $theme.surface2
+  variable: { fg: $theme.flamingo attr: i }
+  filepath: $theme.yellow
+}
+
+$env.config.color_config = {
+  separator: { fg: $theme.surface2 attr: b }
+  leading_trailing_space_bg: { fg: $theme.lavender attr: u }
+  header: { fg: $theme.text attr: b }
+  row_index: $scheme.virtual_text
+  record: $theme.text
+  list: $theme.text
+  hints: $scheme.virtual_text
+  search_result: { fg: $theme.base bg: $theme.yellow }
+  shape_closure: $theme.teal
+  closure: $theme.teal
+  shape_flag: { fg: $theme.maroon attr: i }
+  shape_matching_brackets: { attr: u }
+  shape_garbage: $theme.red
+  shape_keyword: $theme.mauve
+  shape_match_pattern: $theme.green
+  shape_signature: $theme.teal
+  shape_table: $scheme.punctuation
+  cell-path: $scheme.punctuation
+  shape_list: $scheme.punctuation
+  shape_record: $scheme.punctuation
+  shape_vardecl: $scheme.variable
+  shape_variable: $scheme.variable
+  empty: { attr: n }
+  filesize: {||
+    if $in < 1kb {
+      $theme.teal
+    } else if $in < 10kb {
+      $theme.green
+    } else if $in < 100kb {
+      $theme.yellow
+    } else if $in < 10mb {
+      $theme.peach
+    } else if $in < 100mb {
+      $theme.maroon
+    } else if $in < 1gb {
+      $theme.red
+    } else {
+      $theme.mauve
+    }
+  }
+  duration: {||
+    if $in < 1day {
+      $theme.teal
+    } else if $in < 1wk {
+      $theme.green
+    } else if $in < 4wk {
+      $theme.yellow
+    } else if $in < 12wk {
+      $theme.peach
+    } else if $in < 24wk {
+      $theme.maroon
+    } else if $in < 52wk {
+      $theme.red
+    } else {
+      $theme.mauve
+    }
+  }
+  datetime: {|| (date now) - $in |
+    if $in < 1day {
+      $theme.teal
+    } else if $in < 1wk {
+      $theme.green
+    } else if $in < 4wk {
+      $theme.yellow
+    } else if $in < 12wk {
+      $theme.peach
+    } else if $in < 24wk {
+      $theme.maroon
+    } else if $in < 52wk {
+      $theme.red
+    } else {
+      $theme.mauve
+    }
+  }
+  shape_external: $scheme.unrecognized_command
+  shape_internalcall: $scheme.recognized_command
+  shape_external_resolved: $scheme.recognized_command
+  shape_block: $scheme.recognized_command
+  block: $scheme.recognized_command
+  shape_custom: $theme.pink
+  custom: $theme.pink
+  background: $theme.base
+  foreground: $theme.text
+  cursor: { bg: $theme.rosewater fg: $theme.base }
+  shape_range: $scheme.operator
+  range: $scheme.operator
+  shape_pipe: $scheme.operator
+  shape_operator: $scheme.operator
+  shape_redirection: $scheme.operator
+  glob: $scheme.filepath
+  shape_directory: $scheme.filepath
+  shape_filepath: $scheme.filepath
+  shape_glob_interpolation: $scheme.filepath
+  shape_globpattern: $scheme.filepath
+  shape_int: $scheme.constant
+  int: $scheme.constant
+  bool: $scheme.constant
+  float: $scheme.constant
+  nothing: $scheme.constant
+  binary: $scheme.constant
+  shape_nothing: $scheme.constant
+  shape_bool: $scheme.constant
+  shape_float: $scheme.constant
+  shape_binary: $scheme.constant
+  shape_datetime: $scheme.constant
+  shape_literal: $scheme.constant
+  string: $scheme.string
+  shape_string: $scheme.string
+  shape_string_interpolation: $theme.flamingo
+  shape_raw_string: $scheme.string
+  shape_externalarg: $scheme.string
+}
+$env.config.highlight_resolved_externals = true
+$env.config.explore = {
+    status_bar_background: { fg: $theme.text, bg: $theme.mantle },
+    command_bar_text: { fg: $theme.text },
+    highlight: { fg: $theme.base, bg: $theme.yellow },
+    status: {
+        error: $theme.red,
+        warn: $theme.yellow,
+        info: $theme.blue,
+    },
+    selected_cell: { bg: $theme.blue fg: $theme.base },
+}

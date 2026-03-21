@@ -1,5 +1,7 @@
 # cargo install starship --locked
-# Catppuccin Mocha palette
+# Catppuccin Mocha palette via official integration
+
+palette = "catppuccin_mocha"
 
 format = """
 $time\
@@ -8,7 +10,7 @@ ${custom.dir}\
 $git_branch\
 $git_status\
 $jobs\
-[](fg:#1e1e2e bg:#313244) \
+[](fg:base bg:surface0) \
 """
 
 # Disable the blank line at the start of the prompt
@@ -17,12 +19,12 @@ add_newline = false
 [time]
 disabled = false
 time_format = "%m-%d %R"
-style = "fg:#89dceb bg:#1e1e2e"
+style = "fg:sky bg:base"
 format = '[ $time ]($style)'
 
 [directory]
 truncate_to_repo = false
-style = "fg:#cba6f7 bg:#1e1e2e"
+style = "fg:mauve bg:base"
 format = "[$path ]($style)"
 truncation_length = 3
 truncation_symbol = "…/"
@@ -36,48 +38,48 @@ truncation_symbol = "…/"
 
 [docker_context]
 symbol = " "
-style = "fg:#89dceb bg:#1e1e2e"
+style = "fg:teal bg:base"
 format = '[ $symbol $context ]($style) $path'
 
 [git_branch]
 symbol = ""
-style = "fg:#f9e2af bg:#1e1e2e"
+style = "fg:yellow bg:base"
 format = '[$branch ]($style)'
 
 [git_status]
-style = "fg:#f9e2af bg:#1e1e2e"
+style = "fg:yellow bg:base"
 format = '[$all_status$ahead_behind ]($style)'
 
 [git_metrics]
 disabled = true
-added_style = "#a6e3a1"
+added_style = "green"
 
 [nodejs]
 symbol = ""
-style = "fg:#89b4fa bg:#1e1e2e"
+style = "fg:blue bg:base"
 format = '[ $symbol ($version) ]($style)'
 
 [rust]
 symbol = ""
-style = "fg:#f38ba8 bg:#1e1e2e"
+style = "fg:red bg:base"
 format = '[ $symbol ($version) ]($style)'
 
 [python]
 version_format = 'py$major.$minor'
-style = "fg:#cdd6f4 bg:#1e1e2e"
+style = "fg:text bg:base"
 format = '[$virtualenv ]($style)'
 detect_files = []
 detect_extensions = [ ]
 
 [jobs]
-style = "fg:#89b4fa bg:#1e1e2e"
+style = "fg:blue bg:base"
 symbol = "&"
 format = '[$number$symbol ]($style)'
 
 [custom.dir]
 when = true
 shell = ["bash", "--noprofile", "--norc"]
-style = "fg:#cba6f7 bg:#1e1e2e"
+style = "fg:mauve bg:base"
 command = '''
 short_path() {
   if [[ $PWD == $HOME ]]; then
@@ -99,3 +101,31 @@ short_path() {
 short_path
 '''
 format = "[$output ]($style)"
+
+[palettes.catppuccin_mocha]
+rosewater = "#f5e0dc"
+flamingo = "#f2cdcd"
+pink = "#f5c2e7"
+mauve = "#cba6f7"
+red = "#f38ba8"
+maroon = "#eba0ac"
+peach = "#fab387"
+yellow = "#f9e2af"
+green = "#a6e3a1"
+teal = "#94e2d5"
+sky = "#89dceb"
+sapphire = "#74c7ec"
+blue = "#89b4fa"
+lavender = "#b4befe"
+text = "#cdd6f4"
+subtext1 = "#bac2de"
+subtext0 = "#a6adc8"
+overlay2 = "#9399b2"
+overlay1 = "#7f849c"
+overlay0 = "#6c7086"
+surface2 = "#585b70"
+surface1 = "#45475a"
+surface0 = "#313244"
+base = "#1e1e2e"
+mantle = "#181825"
+crust = "#11111b"

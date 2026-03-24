@@ -75,4 +75,14 @@ config.mouse_bindings = {
   },
 }
 
+-- =============================================================================
+-- Keys: override defaults that conflict with tmux bindings
+-- =============================================================================
+
+config.keys = {
+  -- Pass Ctrl+V through to tmux (WezTerm default: PasteFrom clipboard).
+  -- tmux intercepts Ctrl+V for context-aware image paste (lace-paste-image).
+  { key = 'v', mods = 'CTRL', action = wezterm.action.SendKey { key = 'v', mods = 'CTRL' } },
+}
+
 return config

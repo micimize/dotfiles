@@ -6,6 +6,7 @@ palette = "catppuccin_mocha"
 format = """
 $time\
 $username\
+${custom.container}\
 ${custom.dir}\
 $git_branch\
 $git_status\
@@ -74,6 +75,13 @@ detect_extensions = [ ]
 style = "blue"
 symbol = "&"
 format = '[$number$symbol ]($style)'
+
+[custom.container]
+when = 'test "${LACE_PROJECT_NAME}" != ""'
+shell = ["bash", "--noprofile", "--norc"]
+command = 'echo "${LACE_PROJECT_NAME}"'
+format = "[$output ]($style)"
+style = "teal"
 
 [custom.dir]
 when = true

@@ -41,6 +41,9 @@ $env.LESS_TERMCAP_so = $"(ansi escape)[01;44;33m"
 $env.LESS_TERMCAP_ue = $"(ansi escape)[0m"
 $env.LESS_TERMCAP_us = $"(ansi escape)[01;32m"
 
+# BSD-style LS_COLORS for file listing
+$env.LS_COLORS = "fxgxcxdxbxegedabagacad"
+
 # Hostname (cached for prompt/scripts -- avoids calling external command on every use)
 $env._HOSTNAME = (^hostname | str trim)
 

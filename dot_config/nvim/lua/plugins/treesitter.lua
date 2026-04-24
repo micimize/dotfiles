@@ -1,7 +1,23 @@
 -- Treesitter: syntax highlighting and more
--- nvim-treesitter was rewritten in 2025 - this uses the new main branch API
--- See: https://github.com/nvim-treesitter/nvim-treesitter
+-- ts-install.nvim restores auto_install behavior removed from nvim-treesitter's main branch.
+-- nvim-treesitter provides parser compilation infrastructure and query files.
 return {
+  -- Parser auto-installation (replaces manual install + FileType autocmd)
+  {
+    "lewis6991/ts-install.nvim",
+    opts = {
+      auto_install = true,
+      ensure_install = {
+        "bash", "c", "css", "scss", "diff", "dockerfile",
+        "html", "javascript", "jsdoc", "json", "jsonc",
+        "lua", "luadoc", "luap", "markdown", "markdown_inline",
+        "printf", "python", "query", "regex", "rust",
+        "toml", "tsx", "typescript", "vim", "vimdoc", "xml", "yaml",
+      },
+    },
+  },
+
+  -- Treesitter core (query files, parser compilation, incremental selection)
   {
     "nvim-treesitter/nvim-treesitter",
     branch = "main",
@@ -9,23 +25,6 @@ return {
     build = ":TSUpdate",
     config = function()
       require("nvim-treesitter").setup({})
-
-      -- Install parsers (async)
-      local parsers = {
-        "typescript", "tsx", "javascript", "lua", "vim", "vimdoc",
-        "html", "css", "json", "jsonc", "yaml", "markdown", "markdown_inline",
-        "bash", "rust", "python",
-      }
-      vim.schedule(function()
-        require("nvim-treesitter").install(parsers)
-      end)
-
-      -- Enable treesitter highlighting for all filetypes
-      vim.api.nvim_create_autocmd("FileType", {
-        callback = function()
-          pcall(vim.treesitter.start)
-        end,
-      })
 
       -- Incremental selection (matching mjr's 's' for expand)
       vim.keymap.set("n", "s", function()

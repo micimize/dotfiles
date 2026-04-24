@@ -140,7 +140,7 @@ require("lazy").setup({
     lazy = false,
     version = false,
   },
-  install = { colorscheme = { "solarized", "habamax" } },
+  install = { colorscheme = { "catppuccin", "habamax" } },
   checker = { enabled = false },
   performance = {
     rtp = {
@@ -150,12 +150,6 @@ require("lazy").setup({
     },
   },
 })
-
--- =============================================================================
--- Colorscheme (after plugins load)
--- =============================================================================
-
-vim.cmd.colorscheme("solarized")
 
 -- =============================================================================
 -- JSONL Notify Logger (runs after snacks.notifier replaces vim.notify)

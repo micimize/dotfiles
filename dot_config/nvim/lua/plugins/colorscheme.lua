@@ -1,41 +1,37 @@
--- Solarized colorscheme with slate background overrides
--- Keeps solarized's accent/syntax colors but replaces blue-tinted backgrounds
--- with the greyscale slate palette from the legacy VSCode customizations.
+-- Catppuccin colorscheme (mocha flavor)
+-- Matches the catppuccin mocha theme used in tmux for a consistent terminal palette.
 return {
   {
-    "maxmx03/solarized.nvim",
+    "catppuccin/nvim",
+    name = "catppuccin",
     lazy = false,
     priority = 1000,
     opts = {
-      transparent = { enabled = false },
+      flavour = "mocha",
+      transparent_background = false,
       styles = {
-        comments = { italic = true },
-        keywords = { bold = true },
+        comments = { "italic" },
+        keywords = { "bold" },
       },
-      on_colors = function(colors, color)
-        return {
-          base03 = "#232323",  -- Normal bg (was #002b36)
-          base02 = "#282828",  -- CursorLine, emphasis (was #073642)
-          base04 = "#1c1c1c",  -- NormalFloat bg (was #002731)
-          -- base01 left at solarized default (#586e75) for readable comments
-        }
-      end,
-      on_highlights = function(colors, color)
-        return {
-          NormalFloat = { bg = "#1c1c1c", fg = colors.base0 },
-          WinSeparator = { fg = "#282828", bg = "#151515" },
-        }
-      end,
+      integrations = {
+        cmp = true,
+        gitsigns = true,
+        indent_blankline = { enabled = true },
+        mason = true,
+        flash = true,
+        which_key = true,
+        snacks = true,
+      },
     },
     config = function(_, opts)
-      require("solarized").setup(opts)
-      vim.o.background = "dark"
+      require("catppuccin").setup(opts)
+      vim.cmd.colorscheme("catppuccin")
 
+      -- Gitsigns line number colors (catppuccin mocha accents)
       local hl = vim.api.nvim_set_hl
-      -- Gitsigns line number colors (solarized accents)
-      hl(0, "GitSignsAddNr", { fg = "#859900" })
-      hl(0, "GitSignsChangeNr", { fg = "#b58900" })
-      hl(0, "GitSignsDeleteNr", { fg = "#dc322f" })
+      hl(0, "GitSignsAddNr", { fg = "#a6e3a1" })    -- green
+      hl(0, "GitSignsChangeNr", { fg = "#f9e2af" })  -- yellow
+      hl(0, "GitSignsDeleteNr", { fg = "#f38ba8" })  -- red
     end,
   },
 }

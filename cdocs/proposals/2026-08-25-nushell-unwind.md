@@ -1,7 +1,7 @@
 ---
 title: "Nushell Unwind: Restore bash + ble.sh Across Dotfiles, Lace, and Downstream Repos"
 date: 2026-08-25
-status: accepted
+status: implemented
 first_authored:
   by: "@claude-opus-4-8"
   at: 2026-08-25T12:00:00-05:00

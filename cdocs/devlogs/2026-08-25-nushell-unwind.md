@@ -1,7 +1,7 @@
 ---
 title: "Devlog: Nushell Unwind Implementation"
 date: 2026-08-25
-status: in_progress
+status: implemented
 first_authored:
   by: "@claude-opus-4-8"
   at: 2026-08-25T15:00:00-05:00
@@ -10,13 +10,13 @@ state: live
 task_list: 2026-08-25-nushell-unwind
 proposal: cdocs/proposals/2026-08-25-nushell-unwind.md
 last_reviewed:
-  status: revision_requested
+  status: accepted
   by: "@claude-opus-4-8"
-  at: 2026-08-25T18:40:00-05:00
-  round: 1
-  scope: phase2
-  verdict: revise
-  review_of: cdocs/reviews/2026-08-25-review-of-nushell-unwind-phase2-r1.md
+  at: 2026-08-25T20:30:00-05:00
+  round: 5
+  scope: full
+  verdict: accept
+  review_of: cdocs/reviews/2026-08-25-review-of-nushell-unwind-phase4-r1.md
 ---
 
 # Devlog: Nushell Unwind Implementation
@@ -57,6 +57,7 @@ Rationale for phase-by-phase: the change spans six repos and mutates the live wo
 | 2 | impl-2 (general-purpose) | rev-2 (cdocs:reviewer) | revise | deferred-to-followup | cdocs/reviews/2026-08-25-review-of-nushell-unwind-phase2-r1.md | Phase 2 lace ble.sh feature. Feature + `user.json` edit verified CORRECT via reproduced podman test (ble.sh installs, chsh flips node to bash). REVISE is on sequencing only: `user.json` points at unpublished `blesh:1`, breaking `lace up` globally until the lace `nushell-unwind` branch (@7eb7394) merges to `main` + publishes to ghcr; local-path ref is forbidden by `validateFeatureReferences`. Escalated to supervisor (merge/publish authority). Real `lace up` verification deferred until post-publish. **UNBLOCKED 2026-08-25: supervisor authorized merge+push; overseer fast-forwarded `origin/main` `8751d6c`->`7eb7394` (blesh commit + 5 pre-existing unpushed local main commits). Release workflow run 32892380392 succeeded; `ghcr.io/weftwiseink/devcontainer-features/blesh` published with tags 1/1.0/1.0.0/latest (manifest HTTP 200, public). `user.json` blesh:1 ref now resolves. Live `lace up` verification folded into the final end-to-end check after Phase 3/4.** |
 | 3 | impl-3 (general-purpose) | rev-3 (cdocs:reviewer) | accept | n/a | cdocs/reviews/2026-08-25-review-of-nushell-unwind-phase3-r1.md | Phase 3 downstream. jif (@0ea1a1ad) removed own nushell feature/defaultShell/SHELL; weftwise (@b8e315a5) removed nushell-config mount + restored bash-history mount; whelm (@fefdf4f) dropped vendored sprack nu heredoc; clauthier verified clean (no change). Accept-with-nits: weftwise `/commandhistory` mount inert (no `HISTFILE` set) + false comment; overseer fixing by mirroring clauthier's Dockerfile HISTFILE pattern. Live `lace up` deferred to overseer end-to-end check. All branches unmerged pending supervisor decision. |
 | 4 | impl-4 (general-purpose) | rev-4 (cdocs:reviewer) | accept | n/a | cdocs/reviews/2026-08-25-review-of-nushell-unwind-phase4-r1.md | Phase 4 lace cleanup (branch `nushell-unwind-cleanup`): dropped nushell lock pin, flipped lace-fundamentals defaultShell example to bash + removed nushell installsAfter, deleted sprack nu heredoc (bash parity intact), updated neovim comment, flipped default-shell test fixtures. `pnpm --filter lace test`: 1081 passed; only failures are the pre-existing `port-allocator.test.ts` EADDRINUSE flake in an untouched file. ACCEPT (clean). Unmerged pending final lace merge+publish. |
+| 5 | impl-5 (overseer) + final-verify (general-purpose) | overseer (confirmed by live container) | accept | confirmed | (this devlog, Finalization) | Final end-to-end `lace up` (clauthier, cold rebuild, podman) surfaced a Phase-1 regression: `.chezmoiignore` leading-slash patterns (`/archive/` etc.) are rejected by the container's chezmoi v2.72.0 ("invalid path"), aborting `chezmoi apply` so NO bash dotfiles deployed and ble.sh never loaded. Overseer fixed: dropped vestigial `/bash//blackbox/` (both live under archive/legacy/), unanchored `archive/`. Re-verified IN the running clauthier container (v2.72.0): `chezmoi apply` exit 0; live PTY `LIVEMARK=/usr/bin/bash BLE=0.4.0-devel3+1a5c451c HF=/commandhistory/.bash_history`; `getent passwd node`=/usr/bin/bash; `nu` absent. Floor MET. |
 
 ## Judge Log
 
@@ -186,3 +187,31 @@ All floor checks pass: node login shell is `/usr/bin/bash`, an interactive login
 - No dotfiles change was required for coordination (the feature installs to the path the run_once already checks).
 - `pnpm -w build` / `pnpm -w test` unaffected: the only lace change is an additive feature directory (json/sh/md), no TypeScript touched. The nu-hardcoded TS fixtures are Phase 4 and were left alone.
 - Phases 3-4 (downstream repos, lock regen, lace-fundamentals installsAfter/examples, sprack nu heredoc, TS fixtures) intentionally NOT done.
+
+## Finalization
+
+> BLUF: The nushell unwind is complete and the verification floor is MET end to end. Host and lace containers now come up bash + ble.sh, nu is de-defaulted (removed from new containers, still installed on the host). One Phase-1 regression (`.chezmoiignore` v2.72 incompatibility) was caught by the final live `lace up` and fixed. A few non-blocking follow-ups remain.
+
+### Final state by repo
+
+- **dotfiles** (`main`, committed): bash + ble.sh restored and deployed; tmux launches `$SHELL` (bash); live `default` tmux server refreshed; bash-side starship/zoxide init; `wt-clone` ported; container history persistence via `/commandhistory`; `.chezmoiignore` container-compatible. Nu tree retained (de-default only).
+- **lace** (`main`, merged + PUSHED to origin, feature PUBLISHED): `blesh` devcontainer feature (`ghcr.io/weftwiseink/devcontainer-features/blesh`, tags 1/1.0/1.0.0/latest); lace-fundamentals defaults to bash; sprack nu hook dropped; nushell lock pin removed; TS fixtures reflect bash. Release runs 32892380392 + 32893976760 succeeded.
+- **jif / weftwise / whelm** (`main`, merged LOCALLY, NOT pushed per supervisor): own hand-authored nu removed (jif feature/defaultShell/SHELL; weftwise nushell mount + bash-history restore; whelm vendored sprack nu heredoc).
+- **clauthier**: verified clean, no change needed.
+- `~/.config/lace/user.json` (machine state): `defaultShell=/usr/bin/bash`, blesh feature added, nushell feature removed. Backups at `*.bak-nushell-unwind`.
+
+### Final verification (floor MET)
+
+Cold `lace up --rebuild` on clauthier (podman), then applied from the fixed source under the container's chezmoi v2.72.0:
+- `chezmoi apply` exit 0 (was aborting on the leading-slash `.chezmoiignore` patterns).
+- Live interactive PTY: `LIVEMARK=/usr/bin/bash BLE=0.4.0-devel3+1a5c451c HF=/commandhistory/.bash_history`.
+- `getent passwd node` = `/usr/bin/bash`; `command -v nu` = absent.
+
+### Follow-ups (NOT done; tracked for the supervisor)
+
+- **stinkpot integration** (https://tangled.org/oppi.li/stinkpot): deferred to a separate `/rfp` as requested (single-sql-file vs many-container concern).
+- **starship in containers**: the node base image has no cargo, so the dotfiles `cargo install starship` silently skips and the lace prompt module does not render in containers (guarded, non-fatal). Options: add a starship install to the `blesh`/a lace feature via a prebuilt binary, or a devcontainer feature. Recommend an RFP/stub.
+- **Push downstream mains**: jif/weftwise/whelm `main` carry the unwind commit locally but were NOT pushed (supervisor: "merge all no push"). jif main is far ahead of origin (~92) with pre-existing unpushed history.
+- **Host login shell cosmetic**: `chsh`/`usermod -s /usr/bin/bash` could not run non-interactively on the Fedora Atomic host; the login shell is already `/bin/bash` (== `/usr/bin/bash`) so this is cosmetic. Optional manual: `sudo usermod -s /usr/bin/bash "$USER"`.
+- **lace host nu scripts** (`bin/lace-inspect`, `bin/lace-paste-image`): left as nushell (de-default keeps nu installed). Container image-paste flakiness is a separate follow-up.
+- The running `clauthier` test container's home was re-applied from the fixed source during verification; it is left running (harmless).

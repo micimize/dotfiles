@@ -7,6 +7,11 @@ first_authored:
   at: 2026-08-25T12:00:00-05:00
 type: proposal
 state: live
+last_reviewed:
+  status: accepted
+  by: "@claude-opus-4-8"
+  at: 2026-08-25T14:30:00-05:00
+  round: 1
 tags: [proposal, nushell, bash, blesh, lace, devcontainer, migration, shell]
 ---
 

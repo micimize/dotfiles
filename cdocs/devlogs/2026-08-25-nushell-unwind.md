@@ -9,6 +9,14 @@ type: devlog
 state: live
 task_list: 2026-08-25-nushell-unwind
 proposal: cdocs/proposals/2026-08-25-nushell-unwind.md
+last_reviewed:
+  status: accepted
+  by: "@claude-opus-4-8"
+  at: 2026-08-25T11:10:00-05:00
+  round: 1
+  scope: phase1
+  verdict: accept_with_nits
+  review_of: cdocs/reviews/2026-08-25-review-of-nushell-unwind-phase1-r1.md
 ---
 
 # Devlog: Nushell Unwind Implementation
@@ -45,6 +53,7 @@ Rationale for phase-by-phase: the change spans six repos and mutates the live wo
 
 | iteration | implementer | reviewer | review_verdict | review_proof | review_path | notes |
 |---|---|---|---|---|---|---|
+| 1 | impl-1 (general-purpose) | rev-1 (cdocs:reviewer) | accept | confirmed | cdocs/reviews/2026-08-25-review-of-nushell-unwind-phase1-r1.md | Phase 1 host restore. Accept-with-nits; all 3 nits resolved by overseer: live `default` tmux server refreshed to bash (new panes only), starship init guarded, stale test sockets removed. Live-interactive ble.sh load cited in review. Literal `chsh`/`usermod` not runnable (Fedora Atomic, needs root+password) but login shell already `/bin/bash` == `/usr/bin/bash`, so floor met; optional cosmetic `usermod` documented for the supervisor. |
 
 ## Judge Log
 
@@ -95,5 +104,5 @@ Revert path (if ever needed): `sudo usermod -s ~/.cargo/bin/nu "$USER"` (or `chs
 
 ### Notes for later phases (not done here)
 
-- The user's currently running tmux server may still hold the old nu `default-command` in memory; existing panes are unaffected and new tmux *servers* pick up bash. A `tmux source-file ~/.config/tmux/tmux.conf` only updates options for new sessions in that server, and was intentionally not forced on the live server to avoid disrupting active panes.
+- RESOLVED by overseer during review round 1: the live `default` tmux server (socket `/tmp/tmux-1000/default`, holding `main`/`lace-local`/`vscode_*` sessions) had held the old nu `default-command`/`default-shell` in memory. Setting these options affects only newly created panes/windows, not active panes, so the overseer applied `tmux -S /tmp/tmux-1000/default set -g default-shell /usr/bin/bash` and `... set -g default-command /usr/bin/bash` live. New panes now launch bash + ble.sh. Stale test sockets (`vtest`, `revtest`, `revtest2`) were removed.
 - Phases 2-4 (lace feature, downstream repos, cleanup) are out of scope for this dispatch.

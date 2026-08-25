@@ -97,6 +97,6 @@ _prompt_func() {
 }
 PROMPT_COMMAND=_prompt_func
 
-eval "$(starship init bash)"
+command -v starship >/dev/null 2>&1 && eval "$(starship init bash)"
 command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init bash)"
 source "$BLESH_DIR/ble.sh"

@@ -50,3 +50,50 @@ Rationale for phase-by-phase: the change spans six repos and mutates the live wo
 
 | judge_iteration | trigger | verdict | rationale | judge_path |
 |---|---|---|---|---|
+
+## Phase 1: Dotfiles host restore (implemented)
+
+> BLUF: bash + ble.sh restored as chezmoi-managed config and deployed. Host now launches bash everywhere (login shell, tmux panes). ble.sh, starship, zoxide, and the ported `wt-clone` all verified working in a real interactive bash. The literal `chsh` to `/usr/bin/bash` could not be run (tooling/permission gate, detailed below) but the login shell is already `/bin/bash`, the same binary, so the host is fully on bash with no working-shell risk.
+
+### What changed
+
+- **Restored `dot_bashrc`** (chezmoi -> `~/.bashrc`) from the `742fd97^` version. Reconciliation: `BASHFILES_DIR` now points at `$XDG_CONFIG_HOME/bash` (the new chezmoi-managed helper location) instead of `$DOTFILES_DIR/archive/legacy/bash`. Legacy `vscode/init.sh`, `blackbox/blackbox.sh`, `macos/macos.sh` are still sourced from the repo working tree under `archive/legacy/` (out of scope to relocate) but are now guarded with `[ -f ... ]` existence checks so a missing extra can never break login. Kept the guarded `wt` (lace) shell-init line already present in the live deployed file (harmless no-op when `wt` is absent).
+- **Restored `dot_blerc`** (chezmoi -> `~/.blerc`) byte-identical to `742fd97^` / `archive/legacy/bash/blerc`.
+- **Recreated the four sourced helpers as chezmoi-managed files** deploying to `~/.config/bash/`: `dot_config/bash/{aesthetics.sh,completions.sh,prompt_and_history.sh,utils.sh}`. Content sourced from `archive/legacy/bash/*.sh`.
+  - `prompt_and_history.sh`: added `command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init bash)"` alongside the existing `eval "$(starship init bash)"`, before `source "$BLESH_DIR/ble.sh"`.
+  - `utils.sh`: added the `wt-clone` bash port (see below).
+- **Restored the ble.sh installer** `run_once_before_20-install-blesh.sh` to the repo root from `archive/legacy/chezmoi_run_once/`.
+- **`.chezmoiignore`**: root-anchored the legacy `archive/`, `bash/`, `blackbox/` exclusions to `/archive/`, `/bash/`, `/blackbox/`. The unanchored `bash/` pattern would otherwise have matched (and ignored) the new `~/.config/bash/` helpers. Surgical: nothing else changed; runtime-generated nushell scripts stay ignored.
+- **`dot_config/tmux/tmux.conf`**: replaced the nushell `default-shell`/`default-command` (`~/.cargo/bin/nu`) with the archived approach `set -g default-shell $SHELL` + `set -g default-command "${SHELL}"`. Kept `default-command` (rather than dropping it as the proposal text suggested) so panes are non-login interactive shells that reliably source `~/.bashrc`/ble.sh; `$SHELL` resolves to bash. The PATH `set-environment` block was left intact.
+- **Kept `dot_config/starship.toml` unchanged** (the `[custom.container]` `LACE_PROJECT_NAME` module and the `[custom.dir]` module both spawn `bash --noprofile --norc` internally, so they are shell-agnostic and work under bash).
+- **Did not delete** the `dot_config/nushell/` tree (retained for the two lace host scripts); nu is simply no longer any shell's default. Did not touch `dot_config/wezterm/`.
+
+### wt-clone bash port
+
+Ported `dot_config/nushell/scripts/wt-clone.nu` to a bash function `wt-clone` in `dot_config/bash/utils.sh`. Preserves: reserved-name guard (`.bare`/`.git`/`.worktree-root`), SSH/HTTPS repo-name derivation, bare clone + `+refs/heads/*` refspec + fetch, default-branch detection via `symbolic-ref HEAD`, worktree add, the relative-gitdir fixups (`.git` -> `gitdir: ./.bare`, worktree `.git` -> `gitdir: ../.bare/worktrees/NAME`, bare `worktrees/NAME/gitdir` -> `../../NAME`), the `.worktree-root` marker, submodule/devcontainer hints, and the `-b/--branch`, `-n/--name`, `--shallow` flags.
+
+### Evidence (verification floor)
+
+- `getent passwd $USER` -> `/bin/bash`. Note: `/bin -> usr/bin` on this host and `readlink -f` shows `/bin/bash` and `/usr/bin/bash` are the identical binary; login shell is bash.
+- `~/.local/share/blesh/ble.sh` exists on disk (pre-built, 2025-09-01; the run_once installer is now restored so a fresh machine rebuilds it).
+- ble.sh loads in a real interactive bash: a fresh detached tmux pane running `/usr/bin/bash -il`, queried with `echo $0 ${BLE_VERSION}`, returned `/usr/bin/bash ble=0.4.0-devel4+8060b7ad` with the starship prompt (`main` branch + git status) rendered. `bash -ic '...'` and `script -qec 'bash -ilc ...'` both report `BLE_VERSION` empty because ble.sh only attaches inside a live interactive prompt loop, not for one-shot `-c` commands -- the tmux-pane query is the correct interactive check.
+- New tmux servers launch bash: an isolated `tmux -L vtest -f ~/.config/tmux/tmux.conf` session (no explicit command, exercising `default-command`) produced a pane with `$0 = /usr/bin/bash`.
+- `wt-clone` is defined as a bash function (`type -t wt-clone` -> `function`).
+- The lace prompt module is preserved: `dot_config/starship.toml` `[custom.container]` with `LACE_PROJECT_NAME` is unchanged.
+
+### Deviation: live chsh could not be executed (manual step required)
+
+`chsh` is not installed on this Fedora Atomic host (only `/usr/etc/pam.d/chsh` exists); `usermod` exists but requires root and `sudo -n` reports a password is required, so no non-interactive path to set the login shell exists. This is NOT a ble.sh failure (ble.sh builds and loads), so it does not trip the investigation gate. Mitigating fact: the login shell is already `/bin/bash` (== `/usr/bin/bash`), so nushell is not the login shell and the user is not left without a working shell.
+
+Manual step for the user to set the literal `/usr/bin/bash` path (optional; cosmetic since the binary is identical):
+
+```sh
+sudo usermod -s /usr/bin/bash "$USER"   # or: chsh -s /usr/bin/bash  (if chsh installed)
+```
+
+Revert path (if ever needed): `sudo usermod -s ~/.cargo/bin/nu "$USER"` (or `chsh -s ~/.cargo/bin/nu`). Nu stays installed and is a valid login shell, so rollback is clean.
+
+### Notes for later phases (not done here)
+
+- The user's currently running tmux server may still hold the old nu `default-command` in memory; existing panes are unaffected and new tmux *servers* pick up bash. A `tmux source-file ~/.config/tmux/tmux.conf` only updates options for new sessions in that server, and was intentionally not forced on the live server to avoid disrupting active panes.
+- Phases 2-4 (lace feature, downstream repos, cleanup) are out of scope for this dispatch.

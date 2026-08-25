@@ -7,12 +7,15 @@ setup.sh
 setup.sh.archive
 *.archive
 
-# Legacy directories (original structure before chezmoi)
-# Root-anchored so they only ignore ~/archive, ~/bash, ... and do NOT match the
-# chezmoi-managed ~/.config/bash bash fragments restored in the nushell unwind.
-/archive/
-/bash/
-/blackbox/
+# Legacy directories (original structure before chezmoi).
+# `archive/` holds the pre-chezmoi tree, including the legacy bash/blackbox/vscode
+# sources under archive/legacy/. Patterns are unanchored (no leading slash):
+# chezmoi 2.72+ rejects leading-slash paths in .chezmoiignore with "invalid path",
+# which aborts `chezmoi apply` entirely inside lace containers (they run a newer
+# chezmoi than the host). There is no top-level `bash`/`blackbox` to ignore anymore
+# (both live under archive/legacy/), and `archive` does not collide with the
+# chezmoi-managed ~/.config/bash fragments restored in the nushell unwind.
+archive/
 btrfs/
 firefox/
 macos/

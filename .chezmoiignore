@@ -8,9 +8,11 @@ setup.sh.archive
 *.archive
 
 # Legacy directories (original structure before chezmoi)
-archive/
-bash/
-blackbox/
+# Root-anchored so they only ignore ~/archive, ~/bash, ... and do NOT match the
+# chezmoi-managed ~/.config/bash bash fragments restored in the nushell unwind.
+/archive/
+/bash/
+/blackbox/
 btrfs/
 firefox/
 macos/

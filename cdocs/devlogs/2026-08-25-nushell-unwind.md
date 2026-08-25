@@ -10,13 +10,13 @@ state: live
 task_list: 2026-08-25-nushell-unwind
 proposal: cdocs/proposals/2026-08-25-nushell-unwind.md
 last_reviewed:
-  status: accepted
+  status: revision_requested
   by: "@claude-opus-4-8"
-  at: 2026-08-25T11:10:00-05:00
+  at: 2026-08-25T18:40:00-05:00
   round: 1
-  scope: phase1
-  verdict: accept_with_nits
-  review_of: cdocs/reviews/2026-08-25-review-of-nushell-unwind-phase1-r1.md
+  scope: phase2
+  verdict: revise
+  review_of: cdocs/reviews/2026-08-25-review-of-nushell-unwind-phase2-r1.md
 ---
 
 # Devlog: Nushell Unwind Implementation
@@ -54,6 +54,7 @@ Rationale for phase-by-phase: the change spans six repos and mutates the live wo
 | iteration | implementer | reviewer | review_verdict | review_proof | review_path | notes |
 |---|---|---|---|---|---|---|
 | 1 | impl-1 (general-purpose) | rev-1 (cdocs:reviewer) | accept | confirmed | cdocs/reviews/2026-08-25-review-of-nushell-unwind-phase1-r1.md | Phase 1 host restore. Accept-with-nits; all 3 nits resolved by overseer: live `default` tmux server refreshed to bash (new panes only), starship init guarded, stale test sockets removed. Live-interactive ble.sh load cited in review. Literal `chsh`/`usermod` not runnable (Fedora Atomic, needs root+password) but login shell already `/bin/bash` == `/usr/bin/bash`, so floor met; optional cosmetic `usermod` documented for the supervisor. |
+| 2 | impl-2 (general-purpose) | rev-2 (cdocs:reviewer) | revise | deferred-to-followup | cdocs/reviews/2026-08-25-review-of-nushell-unwind-phase2-r1.md | Phase 2 lace ble.sh feature. Feature + `user.json` edit verified CORRECT via reproduced podman test (ble.sh installs, chsh flips node to bash). REVISE is on sequencing only: `user.json` points at unpublished `blesh:1`, breaking `lace up` globally until the lace `nushell-unwind` branch (@7eb7394) merges to `main` + publishes to ghcr; local-path ref is forbidden by `validateFeatureReferences`. Escalated to supervisor (merge/publish authority). Real `lace up` verification deferred until post-publish. |
 
 ## Judge Log
 

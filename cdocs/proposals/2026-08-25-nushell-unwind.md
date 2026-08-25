@@ -1,7 +1,7 @@
 ---
 title: "Nushell Unwind: Restore bash + ble.sh Across Dotfiles, Lace, and Downstream Repos"
 date: 2026-08-25
-status: draft
+status: accepted
 first_authored:
   by: "@claude-opus-4-8"
   at: 2026-08-25T12:00:00-05:00
@@ -29,7 +29,7 @@ Nushell was trialed as the default interactive shell across the host and every l
 This proposal reverses that decision and returns to bash + ble.sh while keeping the improvements the nu era produced.
 
 The reversal is small because nu was wired in through a few well-understood seams, not woven through application code.
-No downstream repo contains nu scripts, nu in `package.json`, or nu application logic: the entanglement is purely at the devcontainer shell-configuration layer.
+No downstream repo contains nu scripts, nu in `package.json`, or nu application logic: the entanglement is purely at the devcontainer shell-configuration layer, with one inert exception (whelm vendors a copy of the sprack nu hook, addressed in Phase 3).
 On the host, nu is the default through essentially one line in `tmux.conf` plus a manual `chsh` never captured in the repo.
 
 Three user decisions shape the design and are treated as settled: restore with gains ported forward, provide container ble.sh via a user-level lace feature, and de-default nu without uninstalling it.
@@ -91,12 +91,12 @@ The nu default matters for new login shells and for any tooling that reads the u
 
 ### Downstream consumers
 
-Entanglement is purely at the devcontainer shell-config layer. No nu code, scripts, or `package.json` entries exist in any consumer.
+Entanglement is purely at the devcontainer shell-config layer. No nu code, scripts, or `package.json` entries exist in any consumer, with one inert exception noted for whelm below.
 
 - **jif** (`/var/home/mjr/code/weft/jif/main`), heavy: its own `.devcontainer/devcontainer.json` hand-authors the nushell feature (~line 73), `defaultShell: /usr/local/bin/nu` (~76), and `containerEnv.SHELL=/usr/local/bin/nu` (~112). Dockerfile comments reference `env.nu`. Base is the flutter image (does not bake nu).
 - **weftwise** (`/var/home/mjr/code/weft/weftwise/main`), heavy: its own `.devcontainer/devcontainer.json` hand-authors a `nushell-config` mount to `/home/node/.config/nushell` (~120-124) and removed the bash-history mount (~160), calling nu "the primary shell". Base `FROM lace.local/node:24-bookworm`.
 - **clauthier** (`/var/home/mjr/code/weft/clauthier/main`), light: nu inherited from lace injection only; its Dockerfile still bakes bash history. Near-free once lace flips.
-- **whelm** (`/var/home/mjr/code/apps/whelm`), light: nu inherited only; a comment notes the base image `lace.local/node:24-bookworm` bakes the node user's login shell to nushell and that node bootstrap "chokes on `&&` under nushell", so it works around nu. Near-free once lace flips.
+- **whelm** (`/var/home/mjr/code/apps/whelm`), light: nu inherited only; a comment notes the base image `lace.local/node:24-bookworm` bakes the node user's login shell to nushell and that node bootstrap "chokes on `&&` under nushell", so it works around nu. Near-free once lace flips for the shell default. One inert exception: whelm vendors its own copy of the sprack feature at `.devcontainer/features/sprack/install.sh:57-70`, containing the same nu `sprack-hooks.nu` heredoc block. It is inert (the hook only fires if a nu config sources it, and nu is de-defaulted) and does not affect the shell default, but Phase 4's edit to lace's `sprack/install.sh` will not propagate to it, so Phase 3 drops it explicitly.
 
 ### Base-image nu bake (verified)
 
@@ -109,7 +109,7 @@ The plan therefore sets `defaultShell` to bash explicitly rather than clearing i
 
 Reverse each seam above and port forward the gains, in four phases.
 
-1. **Dotfiles host restore.** Restore `dot_bashrc` and `dot_blerc` from the archive, restore the ble.sh installer, point tmux back at `$SHELL`, switch starship/zoxide init from nu to bash, port `wt-clone` to a bash function, `chsh -s /usr/bin/bash` on the host, and keep the current shell-agnostic `starship.toml`.
+1. **Dotfiles host restore.** Restore `dot_bashrc` and `dot_blerc` from the archive, restore the ble.sh installer, point tmux back at `$SHELL`, add bash-side starship/zoxide init to the restored bash config, port `wt-clone` to a bash function, `chsh -s /usr/bin/bash` on the host, and keep the current shell-agnostic `starship.toml`.
 2. **Lace: ble.sh feature + de-default.** Author a `blesh` devcontainer feature (or fold a ble.sh install into `lace-fundamentals`), enable it at the user-settings level mirroring how the nushell feature was configured, remove the nushell feature and nu `defaultShell` from `~/.config/lace/settings.json`, and set `defaultShell` to bash explicitly.
 3. **Downstream hand-edits.** Edit jif's and weftwise's own devcontainer files to drop their hand-authored nu config; verify clauthier and whelm inherit bash for free from the lace flip.
 4. **Cleanup.** Regenerate the lace `devcontainer-lock.json`, update `lace-fundamentals` examples and README, fix TypeScript test fixtures, and drop the sprack nu hook.
@@ -145,7 +145,7 @@ Four decisions are settled and drive the design.
 - **ble.sh build cost in containers.** Building ble.sh from source on every container create adds startup latency. Mitigate by pinning a release, caching the build in the feature layer, or baking it into base images if latency proves painful. Flag as a tuning follow-up, not a blocker.
 - **Nu installed but non-default.** `run_once_before_30-install-carapace.sh` installs carapace "for nushell completions". Keep it: carapace is harmless under bash and still serves the retained nu host scripts. Leave the nu install path intact; only the defaults change.
 - **Sprack nu hook removal.** The `sprack` feature (`devcontainers/features/src/sprack/install.sh`) emits both a bash hook (`/etc/profile.d/sprack-metadata.sh`, lines 48-55) and a nu hook (`/etc/nushell/sprack-hooks.nu`, lines 57-70). Bash parity already exists, so drop the nu heredoc block as pure entanglement. Low risk.
-- **Stray nu references with no runtime effect.** `lace-fundamentals/devcontainer-feature.json:12,19` and `README.md:32` use `/usr/bin/nu` as the `defaultShell` example; `neovim/install.sh:52` has a "su - may start nushell" workaround comment; TypeScript test fixtures under `packages/lace/src/**/__tests__/` hardcode nu. Update these in cleanup so the codebase reflects the bash default; none affect runtime.
+- **Stray nu references with no runtime effect.** `lace-fundamentals/devcontainer-feature.json:12` and `README.md:32` use `/usr/bin/nu` as the `defaultShell` example; `devcontainer-feature.json:19` is a distinct `installsAfter` entry (`ghcr.io/eitsupi/devcontainer-features/nushell`), a dependency-ordering reference rather than a defaultShell example; `neovim/install.sh:52` has a "su - may start nushell" workaround comment; TypeScript test fixtures under `packages/lace/src/**/__tests__/` hardcode nu. Update these in cleanup so the codebase reflects the bash default; none affect runtime.
 - **wezterm untouched.** wezterm.lua does not name nu and needs no change. If it is touched for any reason, the repo `CLAUDE.md` WezTerm validation workflow (parse-check via `ls-fonts` stderr, `show-keys` diff) applies. It should not be touched.
 
 ## Test Plan
@@ -154,21 +154,29 @@ Each phase has a concrete acceptance check; the verification methodology below g
 
 - **Host:** login shell is bash, tmux panes are bash, ble.sh loads, starship prompt renders, `wt-clone` works as a bash function.
 - **Lace container:** `node` login shell is bash, an interactive container bash session has ble.sh active, the `LACE_PROJECT_NAME` starship module still renders, no nushell feature present in the generated `.lace/devcontainer.json`.
-- **Downstream:** jif and weftwise containers come up with bash after their hand-edits; clauthier and whelm come up with bash with no per-repo change beyond the lace flip.
+- **Downstream:** jif and weftwise containers come up with bash after their hand-edits; clauthier and whelm come up with bash with no shell-config change beyond the lace flip (whelm additionally drops its inert vendored sprack nu heredoc).
 - **Cleanup:** lace test suite passes with bash-default fixtures; `devcontainer-lock.json` no longer pins the nushell feature.
 
 ## Verification Methodology
 
 Run these directly after each phase; do not rely on inspection alone.
 
-Host (Phase 1):
+Host (Phase 1), non-interactive checks (run from any shell, including `bash -c`):
 
 ```sh
 getent passwd "$USER" | awk -F: '{print $7}'   # expect /usr/bin/bash
+echo "$SHELL"                                  # expect /usr/bin/bash after chsh
 tmux new-session -d -s vt 'echo $0; sleep 1'   # pane shell should be bash
 tmux capture-pane -pt vt
-shopt -q login_shell; echo "ble loaded: ${BLE_VERSION:-no}"  # in an interactive bash
+ls ~/.local/share/blesh/ble.sh                 # ble.sh installed on disk
 type wt-clone                                  # expect a bash function
+```
+
+Host (Phase 1), interactive checks (run BY HAND in a live interactive bash: `$BLE_VERSION` is only populated inside an interactive ble.sh session, so it cannot be checked from a non-interactive `bash -c`):
+
+```sh
+echo "ble loaded: ${BLE_VERSION:-no}"          # expect a version string, not "no"
+# confirm vi keybindings respond and the starship prompt renders
 ```
 
 Lace container (Phase 2), after `lace up` and entering a container:
@@ -177,11 +185,12 @@ Lace container (Phase 2), after `lace up` and entering a container:
 getent passwd node | awk -F: '{print $7}'      # expect bash, NOT nu (base-image bake check)
 bash -lic 'echo "ble: ${BLE_VERSION:-no}"'     # expect a version string
 grep -c nushell .lace/devcontainer.json        # expect 0
-STARSHIP output should still show the lace project name via LACE_PROJECT_NAME
 ```
 
+The starship prompt in the container should still show the lace project name via `LACE_PROJECT_NAME`; confirm this visually in an interactive container shell.
+
 Downstream (Phase 3): rebuild each container and repeat the `getent passwd node` and ble checks.
-Confirm clauthier and whelm need no per-repo change.
+Confirm clauthier and whelm need no shell-config change for the bash default (whelm's sprack nu-heredoc removal is a separate inert cleanup, not a shell-default change).
 
 Cleanup (Phase 4): run the lace TypeScript test suite and confirm the regenerated lock file omits the nushell feature.
 
@@ -197,10 +206,18 @@ Scope: dotfiles repo only.
 - Restore `dot_bashrc` and `dot_blerc` from `742fd97^` or adapt `archive/legacy/bash/{bashrc,blerc}` plus the sourced fragments (`aesthetics.sh`, `completions.sh`, `prompt_and_history.sh`, `utils.sh`).
 - Restore the ble.sh installer from `archive/legacy/chezmoi_run_once/run_once_before_20-install-blesh.sh`.
 - Edit `dot_config/tmux/tmux.conf:9-11` back to `set -g default-shell $SHELL` (and drop the nu `default-command`), matching `archive/legacy/tmux.conf`.
-- Switch shell init generation from nu to bash: replace the `starship init nu` / `zoxide init nushell` generation (`dot_config/nushell/env.nu:51` and the `scripts/generated/*.nu` path) with `starship init bash` / `zoxide init bash` sourced from the restored bash config.
+- Add bash-side shell init to the restored bash config: `starship init bash` and `zoxide init bash`, sourced from the restored `dot_bashrc` (or its fragments). Leave the nu init generation in place: `dot_config/nushell/env.nu:78` (`starship init nu | save -f $cache`) and `env.nu:92` (`zoxide init nushell | save -f $cache`), sourced via `config.nu:44,47`, stay as-is. The nu tree is retained for the two host scripts and is simply no longer launched by default, so this phase adds bash init rather than replacing the nu generation. (`env.nu:51` is `$env.STARSHIP_SHELL = "nu"`, a nu-only variable, not the init generation.)
 - Port `wt-clone` (`dot_config/nushell/scripts/wt-clone.nu`) to a bash function in the restored config; preserve the reserved-name guard, relative-gitdir fixups, and the `.worktree-root` marker.
 - Keep the current `dot_config/starship.toml` unchanged.
-- `chezmoi apply --force`, then `chsh -s /usr/bin/bash`.
+- Apply and validate before flipping the login shell: run `chezmoi apply --force`, then follow the chsh safety checklist below. Only after bash + ble.sh is validated in a fresh terminal, run `chsh -s /usr/bin/bash`.
+
+Host chsh safety checklist (never close your only working shell):
+
+1. Run `chezmoi apply --force` from the current (still-working) terminal, and keep that terminal open throughout.
+2. Open a NEW terminal or shell and confirm bash + ble.sh loads there: prompt renders, ble.sh is active, keybindings work (see the interactive checks in the verification block). Do not proceed until this passes.
+3. Ensure `/usr/bin/bash` is listed in `/etc/shells` (`grep -qxF /usr/bin/bash /etc/shells`); `chsh` refuses shells not listed. Add it if missing. Pin the absolute path `/usr/bin/bash` deliberately, since PATH `bash` may resolve to the linuxbrew copy.
+4. Only then run `chsh -s /usr/bin/bash`.
+5. Revert path if anything is wrong: `chsh -s ~/.cargo/bin/nu` (or re-point to the prior shell) and restore the `settings.json` backup. Nu stays installed and remains a valid login shell, so this is a clean rollback.
 
 Constraints: do not touch wezterm.lua. Do not delete the nu config tree or the two nu host scripts. Do not restore `archive/legacy/bash/starship.toml`.
 
@@ -222,20 +239,21 @@ Dependency: Phase 2 must precede Phase 3 so clauthier and whelm inherit bash for
 
 ### Phase 3: Downstream hand-edits
 
-Scope: jif and weftwise (edits); clauthier and whelm (verify-only).
+Scope: jif and weftwise (shell-config edits); whelm (verify shell default, plus an inert sprack nu-heredoc cleanup); clauthier (verify-only).
 
 - **jif:** remove the hand-authored nushell feature (~line 73), `defaultShell: /usr/local/bin/nu` (~76), and `containerEnv.SHELL=/usr/local/bin/nu` (~112) from its `.devcontainer/devcontainer.json`; scrub the `env.nu` Dockerfile comments. jif's flutter base does not bake nu, so no `chsh` override concern beyond setting bash.
 - **weftwise:** remove the `nushell-config` mount (~120-124) and restore the bash-history mount (~160) in its `.devcontainer/devcontainer.json`.
-- **clauthier, whelm:** rebuild and verify they come up with bash with no per-repo change beyond the Phase 2 lace flip.
+- **clauthier:** rebuild and verify it comes up with bash with no per-repo change beyond the Phase 2 lace flip.
+- **whelm:** rebuild and verify it comes up with bash with no shell-config edit beyond the Phase 2 lace flip. Separately, drop the inert nu heredoc block from its vendored sprack copy (`.devcontainer/features/sprack/install.sh:57-70`, the `# Nushell integration` comment through `NU_EOF`), leaving the bash profile.d hook intact. This mirrors Phase 4's edit to lace's `sprack/install.sh`, which does not propagate to whelm's vendored copy.
 
-Acceptance: all four containers report bash; clauthier and whelm required no shell-config edits.
+Acceptance: all four containers report bash; clauthier and whelm required no shell-config edits (whelm's sprack nu-heredoc removal is a separate inert cleanup, not a shell-default change).
 
 ### Phase 4: Cleanup
 
 Scope: lace repo.
 
 - Regenerate `.devcontainer/devcontainer-lock.json` to drop the pinned nushell feature (`:23-27`).
-- Update `lace-fundamentals/devcontainer-feature.json:12,19` and `README.md:32` to use bash as the `defaultShell` example.
+- Update the `defaultShell` example to bash in `lace-fundamentals/devcontainer-feature.json:12` and `README.md:32`. Separately, remove (or adjust) the `installsAfter` nushell entry at `devcontainer-feature.json:19` (`ghcr.io/eitsupi/devcontainer-features/nushell`), which no longer applies once the nushell feature is gone.
 - Update the `neovim/install.sh:52` "su - may start nushell" comment.
 - Update TypeScript test fixtures under `packages/lace/src/**/__tests__/` to reflect the bash default.
 - Drop the nu heredoc block from `sprack/install.sh` (lines 57-70), leaving the bash hook intact.

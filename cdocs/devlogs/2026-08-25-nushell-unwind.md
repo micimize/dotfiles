@@ -106,3 +106,80 @@ Revert path (if ever needed): `sudo usermod -s ~/.cargo/bin/nu "$USER"` (or `chs
 
 - RESOLVED by overseer during review round 1: the live `default` tmux server (socket `/tmp/tmux-1000/default`, holding `main`/`lace-local`/`vscode_*` sessions) had held the old nu `default-command`/`default-shell` in memory. Setting these options affects only newly created panes/windows, not active panes, so the overseer applied `tmux -S /tmp/tmux-1000/default set -g default-shell /usr/bin/bash` and `... set -g default-command /usr/bin/bash` live. New panes now launch bash + ble.sh. Stale test sockets (`vtest`, `revtest`, `revtest2`) were removed.
 - Phases 2-4 (lace feature, downstream repos, cleanup) are out of scope for this dispatch.
+
+## Phase 2: Lace ble.sh feature and de-default (implemented)
+
+> BLUF: Authored a new `blesh` devcontainer feature in the lace repo that installs a pinned, prebuilt ble.sh release to the exact path the dotfiles bash config sources (`~/.local/share/blesh/ble.sh`), so the dotfiles run_once installer no-ops in-container. Flipped the user-level lace config to drop nushell, add `blesh`, and set bash as the login shell. Verified end-to-end against the real `lace.local/node:24-bookworm` base image via a throwaway podman container (full `lace up` not possible because the feature is not yet published to ghcr from a branch).
+
+- **lace branch/commit:** `nushell-unwind` @ `7eb7394` (repo `/var/home/mjr/code/weft/lace/main`, remote `git@github.com:weftwiseink/lace.git`). The user-level `~/.config/lace/user.json` edit is machine state, not in any repo.
+
+### The `blesh` feature (`devcontainers/features/src/blesh/`)
+
+Three files mirroring the existing feature conventions (`neovim`, `claude-code`): `devcontainer-feature.json`, `install.sh`, `README.md`.
+
+- **Install path:** `~/.local/share/blesh/ble.sh` for the remote user (`_REMOTE_USER`, default root -> `/root`, else `/home/<user>`). This is exactly `BLESH_DIR="$HOME/.local/share/blesh"` sourced as `$BLESH_DIR/ble.sh` in the deployed dotfiles (`~/.bashrc:21`, `~/.config/bash/prompt_and_history.sh:102`), so **no dotfiles change was required**.
+- **Install method:** PINNED, prebuilt release tarball. Latest tagged ble.sh release is `v0.4.0-devel3` (the newer `devel4` the host runs is git-master, not a tagged release). The release asset `ble-0.4.0-devel3.tar.xz` is a *complete prebuilt distribution* (`ble.sh` + `contrib`/`keymap`/`lib`), extracted with `--strip-components=1` into `BLESH_DIR` -- no `make` needed, fast and reproducible, and cached in an image layer since user features merge into the project's `prebuildFeatures` (verified in `user-config-merge.ts:156-172`). A `version` option (default `0.4.0-devel3`) parameterizes the tag.
+- **Fallback:** build-from-source (`git clone --recursive --branch v<version>` + `make install PREFIX=$HOME/.local`, auto-installing `gawk` via apt/apk) only if the release download fails.
+- **Idempotency / coordination:** the feature no-ops if `$BLESH_DIR/ble.sh` already exists, and it installs the same artifact the dotfiles `run_once_before_20-install-blesh.sh` checks for, so whichever runs first wins and the other short-circuits. Empirically confirmed: after the feature install, running the actual dotfiles run_once as node printed "ble.sh already installed" and exited 0.
+- **`installsAfter`:** `ghcr.io/devcontainers/features/common-utils` (provides curl/tar if a leaner base lacks them). Did NOT touch `lace-fundamentals`'s `installsAfter: [nushell]` entry -- that scrub is explicitly Phase 4.
+
+### Task 2: bash as node's login shell despite the base bake
+
+Verified `lace-fundamentals/steps/shell.sh` logic empirically: with `DEFAULT_SHELL=/usr/bin/bash` it (a) appends `/usr/bin/bash` to `/etc/shells` if absent and (b) runs `chsh -s /usr/bin/bash node`. Setting user-settings `defaultShell` to an explicit `/usr/bin/bash` (NOT empty) is therefore what makes `chsh` run and override any bake.
+
+> NOTE(opus/nushell-unwind/phase2): The local `lace.local/node:24-bookworm` image does NOT actually bake nushell -- `getent passwd node` on the pristine image already reports `/bin/bash`, and no `nu` binary is present (nu was added by the eitsupi feature, not the base image). The base-bake concern from the proposal may be stale for this image, but the fix (explicit bash `defaultShell` so `chsh` runs) is correct and harmless regardless. `/usr/bin/bash` was already listed in the image's `/etc/shells`.
+
+### Task 3: `~/.config/lace/user.json` edit (machine state)
+
+> NOTE(opus/nushell-unwind/phase2): The task named `~/.config/lace/settings.json`, but the nushell feature, `defaultShell`, AND `containerEnv.SHELL` actually live in `~/.config/lace/user.json`. `settings.json` holds only repoMounts/mounts (no features/defaultShell). Edited `user.json` (the real target). Backed up BOTH: `~/.config/lace/settings.json.bak-nushell-unwind` and `~/.config/lace/user.json.bak-nushell-unwind`.
+
+Diff of `user.json` (validated as JSON):
+
+```diff
+-    "ghcr.io/eitsupi/devcontainer-features/nushell:0": {},
++    "ghcr.io/weftwiseink/devcontainer-features/blesh:1": {},
+-  "defaultShell": "/usr/local/bin/nu",
++  "defaultShell": "/usr/bin/bash",
+-    "SHELL": "/usr/local/bin/nu",
++    "SHELL": "/usr/bin/bash",
+```
+
+> NOTE(opus/nushell-unwind/phase2): Also changed `containerEnv.SHELL` (`/usr/local/bin/nu` -> `/usr/bin/bash`), which the task did not explicitly list. This is required for correctness: `shell.sh`'s own fallback comment says it "Falls back to SHELL env var (set in containerEnv)", and tooling reads `$SHELL`. Leaving it as nu would contradict the de-default. nu stays installed via nothing here -- de-default only, not purged.
+
+### Verification (method + evidence)
+
+Method: **throwaway podman container** from the real `lace.local/node:24-bookworm` base image. A full `lace up` was NOT possible: the `blesh` feature is referenced from `user.json` as `ghcr.io/weftwiseink/devcontainer-features/blesh:1`, which only publishes to ghcr on push to `main` (`.github/workflows/devcontainer-features-release.yaml`), so a branch-local feature cannot be pulled by `lace up` yet. The podman test exercises the feature's real `install.sh` and the real `shell.sh` against the actual base image.
+
+Cited output:
+
+```text
+# feature install.sh (as root, _REMOTE_USER=node)
+blesh: installed prebuilt ble.sh 0.4.0-devel3 to /home/node/.local/share/blesh.
+-rw-r--r--. 1 node node 950686 ... /home/node/.local/share/blesh/ble.sh   (owner node:node)
+
+# lace-fundamentals shell.sh with DEFAULT_SHELL=/usr/bin/bash
+lace-fundamentals: Default shell set to /usr/bin/bash for node.
+getent passwd node -> /usr/bin/bash        (was /bin/bash before)
+
+# dotfiles run_once coordination (as node)
+ble.sh already installed at /home/node/.local/share/blesh   (no-op, exit 0)
+
+# live-interactive ble.sh load (real tmux pane running /usr/bin/bash -il)
+MARKER=/usr/bin/bash_ble=0.4.0-devel3+1a5c451c
+
+# starship lace prompt module under bash (STARSHIP_CONFIG=dotfiles starship.toml, LACE_PROJECT_NAME=demo-project)
+08-25 18:17 demo-project /     <- [custom.container] LACE_PROJECT_NAME module rendered
+```
+
+All floor checks pass: node login shell is `/usr/bin/bash`, an interactive login bash loads ble.sh (`BLE_VERSION` set live, not via one-shot `bash -c`, matching the Phase 1 method), and the lace prompt module renders under bash.
+
+**Coverage limitation:** the full `lace up` merge path (user.json -> generated `.lace/devcontainer.json` -> build) was verified by code-reading `user-config-merge.ts` plus per-component empirical tests, not by an actual `lace up`. See the sequencing dependency below.
+
+### Deviations / caveats for the supervisor
+
+- **Publish-before-use sequencing (action required):** `user.json` now points at `blesh:1`, which does not exist on ghcr until the lace `nushell-unwind` branch merges to `main` (the release workflow publishes it). Until then, `lace up` will FAIL to resolve the `blesh` feature. Merge/publish the lace branch before relying on containers, OR temporarily point the feature at a local path for early testing. Rollback is clean: restore `~/.config/lace/user.json.bak-nushell-unwind` (re-adds nushell, restores nu defaultShell) -- nu stays installed.
+- Config file discrepancy (`settings.json` vs `user.json`) documented above.
+- `containerEnv.SHELL` change documented above.
+- No dotfiles change was required for coordination (the feature installs to the path the run_once already checks).
+- `pnpm -w build` / `pnpm -w test` unaffected: the only lace change is an additive feature directory (json/sh/md), no TypeScript touched. The nu-hardcoded TS fixtures are Phase 4 and were left alone.
+- Phases 3-4 (downstream repos, lock regen, lace-fundamentals installsAfter/examples, sprack nu heredoc, TS fixtures) intentionally NOT done.

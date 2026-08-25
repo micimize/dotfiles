@@ -3,3 +3,5 @@ bind ? fillcmdline find -?
 bind n findnext 1
 bind N findnext -1
 bind ,<Space> nohlsearch
+
+seturl (https?://)?([^/]+\.)?localhost(:\d+)? superignore true

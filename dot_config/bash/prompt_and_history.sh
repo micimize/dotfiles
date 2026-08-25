@@ -3,6 +3,14 @@ export HISTSIZE=1000000
 export HISTFILESIZE=1000000
 export HISTIGNORE="&:ls:ll:la:l.:pwd:exit:clear"
 
+# Container bash-history persistence: lace devcontainers bind-mount a
+# /commandhistory volume so shell history survives container rebuilds. When it
+# is present, point HISTFILE at it (ble.sh's history syncing flushes to HISTFILE).
+# Guarded on the directory so host shells are unaffected (no /commandhistory there).
+if [ -d /commandhistory ]; then
+  export HISTFILE=/commandhistory/.bash_history
+fi
+
 # automatic virtualenv sourcing
 export _LAST_SEEN_PWD=""
 function _current_venv_info {

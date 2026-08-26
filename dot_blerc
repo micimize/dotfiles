@@ -6,10 +6,16 @@ bleopt canvas_winch_action=redraw-prev
 # legible syntax errors
 ble-face syntax_error=bg=88,bold
 
-ble-import -d integration/fzf-completion
-ble-import -d integration/fzf-key-bindings
-# _ble_contrib_fzf_git_config=key-binding:sabbrev:arpeggio
-# ble-import -d integration/fzf-git
+# Only wire ble.sh's fzf integration when fzf is actually installed, otherwise
+# ble emits `"fzf" not found` / `_fzf_complete is not a function` errors on every
+# prompt (e.g. containers without fzf). The blesh devcontainer feature installs
+# fzf, but guard here so the config is robust wherever fzf is missing.
+if command -v fzf >/dev/null 2>&1; then
+  ble-import -d integration/fzf-completion
+  ble-import -d integration/fzf-key-bindings
+  # _ble_contrib_fzf_git_config=key-binding:sabbrev:arpeggio
+  # ble-import -d integration/fzf-git
+fi
 
 ## Ctrl-C behavior
 function ble/widget/discard-and-cancel {

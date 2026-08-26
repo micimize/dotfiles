@@ -43,6 +43,9 @@ __postfix_paths=(
   "/home/linuxbrew/.linuxbrew/bin"
   "$HOME/.local/bin"
   "$HOME/.cargo/bin"
+  # lace-into / lace-discover live in the lace repo bin/ (not symlinked into
+  # ~/.local/bin like lace-split). Dir-guarded, so a no-op where lace is absent.
+  "/var/home/mjr/code/weft/lace/main/bin"
 )
 for entry in "${__postfix_paths[@]}"; do
   # if not present and dir exists

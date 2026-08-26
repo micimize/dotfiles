@@ -215,3 +215,19 @@ Cold `lace up --rebuild` on clauthier (podman), then applied from the fixed sour
 - **Host login shell cosmetic**: `chsh`/`usermod -s /usr/bin/bash` could not run non-interactively on the Fedora Atomic host; the login shell is already `/bin/bash` (== `/usr/bin/bash`) so this is cosmetic. Optional manual: `sudo usermod -s /usr/bin/bash "$USER"`.
 - **lace host nu scripts** (`bin/lace-inspect`, `bin/lace-paste-image`): left as nushell (de-default keeps nu installed). Container image-paste flakiness is a separate follow-up.
 - The running `clauthier` test container's home was re-applied from the fixed source during verification; it is left running (harmless).
+
+## Post-implementation follow-up fixes (2026-08-25)
+
+Two issues surfaced in real use after the main unwind; both fixed and verified.
+
+### 1. `lace-into` / `lace-discover` missing from bash PATH
+
+nu's `env.nu:23` had added `/var/home/mjr/code/weft/lace/main/bin` to PATH (that is where `lace-into`/`lace-discover` live; unlike `lace-split` they are not symlinked into `~/.local/bin`). The restored bash config never added it.
+Fix: appended that dir (dir-guarded) to `__postfix_paths` in `dot_bashrc` (dotfiles `main` @ `0c8052a`).
+Verified: a fresh interactive bash scrubbed of the inherited nu PATH resolves both `lace-into` and `lace-discover`.
+
+### 2. ble.sh fzf integration errors in containers
+
+Going into a container (jif/nukani) printed `ble/contrib:integration/fzf: "fzf" not found` and `_fzf_complete is not a function` on every prompt: the blesh feature installed ble.sh but not fzf, and ble.sh's fzf integration expects fzf plus its `completion.bash`/`key-bindings.bash` shell files (which the fzf binary-only tarball does not ship).
+Fix (blesh feature bumped to `1.1.0`, lace `main` @ `61ec1ec`, republished to ghcr; `blesh:1` now resolves to 1.1.0): `installFzf` option (default true) installs a pinned fzf binary to `~/.local/bin` and fetches `completion.bash`/`key-bindings.bash` into `~/.local/share/fzf/` so ble.sh's `fzf-initialize` auto-detects the base dir. Also guarded the dotfiles `dot_blerc` fzf imports on `command -v fzf` for defense-in-depth (dotfiles `main` @ `0c8052a`).
+Verified in the running clauthier container: fzf installs, shell files placed, live interactive ble.sh reload reports **0 fzf errors**.

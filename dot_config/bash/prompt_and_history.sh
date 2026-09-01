@@ -1,14 +1,23 @@
-# export HISTCONTROL=ignoredups
-export HISTSIZE=1000000
-export HISTFILESIZE=1000000
+export HISTCONTROL=ignoreboth
+export HISTSIZE=-1
+export HISTFILESIZE=-1
+export HISTTIMEFORMAT='%F %T '
 export HISTIGNORE="&:ls:ll:la:l.:pwd:exit:clear"
 
 # Container bash-history persistence: lace devcontainers bind-mount a
-# /commandhistory volume so shell history survives container rebuilds. When it
+# /bash-history volume so shell history survives container rebuilds. When it
 # is present, point HISTFILE at it (ble.sh's history syncing flushes to HISTFILE).
-# Guarded on the directory so host shells are unaffected (no /commandhistory there).
-if [ -d /commandhistory ]; then
-  export HISTFILE=/commandhistory/.bash_history
+# Guarded on the directory so host shells are unaffected (no /bash-history there).
+if [ -d /bash-history ]; then
+  export HISTFILE=/bash-history/.bash_history
+fi
+
+# Append-only archive log lives on the mount when present, else in $HOME.
+# Resolved once; _prompt_func appends every command here regardless of HISTFILE depth.
+if [ -d /bash-history ]; then
+  _FULL_HISTORY=/bash-history/full_history
+else
+  _FULL_HISTORY="$HOME/.full_history"
 fi
 
 # automatic virtualenv sourcing
@@ -100,10 +109,14 @@ function unmargin_pane {
 #log all history always
 _prompt_func() {
   # right before prompting for the next command, save the previous command in a file.
-  echo "$(date +%Y-%m-%d--%H-%M-%S) $(hostname) $PWD $(history 1)" >>~/.full_history
+  # HISTTIMEFORMAT makes `history 1` prepend its own index + timestamp, so strip both
+  # to avoid a double stamp: the archive line already carries its own %Y-%m-%d--%H-%M-%S.
+  local _cmd
+  _cmd=$(history 1 | sed -E 's/^[[:space:]]*[0-9]+[[:space:]]+[0-9]{4}-[0-9]{2}-[0-9]{2}[[:space:]]+[0-9]{2}:[0-9]{2}:[0-9]{2}[[:space:]]+//')
+  echo "$(date +%Y-%m-%d--%H-%M-%S) $(hostname) $PWD $_cmd" >>"$_FULL_HISTORY"
   auto_activate_venv
 }
-PROMPT_COMMAND=_prompt_func
+PROMPT_COMMAND="history -a; _prompt_func"
 
 command -v starship >/dev/null 2>&1 && eval "$(starship init bash)"
 command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init bash)"

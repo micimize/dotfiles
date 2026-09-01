@@ -8,6 +8,11 @@ first_authored:
 task_list: bash/history-persistence
 type: proposal
 state: live
+last_reviewed:
+  status: accepted
+  by: "@claude-opus-4-8"
+  at: 2026-09-01T14:30:00-07:00
+  round: 1
 tags: [proposal, bash, history, blesh, lace, devcontainer, atuin, stinkpot, persistence]
 ---
 

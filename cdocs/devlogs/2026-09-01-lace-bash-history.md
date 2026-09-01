@@ -1,12 +1,12 @@
 ---
 title: "Devlog: Persistent Per-Project Bash History Implementation"
 date: 2026-09-01
-status: implemented
+status: done
 first_authored:
   by: "@claude-opus-4-8"
   at: 2026-09-01T18:00:00-07:00
 type: devlog
-state: live
+state: done
 task_list: bash/history-persistence
 proposal: cdocs/proposals/2026-09-01-lace-persistent-bash-history.md
 ---

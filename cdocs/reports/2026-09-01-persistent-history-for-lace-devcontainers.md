@@ -1,11 +1,12 @@
 ---
+title: "Persistent, Richer Bash History for Lace Devcontainers"
 first_authored:
   by: "@claude-sonnet-5"
   at: 2026-09-01T12:00:00-07:00
 task_list: bash/history-hardening
 type: report
 state: live
-status: wip
+status: done
 tags: [analysis, bash, blesh, history, lace, devcontainer, atuin, stinkpot]
 ---
 

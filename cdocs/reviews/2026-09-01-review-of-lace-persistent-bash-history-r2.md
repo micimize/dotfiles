@@ -5,7 +5,7 @@ first_authored:
   at: 2026-09-01T17:15:00-07:00
 task_list: bash/history-persistence
 type: review
-state: live
+state: done
 status: done
 tags: [rereview_agent, revision, architecture, lace, devcontainer, source_verified, consistency]
 round: 2

@@ -5,7 +5,7 @@ first_authored:
   at: 2026-09-01T09:51:20-07:00
 task_list: bash/history-persistence
 type: review
-state: live
+state: done
 status: done
 tags: [fresh_agent, runtime_validated, migration, devcontainer, isolation, phase3]
 ---

@@ -1,13 +1,13 @@
 ---
 title: "Persistent, Per-Project Bash History for Lace Devcontainers"
 date: 2026-09-01
-status: implemented
+status: done
 first_authored:
   by: "@claude-opus"
   at: 2026-09-01T13:00:00-07:00
 task_list: bash/history-persistence
 type: proposal
-state: live
+state: done
 last_reviewed:
   status: accepted
   by: "@claude-opus-4-8"

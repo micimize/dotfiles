@@ -163,9 +163,12 @@ Pointing `ATUIN_DB_PATH` into `/commandhistory` inherits the same per-repo isola
 > Co-locating both in the mount is chosen instead because atuin's offline encryption key and session token live under `ATUIN_CONFIG_DIR`; keeping them in the mount keeps them stable across rebuilds and keeps all per-project state in one place. The `config.toml` is static (offline settings), so there is no config-evolution cost to storing it there. This is a reversible decision.
 
 Ctrl-R ownership (must be resolved explicitly): ble.sh binds `C-r` to `isearch/backward` in `vi_nmap` (`dot_blerc:34`), and atuin's shell init also binds `C-r`.
-atuin natively supports ble.sh, so `eval "$(atuin init bash)"` wires atuin's search through ble.sh's keymap correctly, but the explicit `ble-bind -m vi_nmap -f C-r isearch/backward` in `dot_blerc` will shadow it unless removed or guarded.
-Resolution: atuin owns `C-r` when present.
-Guard the `dot_blerc` `C-r isearch/backward` binding on `! command -v atuin` (or drop it and let atuin's ble.sh integration own the key), and run `atuin init bash` from the feature's profile.d snippet so the binding is installed at interactive-shell startup.
+atuin natively supports ble.sh, so `eval "$(atuin init bash)"` is designed to wire atuin's search through ble.sh's keymap, but the explicit `ble-bind -m vi_nmap -f C-r isearch/backward` in `dot_blerc` can shadow it.
+Intended resolution: atuin owns `C-r` when present, achieved by guarding the `dot_blerc` `C-r isearch/backward` binding on `! command -v atuin` (or dropping it so atuin's ble.sh integration owns the key), and running `atuin init bash` from the feature's profile.d snippet.
+
+Load-order caveat: whether the profile.d `atuin init` runs before or after ble.sh finishes attaching its vi keymap is not guaranteed by construction (profile.d files source in filename order, and ble.sh's keymap hooks fire via `blehook/eval-after-load`, so the final C-r owner depends on interleaving that this proposal does not prove statically).
+The actual mitigation is the interactive test, not the reasoning: in a real tmux pane or container login shell (a one-shot `bash -c` does NOT load ble.sh, so it cannot verify this, per the nushell-unwind method), press C-r after atuin init and confirm atuin's UI opens rather than ble.sh isearch.
+If the guard alone does not win the binding, force it by re-binding C-r to atuin's widget from a `blehook/eval-after-load keymap_vi` hook, which runs after ble.sh's own vi bindings.
 
 ## Per-Project Isolation Mechanism
 
@@ -212,8 +215,8 @@ The default `historyTool: "none"` delivers the recommended solution (mount + dot
       "default": "none",
       "description": "Optional rich history tool to install and wire for interactive bash. Default 'none' leaves the recommended plain-HISTFILE persistence only; 'atuin' or 'stinkpot' is an opt-in richness tier."
     },
-    "atuinVersion": { "type": "string", "default": "18.x.y",
-      "description": "Pinned atuin release tag (without leading 'v') for the prebuilt binary." },
+    "atuinVersion": { "type": "string", "default": "18.6.1",
+      "description": "Pinned atuin release tag (without leading 'v') for the prebuilt binary. This is the latest-at-authoring pin; bump it like the blesh feature's version option." },
     "stinkpotVersion": { "type": "string", "default": "",
       "description": "Pinned stinkpot release/commit when historyTool=stinkpot." }
   },
@@ -241,8 +244,8 @@ The default `historyTool: "none"` delivers the recommended solution (mount + dot
 ```sh
 #!/bin/sh
 set -eu
-HISTORY_TOOL="${HISTORYTOOL:-atuin}"
-ATUIN_VERSION="${ATUINVERSION:-18.x.y}"
+HISTORY_TOOL="${HISTORYTOOL:-none}"
+ATUIN_VERSION="${ATUINVERSION:-18.6.1}"
 _REMOTE_USER="${_REMOTE_USER:-root}"
 # ... USER_HOME resolution identical to blesh ...
 
@@ -371,13 +374,18 @@ echo "$HISTFILE"                                    # expect /commandhistory/.ba
 echo unique-marker-$$ >> "$HISTFILE"               # write a marker
 # rebuild the container, re-enter, then:
 grep unique-marker "$HISTFILE"                      # marker survived the rebuild
-ls ~/.config/lace/$(basename "$PWD-projectid")/mounts/bash-history/history   # host store exists
 ```
 
-On the host, confirm two projects differ:
+On the host, confirm the per-project store exists and two projects differ.
+`<projectId>` is the bare-repo-root basename; derive it explicitly rather than guessing:
 
 ```sh
-ls ~/.config/lace/*/mounts/bash-history/history     # one dir per projectId, distinct
+# projectId = basename of the bare repo root for this worktree
+bare="$(git rev-parse --path-format=absolute --git-common-dir)"   # .../<repo>/.bare or .../<repo>/.git
+projectId="$(basename "$(dirname "$bare")")"
+ls "$HOME/.config/lace/$projectId/mounts/bash-history/history"     # this project's host store
+
+ls -d "$HOME"/.config/lace/*/mounts/bash-history/history           # one dir per projectId, distinct
 ```
 
 atuin (Phase 4), in a live container pane:
@@ -444,6 +452,10 @@ Scope: lace `bash-history` feature (rich-tool path) plus `user.json` / dotfiles 
 Acceptance: Phase 4 verification block passes: rich capture, C-r coexistence, per-project atuin isolation, db survives a rebuild.
 
 Constraints: prebuilt binary only (no cargo); do not place any atuin path under chezmoi management.
+
+## Open Questions
+
+- **Does the profile.d hook reliably reach interactive container shells?** (Only relevant if the rich tier is opted into.) The assumption rests on two precedents: sprack already ships its bash prompt hook via `/etc/profile.d/sprack-metadata.sh` and it fires in lace containers, and `bin/lace-into` attaches panes as `/bin/bash -l` (login shells, which source `/etc/profile.d/*`). This is judged reliable but is not proven statically here; the P4 interactive-pane test is the confirmation. Marked as a decision point, not a new commitment: if the hook does not reach a given container's interactive shells, the fallback is to source the atuin init from the dotfiles bash config instead of profile.d.
 
 ## Follow-ups (Out of Scope)
 

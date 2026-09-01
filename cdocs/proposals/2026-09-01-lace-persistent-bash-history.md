@@ -1,7 +1,7 @@
 ---
 title: "Persistent, Per-Project Bash History for Lace Devcontainers"
 date: 2026-09-01
-status: accepted
+status: implemented
 first_authored:
   by: "@claude-opus"
   at: 2026-09-01T13:00:00-07:00
@@ -11,8 +11,8 @@ state: live
 last_reviewed:
   status: accepted
   by: "@claude-opus-4-8"
-  at: 2026-09-01T09:05:00-07:00
-  round: 3
+  at: 2026-09-01T09:51:20-07:00
+  round: 5
 tags: [proposal, bash, history, blesh, lace, devcontainer, persistence, timestamps]
 ---
 

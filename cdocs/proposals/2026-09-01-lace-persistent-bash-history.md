@@ -11,8 +11,8 @@ state: live
 last_reviewed:
   status: accepted
   by: "@claude-opus-4-8"
-  at: 2026-09-01T17:15:00-07:00
-  round: 2
+  at: 2026-09-01T09:05:00-07:00
+  round: 3
 tags: [proposal, bash, history, blesh, lace, devcontainer, persistence, timestamps]
 ---
 
@@ -294,7 +294,7 @@ Dotfiles (Phase 1), from an interactive bash:
 echo "$HISTSIZE $HISTFILESIZE"       # expect: -1 -1
 echo "$HISTCONTROL"                  # expect ignoreboth
 echo "$HISTTIMEFORMAT"               # expect '%F %T '
-echo "$PROMPT_COMMAND" | grep -q 'history -a' && echo "flush wired"
+{ echo "$PROMPT_COMMAND"; echo "$STARSHIP_PROMPT_COMMAND"; } | grep -q 'history -a' && echo "flush wired"  # starship relocates PROMPT_COMMAND into STARSHIP_PROMPT_COMMAND; check both
 echo "ble: ${BLE_VERSION:-no}"       # expect a version, not "no"
 ```
 
